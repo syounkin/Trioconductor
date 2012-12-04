@@ -1,4 +1,1 @@
-trioClasses
-===========
-
-R package for implementation of trio classes
+This package creates the trio class along with useful trio methods.
