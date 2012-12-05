@@ -9,7 +9,9 @@ setMethod("initialize", signature(.Object="Pedigree"),
 		  callNextMethod(.Object, trios=trios, trioIndex=trioIndex, ...)
 	  })
 
-setMethod("show", signature(object="Pedigree"), function(object){ print(head(object@trios) ) } )
+setMethod("show", signature(object="Pedigree"), function(object){
+  cat(paste0("This pedigree object contains ", nrow(trios(object)), " complete trios.\nFor access to the data frame use the trios() accessor function.\n"))
+} )
 #~~~~~~~~~~~~~~~~
 setMethod("trios", signature(object="Pedigree"), function(object) object@trios)
 setMethod("trioIndex", signature(object="Pedigree"), function(object) object@trioIndex)
