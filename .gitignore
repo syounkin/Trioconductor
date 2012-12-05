@@ -5,3 +5,6 @@
 # Emacs backup files
 *~
 
+*.aux
+*.log
+*.out
