@@ -29,12 +29,21 @@ library("trioClasses")
 data(ped)
 #tryCatch(Pedigree(pedigreeInfo = ped.df))
 pedigreeInfo <- within(ped.df, {
-  F <- fid
-  M <- mid
-  O <- id
+  F <- as.character(fid)
+  M <- as.character(mid)
+  O <- as.character(id)
 })
 pedigreeInfo <- subset( pedigreeInfo, !is.na(F) & !is.na(M) & !is.na(O) )
 tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
 tg.ped
 @ 
+<<ids>>=
+id <- offspringNames(tg.ped)
+fid <- fatherNames(tg.ped)
+mid <- motherNames(tg.ped)
+names(fid) <- id
+names(mid) <- id
+c(length(unique(id)),length(unique(fid)),length(unique(mid)))
+@ 
+
 \end{document}
