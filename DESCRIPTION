@@ -11,7 +11,7 @@ Depends: R (>= 2.15), methods, BiocGenerics (>= 0.3.2), Biobase (>= 2.17.8), oli
 Imports: 
 Suggests: 
 Enhances:
-Collate: AllClasses.R
+Collate: AllClasses.R methods-Pedigree.R functions.R
 LazyLoad: yes
 biocViews: 
 Packaged: Wed Dec  5 11:01:34 EST 2012; syounkin
