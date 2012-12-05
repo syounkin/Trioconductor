@@ -1,1 +1,7 @@
 setGeneric("trios", function(object) standardGeneric("trios"))
+setGeneric("offspringNames", function(object) standardGeneric("offspringNames"))
+setGeneric("fatherNames", function(object) standardGeneric("fatherNames"))
+setGeneric("motherNames", function(object) standardGeneric("motherNames"))
+setGeneric("sampleNames", function(object) standardGeneric("sampleNames"))
+setGeneric("allNames", function(object) standardGeneric("allNames"))
+setGeneric("trioIndex", function(object) standardGeneric("trioIndex"))

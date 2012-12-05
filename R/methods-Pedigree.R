@@ -14,3 +14,10 @@ setMethod("show", "Pedigree", function(object){ print(head(object@trios) ) } )
 setMethod("trios", signature(object="Pedigree"),
 	  function(object) object@trios)
 
+setMethod("offspringNames", signature(object="Pedigree"), function(object) trios(object)$O)
+setMethod("fatherNames", signature(object="Pedigree"), function(object) trios(object)$F)
+setMethod("motherNames", signature(object="Pedigree"), function(object) trios(object)$M)
+setMethod("sampleNames", signature(object="Pedigree"), function(object) offspringNames(object))
+setMethod("allNames", signature(object="Pedigree"), function(object) unique(trioIndex(object)$individualId))
+setMethod("trioIndex", signature(object="Pedigree"), function(object) object@trioIndex)
+

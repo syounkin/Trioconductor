@@ -33,3 +33,12 @@ Pedigree <- function(pedigreeInfo,
 	rownames(pedigreeIndex) <- NULL
 	new("Pedigree", trios=trios, trioIndex=pedigreeIndex)
 }
+
+make.unique2 <- function(names, sep="___DUP") make.unique(names, sep)
+originalNames <- function(names){
+	if(length(names) ==0) return(names)
+	sep <- formals(make.unique2)[["sep"]]
+	index <- grep(sep, names)
+	if(length(index) > 0) names[index] <- sapply(names[index], function(x) strsplit(x, sep)[[1]][[1]])
+	names
+}
