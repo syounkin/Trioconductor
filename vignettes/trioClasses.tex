@@ -25,4 +25,27 @@ Today is \today.
 > library("trioClasses")
 \end{Sinput}
 \end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+> data(ped)
+> pedigreeInfo <- within(ped.df, {
+     F <- fid
+     M <- mid
+     O <- id
+ })
+> pedigreeInfo <- subset(pedigreeInfo, !is.na(F) & !is.na(M) & 
+     !is.na(O))
+> tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
+> tg.ped
+\end{Sinput}
+\begin{Soutput}
+            F           M           O
+1      578_02      578_03      578_01
+2     1539_02     1539_03     1539_01
+3     4778_02     4778_03     4778_01
+4     4783_02     4783_03     4783_01
+5 20000492_02 20000492_03 20000492_01
+6 20001545_02 20001545_03 20001545_01
+\end{Soutput}
+\end{Schunk}
 \end{document}

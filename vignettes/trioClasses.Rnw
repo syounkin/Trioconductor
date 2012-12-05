@@ -25,4 +25,16 @@ rm(list=ls())
 source("~/jhsph/R/reload.R")
 library("trioClasses")
 @ 
+<<sample-ped>>=
+data(ped)
+#tryCatch(Pedigree(pedigreeInfo = ped.df))
+pedigreeInfo <- within(ped.df, {
+  F <- fid
+  M <- mid
+  O <- id
+})
+pedigreeInfo <- subset( pedigreeInfo, !is.na(F) & !is.na(M) & !is.na(O) )
+tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
+tg.ped
+@ 
 \end{document}
