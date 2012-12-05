@@ -8,3 +8,9 @@ setMethod("initialize", signature(.Object="Pedigree"),
 		   ...){
 		  callNextMethod(.Object, trios=trios, trioIndex=trioIndex, ...)
 	  })
+
+setMethod("show", "Pedigree", function(object){ print(head(object@trios) ) } )
+
+setMethod("trios", signature(object="Pedigree"),
+	  function(object) object@trios)
+

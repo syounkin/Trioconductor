@@ -3,14 +3,17 @@ Pedigree <- function(pedigreeInfo,
 		     motherIds=character(),
 		     offspringIds=character()){
 	if(!missing(pedigreeInfo)){
+          if( !all( c("F","M","O") %in% names(pedigreeInfo) ) ){
+            stop("pedigreeInfo must contain columns named F, M, and O for father, mother and offspring ids.") }else{
 		msg <- "pedigreeInfo must be a data.frame with column names 'F', 'M', and 'O'"
 		if(!is(pedigreeInfo, "data.frame"))
 			stop(msg)
-		trios <- data.frame(F=as.character(pedigreeInfo[[1]]),
-				    M=as.character(pedigreeInfo[[2]]),
-				    O=as.character(pedigreeInfo[[3]]),
+		trios <- data.frame(F=as.character(pedigreeInfo$F),
+				    M=as.character(pedigreeInfo$M),
+				    O=as.character(pedigreeInfo$O),
 				    stringsAsFactors=FALSE)
 		allIds <- as.character(unlist(trios))
+              }
 	} else {
 		fatherIds <- as.character(fatherIds)
 		motherIds <- as.character(motherIds)
