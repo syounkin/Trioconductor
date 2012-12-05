@@ -1,0 +1,28 @@
+% Sweave(file = "./trioClasses.Rnw")
+\documentclass[10pt]{article}
+
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
+%\title{TITLE}
+%\author{Sam}
+%\date{\today}
+%\input{/home/bst/student/syounkin/jhsph/latex/sgy}
+%\input{/home/sgy/jhsph/latex/sgy}
+\usepackage{Sweave}
+\begin{document}
+\setlength{\parskip}{0.2\baselineskip}
+\setlength{\parindent}{0pt}
+%\maketitle
+Today is \today.
+%<<cachedir, echo=FALSE>>=
+%setCacheDir( path = './cache/' )
+%@ 
+\begin{Schunk}
+\begin{Sinput}
+> rm(list = ls())
+> source("~/jhsph/R/reload.R")
+> library("trioClasses")
+\end{Sinput}
+\end{Schunk}
+\end{document}
