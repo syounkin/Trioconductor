@@ -1,7 +1,7 @@
 Package: trioClasses
 Type: Package
 Title: A package for trio class definition
-Version: 0.0.6
+Version: 0.0.7
 Date: Wed Dec  5 11:01:34 EST 2012
 Author: Samuel G. Younkin and Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>, Robert B. Scharpf <rscharpf@jhsph.edu>
@@ -14,8 +14,10 @@ Enhances:
 Collate: AllClasses.R
          AllGenerics.R
 	 AllValidity.R
+	 methods-AnnotatedDataFrame.R
 	 methods-Pedigree.R
 	 methods-TrioSet.R
+	 methods-TdtSet.R
 	 methods-annotatedDataFrame.R
 	 functions.R
 	 TrioSet.R
