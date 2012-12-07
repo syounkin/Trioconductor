@@ -9,7 +9,13 @@ setClassUnion("arrayORff_array", c("array", "ff_array"))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~ TrioSet Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- setClass("TrioSet", contains="gSet",
+setClass("tSet", contains="gSet",
+	 representation(pedigree="Pedigree", "VIRTUAL"))
+
+setClass("TdtSet", contains="tSet")
+
+
+setClass("TrioSet", contains="gSet",
  	 representation(fatherPhenoData="AnnotatedDataFrame",
  			motherPhenoData="AnnotatedDataFrame",
  			pedigree="Pedigree",
