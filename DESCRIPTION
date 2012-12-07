@@ -1,18 +1,29 @@
 Package: trioClasses
 Type: Package
 Title: A package for trio class definition
-Version: 0.0.1
+Version: 0.0.3
 Date: Wed Dec  5 11:01:34 EST 2012
 Author: Samuel G. Younkin and Robert B Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>, Robert B Scharpf <rscharpf@jhsph.edu>
 Description: Trio class definition
 License: GPL
+<<<<<<< HEAD
 Depends: R (>= 2.15), methods, BiocGenerics (>= 0.3.2), Biobase (>= 2.17.8)
 Imports: 
 Suggests: 
+=======
+Depends: R (>= 2.15), methods, BiocGenerics (>= 0.3.2), Biobase (>= 2.17.8), oligoClasses (>= 1.21.0)
+Imports:
+Suggests:
+>>>>>>> 3c422311be5450e0c32ee028bcc6404d595a8dd1
 Enhances:
-Collate: AllClasses.R AllGenerics.R AllValidity.R methods-Pedigree.R functions.R
+Collate: AllClasses.R
+         AllGenerics.R
+	 AllValidity.R
+	 methods-Pedigree.R
+	 functions.R
+	 test_trioClasses_package.R
 LazyLoad: yes
-biocViews: 
+biocViews:
 Packaged: Wed Dec  5 11:01:34 EST 2012; syounkin
 

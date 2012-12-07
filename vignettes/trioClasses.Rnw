@@ -2,7 +2,7 @@
 \documentclass[10pt]{article}
 <<echo=FALSE>>=
   options(width=70, continue = " ")
-@ 
+@
 \SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/trioClasses}
 \usepackage{fullpage}
 \usepackage{times}
@@ -19,12 +19,12 @@
 Today is \today.
 %<<cachedir, echo=FALSE>>=
 %setCacheDir( path = './cache/' )
-%@ 
+%@
 <<packages, cache = FALSE>>=
 rm(list=ls())
-source("~/jhsph/R/reload.R")
+##source("~/jhsph/R/reload.R")
 library("trioClasses")
-@ 
+@
 <<sample-ped>>=
 data(ped)
 #tryCatch(Pedigree(pedigreeInfo = ped.df))
@@ -36,7 +36,7 @@ pedigreeInfo <- within(ped.df, {
 pedigreeInfo <- subset( pedigreeInfo, !is.na(F) & !is.na(M) & !is.na(O) )
 tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
 tg.ped
-@ 
+@
 <<ids>>=
 id <- offspringNames(tg.ped)
 fid <- fatherNames(tg.ped)
@@ -44,6 +44,6 @@ mid <- motherNames(tg.ped)
 names(fid) <- id
 names(mid) <- id
 c(length(unique(id)),length(unique(fid)),length(unique(mid)))
-@ 
+@
 
 \end{document}
