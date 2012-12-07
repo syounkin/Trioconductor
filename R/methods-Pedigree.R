@@ -21,3 +21,4 @@ setMethod("fatherNames", signature(object="Pedigree"), function(object) trios(ob
 setMethod("motherNames", signature(object="Pedigree"), function(object) trios(object)$M)
 setMethod("sampleNames", signature(object="Pedigree"), function(object) offspringNames(object))
 setMethod("allNames", signature(object="Pedigree"), function(object) unique(trioIndex(object)$individualId))
+setMethod("completeTrios", signature(object = "Pedigree", id.vec = "character"), function( object, id.vec ){ completeTrios.fn(object,id.vec) } )

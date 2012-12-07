@@ -6,3 +6,5 @@ setGeneric("fatherNames", function(object) standardGeneric("fatherNames"))
 setGeneric("motherNames", function(object) standardGeneric("motherNames"))
 setGeneric("sampleNames", function(object) standardGeneric("sampleNames"))
 setGeneric("allNames", function(object) standardGeneric("allNames"))
+
+setGeneric("completeTrios", function(object, id.vec) standardGeneric("completeTrios"))

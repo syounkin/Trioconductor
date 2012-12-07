@@ -1,6 +1,6 @@
 exportClasses( Pedigree )
-exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames )
-export( Pedigree, validPedigree, originalNames, make.unique2 )
+exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios )
+export( Pedigree, validPedigree, originalNames, make.unique2, completeTrios.fn )
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------

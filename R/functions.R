@@ -40,3 +40,12 @@ originalNames <- function(names){
 	if(length(index) > 0) names[index] <- sapply(names[index], function(x) strsplit(x, sep)[[1]][[1]])
 	names
 }
+
+completeTrios.fn <- function( ped, id.vec ){
+  if( !is.character(id.vec) ) stop( "ID vector must be character class.")
+  index.vec <- which(colSums(apply( trios(ped), 1, FUN = function( row, id = id.vec ){row %in% id }))==3)
+  trios.df <- trios(ped)
+  trios.df <- trios.df[index.vec,]
+  ped.complete <- Pedigree( pedigreeInfo = trios.df )
+  return(ped.complete)
+}
