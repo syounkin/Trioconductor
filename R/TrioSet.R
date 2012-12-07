@@ -68,13 +68,17 @@ TrioSet <- function(pedigreeData=Pedigree(),
   np <- length(offspring.names)
   bafArray <- initializeBigArray("baf", dim=c(nr, np, 3), vmode="integer")
   logRArray <- initializeBigArray("lrr", dim=c(nr, np, 3), vmode="integer")
-  dimnames(bafArray)[[3]] <- dimnames(logRArray)[[3]] <- c("F", "M", "O")
+  genoArray <- initializeBigArray("geno", dim=c(nr, np, 3), vmode="integer")
+  dimnames(bafArray)[[3]] <- dimnames(logRArray)[[3]] <- dimnames(genoArray)[[3]] <- c("F", "M", "O")
   logRArray[,,"F"] <- lrr[, father.index]
   logRArray[,,"M"] <- lrr[, mother.index]
   logRArray[,,"O"] <- lrr[, offspring.index]
   bafArray[,,"F"] <- baf[, father.index]
   bafArray[,,"M"] <- baf[, mother.index]
   bafArray[,,"O"] <- baf[, offspring.index]
+  genoArray[,,"F"] <- geno[, father.index]
+  genoArray[,,"M"] <- geno[, mother.index]
+  genoArray[,,"O"] <- geno[, offspring.index]
   if(!drop){
     dimnames(bafArray)[c(1,2)] <- dimnames(logRArray)[c(1,2)] <- list(sampleNames(fD), colnames(lrr)[offspring.index])
   }
