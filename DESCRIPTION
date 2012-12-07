@@ -15,7 +15,11 @@ Collate: AllClasses.R
          AllGenerics.R
 	 AllValidity.R
 	 methods-Pedigree.R
+	 methods-TrioSet.R
+	 methods-annotatedDataFrame.R
 	 functions.R
+	 TrioSet.R
+	 Pedigree.R
 	 test_trioClasses_package.R
 LazyLoad: yes
 biocViews:

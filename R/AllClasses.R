@@ -3,7 +3,7 @@ setClass("Pedigree", representation(trios="data.frame", trioIndex="data.frame"))
 setOldClass("ff_array")
 setOldClass("ff_matrix")
 setClass("LogRratioSet", contains="eSet")
-setClassUnion("matrixOrNULL", c("matrix", "NULL"))
+#setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 setClassUnion("arrayORff_array", c("array", "ff_array"))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -12,8 +12,8 @@ setClassUnion("arrayORff_array", c("array", "ff_array"))
  setClass("TrioSet", contains="gSet",
  	 representation(fatherPhenoData="AnnotatedDataFrame",
  			motherPhenoData="AnnotatedDataFrame",
- 			pedigree="Pedigree",
- 			mindist="matrixOrNULL"))
+ 			pedigree="Pedigree" ))
+ #			mindist="matrixOrNULL"))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~ TrioSetList Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,6 +1,6 @@
 exportClasses( Pedigree, TrioSet, TrioSetList )
 exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios )
-export( Pedigree )
+export( Pedigree, TrioSet )
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------
