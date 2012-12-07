@@ -29,11 +29,17 @@ TrioSet(pedigreeData = Pedigree(), sample.sheet, row.names = NULL, lrr,
 
  }
  \item{lrr}{
-   Matrix of log R ratios
+   Matrix of log R ratios of dimension p by 3n where n is the numper of
+ offspring and p is the number of markers.  The order of the columns
+ must be F, M, O for each trio.  To create such a matrix from the
+ pedigree and named vector of log R ratios see trioMat().
  }
 
  \item{baf}{
-   Matrix of B allele frequencies
+   Matrix of B allele frequencies of dimension p by 3n where n is the numper of
+ offspring and p is the number of markers.  The order of the columns
+ must be F, M, O for each trio.  To create such a matrix from the
+ pedigree and named vector of log R ratios see trioMat().
  }
 
  \item{featureData}{
