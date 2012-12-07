@@ -14,3 +14,13 @@ completeTrios.fn <- function( ped, id.vec ){
   return(ped.complete)
 }
 
+genoMat <- function( ped, data.mat ){
+  ped.complete <- completeTrios( ped, rownames(data.mat) )
+  matrix.off <- data.mat[offspringNames(ped.complete),]
+  matrix.fa <- data.mat[fatherNames(ped.complete),]
+  matrix.ma <- data.mat[motherNames(ped.complete),]  
+  matrix.trio <- t(matrix(c(rbind( matrix.fa, matrix.ma, matrix.off )), nrow = 3*nrow(matrix.off), byrow = TRUE))
+  colnames(matrix.trio) <- c(t(cbind(fatherNames(ped.complete),motherNames(ped.complete),offspringNames(ped.complete))))
+  rownames(matrix.trio) <- colnames(data.mat)
+  return(matrix.trio)
+}
