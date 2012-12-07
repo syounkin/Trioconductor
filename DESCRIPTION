@@ -1,15 +1,15 @@
 Package: trioClasses
 Type: Package
 Title: A package for trio class definition
-Version: 0.0.4
+Version: 0.0.5
 Date: Wed Dec  5 11:01:34 EST 2012
 Author: Samuel G. Younkin and Robert B Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>, Robert B Scharpf <rscharpf@jhsph.edu>
 Description: Trio class definition
 License: GPL
-Depends: R (>= 2.15), methods 
-Imports: 
-Suggests: 
+Depends: R (>= 2.15), methods, oligoClasses (>= 1.20.0), Biobase
+Imports:
+Suggests:
 Enhances:
 Collate: AllClasses.R
          AllGenerics.R
