@@ -9,6 +9,8 @@ TrioSet <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
    nr <- nrow(data.mat)
    np <- length(offspring.names)
    genoArray <- initializeBigArray("geno", dim=c(nr, np, 3), vmode="integer")
+   dimnames(genoArray)[[1]] <- rownames(data.mat)
+   dimnames(genoArray)[[2]] <- offspring.names 
    dimnames(genoArray)[[3]] <- c("F", "M", "O")
    genoArray[,,"F"] <- data.mat[,father.names]
    genoArray[,,"M"] <- data.mat[,mother.names]

@@ -37,3 +37,9 @@ setMethod("geno", "TrioSet",
           function(object) {
             assayDataElement(object, "geno")
           })
+
+
+setMethod("getGeno", "TrioSet",
+            function(object){
+              geno.mat.fn(object)
+            })

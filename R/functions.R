@@ -9,7 +9,7 @@ originalNames <- function(names){
 
 completeTrios.fn <- function( ped, id.vec ){
   if( !is.character(id.vec) ) stop( "ID vector must be character class.")
-  index.vec <- which(colSums(apply( trios(ped), 1, FUN = function( row, id = id.vec ){row %in% id }))==3)
+  index.vec <- which( colSums( apply( trios(ped), 1, FUN = function( row, id = id.vec ){ row %in% id } ) ) == 3 )
   ped.complete <- Pedigree( pedigreeInfo = trios(ped)[index.vec,] )
   return(ped.complete)
 }
@@ -19,8 +19,21 @@ genoMat <- function( ped, data.mat ){
   matrix.off <- data.mat[offspringNames(ped.complete),]
   matrix.fa <- data.mat[fatherNames(ped.complete),]
   matrix.ma <- data.mat[motherNames(ped.complete),]  
-  matrix.trio <- t(matrix(c(rbind( matrix.fa, matrix.ma, matrix.off )), nrow = 3*nrow(matrix.off), byrow = TRUE))
+  matrix.trio <- weaveMat( mat.fa = matrix.fa, mat.ma = matrix.ma, mat.off = matrix.off ) 
   colnames(matrix.trio) <- c(t(cbind(fatherNames(ped.complete),motherNames(ped.complete),offspringNames(ped.complete))))
   rownames(matrix.trio) <- colnames(data.mat)
   return(matrix.trio)
+}
+
+weaveMat <- function( mat.fa, mat.ma, mat.off ){
+  trio.mat <- matrix(c(rbind( mat.fa, mat.ma, mat.off )), nrow = ncol(mat.off), ncol = 3*nrow(mat.off), byrow = FALSE)
+  colnames(trio.mat) <- c(t(cbind( rownames(mat.fa),rownames(mat.ma),rownames(mat.off))))
+  rownames(trio.mat) <- colnames(mat.off)
+ return( trio.mat )
+}
+
+geno.mat.fn <- function( ts ){
+  geno.array <- geno(ts)
+  geno.out <- weaveMat( t(geno.array[,,"F"]),t(geno.array[,,"M"]),t(geno.array[,,"O"]) )
+  return( geno.out)
 }
