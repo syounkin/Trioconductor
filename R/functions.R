@@ -15,7 +15,7 @@ completeTrios.fn <- function( ped, id.vec ){
 }
 
 genoMat <- function( ped, data.mat ){
-  ped.complete <- completeTrios( ped, rownames(data.mat) )
+  ped.complete <- completeTrios( ped, as.character(rownames(data.mat)) )
   matrix.off <- data.mat[offspringNames(ped.complete),]
   matrix.fa <- data.mat[fatherNames(ped.complete),]
   matrix.ma <- data.mat[motherNames(ped.complete),]  
