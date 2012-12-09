@@ -7,8 +7,8 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{\emph{trioClasses} class \emph{gTrio}: A Derivative of \emph{TrioSet} for use with genotype data}
-%\author{Sam}
+\title{Classes \emph{gTrio} and \emph{iTrio}: Derivatives of \emph{TrioSet} for use with genotype and intensity data in package \emph{trioClasses}}
+\author{Samuel G. Younkin}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
 %\input{/home/sgy/jhsph/latex/sgy}
