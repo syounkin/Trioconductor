@@ -3,6 +3,7 @@ Pedigree <- function(pedigreeInfo, fatherIds=character(), motherIds=character(),
 		if( !all( c("F","M","O") %in% names(pedigreeInfo) ) ){
 			stop("pedigreeInfo must contain columns named F, M, and O for father, mother and offspring ids.")
 		}else{
+                        pedigreeInfo <- subset( pedigreeInfo, !is.na(F) & !is.na(M) & !is.na(O) )
 			msg <- "pedigreeInfo must be a data.frame with column names 'F', 'M', and 'O'"
 			if(!is(pedigreeInfo, "data.frame"))
 			stop(msg)
