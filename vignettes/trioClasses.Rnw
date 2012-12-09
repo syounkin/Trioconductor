@@ -28,16 +28,16 @@ library("trio")
 @
 <<sample-ped>>=
 data(ped)
+head(ped.df)
 pedigreeInfo <- within(ped.df, {
   F <- as.character(fid)
   M <- as.character(mid)
   O <- as.character(id)
 })
-pedigreeInfo <- subset( pedigreeInfo, !is.na(F) & !is.na(M) & !is.na(O) )
 tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
 tg.ped
 @
-<<ids>>=
+<<ids, echo = FALSE, eval = FALSE>>=
 id <- offspringNames(tg.ped)
 fid <- fatherNames(tg.ped)
 mid <- motherNames(tg.ped)

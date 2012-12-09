@@ -29,31 +29,29 @@ Today is \today.
 \begin{Schunk}
 \begin{Sinput}
 > data(ped)
+> head(ped.df)
+\end{Sinput}
+\begin{Soutput}
+             id     mid     fid  Population     PI Ethnicity
+578_01   578_01  578_03  578_02 PHILIPPINES Murray  filipino
+578_02   578_02    <NA>    <NA> PHILIPPINES Murray  filipino
+578_03   578_03    <NA>    <NA> PHILIPPINES Murray  filipino
+1539_01 1539_01 1539_03 1539_02        IOWA Murray  european
+1539_02 1539_02    <NA>    <NA>        IOWA Murray  european
+1539_03 1539_03    <NA>    <NA>        IOWA Murray  european
+\end{Soutput}
+\begin{Sinput}
 > pedigreeInfo <- within(ped.df, {
      F <- as.character(fid)
      M <- as.character(mid)
      O <- as.character(id)
  })
-> pedigreeInfo <- subset(pedigreeInfo, !is.na(F) & !is.na(M) & 
-     !is.na(O))
 > tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
 > tg.ped
 \end{Sinput}
 \begin{Soutput}
 This pedigree object contains 1812 complete trios.
 For access to the data frame use the trios() accessor function.
-\end{Soutput}
-\end{Schunk}
-\begin{Schunk}
-\begin{Sinput}
-> id <- offspringNames(tg.ped)
-> fid <- fatherNames(tg.ped)
-> mid <- motherNames(tg.ped)
-> names(fid) <- names(mid) <- id
-> c(length(unique(id)), length(unique(fid)), length(unique(mid)))
-\end{Sinput}
-\begin{Soutput}
-[1] 1812 1812 1812
 \end{Soutput}
 \end{Schunk}
 \section{TrioSet}
