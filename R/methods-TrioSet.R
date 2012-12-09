@@ -1,9 +1,9 @@
 setMethod("initialize", "TrioSet",
           function(.Object,
-                   assayData=assayDataNew(geno=geno, ...),
-                   phenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
-                   fatherPhenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
-                   motherPhenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
+                   assayData = assayDataNew(geno=geno),
+                   #phenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
+                   #fatherPhenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
+                   #motherPhenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
                    #annotation=character(),
                    #featureData=GenomeAnnotatedDataFrameFrom(assayData, annotation, genome=genome),
                    #experimentData=new("MIAME"),
@@ -16,13 +16,13 @@ setMethod("initialize", "TrioSet",
                    #genome=c("hg19", "hg18")
                     ...){
             .Object@pedigree <- pedigree
-            .Object@fatherPhenoData <- fatherPhenoData
-            .Object@motherPhenoData <- motherPhenoData
+            #.Object@fatherPhenoData <- fatherPhenoData
+            #.Object@motherPhenoData <- motherPhenoData
             callNextMethod(.Object,
                            assayData=assayData,
-                           phenoData=phenoData,
-                           fatherPhenoData=fatherPhenoData,
-                           motherPhenoData=motherPhenoData,
+                           #phenoData=phenoData,
+                           #fatherPhenoData=fatherPhenoData,
+                           #motherPhenoData=motherPhenoData,
                            #featureData=featureData,
                            #experimentData=experimentData,
                            #annotation=annotation,
@@ -31,4 +31,9 @@ setMethod("initialize", "TrioSet",
                            #mindist=mindist,
                            #genome=match.arg(genome)
                             ...)
+          })
+
+setMethod("geno", "TrioSet",
+          function(object) {
+            assayDataElement(object, "geno")
           })
