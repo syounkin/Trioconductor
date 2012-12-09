@@ -1,18 +1,20 @@
 TrioSet <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
- if(is.null(geno))
+ if(is.null(geno)){
     object <- new("TrioSet", pedigree=pedigreeData)
- data.mat <- geno
- father.names <- fatherNames(pedigreeData)
- mother.names <- motherNames(pedigreeData)
- offspring.names <- offspringNames(pedigreeData)
- nr <- nrow(data.mat)
- np <- length(offspring.names)
- genoArray <- initializeBigArray("geno", dim=c(nr, np, 3), vmode="integer")
- dimnames(genoArray)[[3]] <- c("F", "M", "O")
- genoArray[,,"F"] <- data.mat[,father.names]
- genoArray[,,"M"] <- data.mat[,mother.names]
- genoArray[,,"O"] <- data.mat[,offspring.names]
- object <- new("TrioSet", geno=genoArray, pedigree=pedigreeData)
+ }else{
+   data.mat <- geno
+   father.names <- fatherNames(pedigreeData)
+   mother.names <- motherNames(pedigreeData)
+   offspring.names <- offspringNames(pedigreeData)
+   nr <- nrow(data.mat)
+   np <- length(offspring.names)
+   genoArray <- initializeBigArray("geno", dim=c(nr, np, 3), vmode="integer")
+   dimnames(genoArray)[[3]] <- c("F", "M", "O")
+   genoArray[,,"F"] <- data.mat[,father.names]
+   genoArray[,,"M"] <- data.mat[,mother.names]
+   genoArray[,,"O"] <- data.mat[,offspring.names]
+   object <- new("TrioSet", geno=genoArray, pedigree=pedigreeData)
+ }
 }
 
 ##   object <- new("TrioSet",
