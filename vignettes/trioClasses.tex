@@ -17,17 +17,17 @@
 Today is \today.
 %<<cachedir, echo=FALSE>>=
 %setCacheDir( path = './cache/' )
-%@ 
+%@
 \begin{Schunk}
 \begin{Sinput}
 > rm(list = ls())
-> source("~/jhsph/R/reload.R")
 > library("trioClasses")
 \end{Sinput}
 \end{Schunk}
 \begin{Schunk}
 \begin{Sinput}
 > data(ped)
+> data(geno)
 > pedigreeInfo <- within(ped.df, {
      F <- as.character(fid)
      M <- as.character(mid)
@@ -48,13 +48,137 @@ For access to the data frame use the trios() accessor function.
 > id <- offspringNames(tg.ped)
 > fid <- fatherNames(tg.ped)
 > mid <- motherNames(tg.ped)
-> names(fid) <- id
-> names(mid) <- id
+> names(fid) <- names(mid) <- id
 > c(length(unique(id)), length(unique(fid)), length(unique(mid)))
 \end{Sinput}
 \begin{Soutput}
 [1] 1812 1812 1812
 \end{Soutput}
 \end{Schunk}
+\section{TrioSet}
+\begin{Schunk}
+\begin{Sinput}
+> head(geno.mat[, 1:6])
+\end{Sinput}
+\begin{Soutput}
+        snp1 snp2 snp3 snp4 snp5 snp6
+578_01     2    2    0    2    2    1
+578_02     1    0    1    0    2    2
+578_03     0    2    2    0    2    2
+1539_01    2    0    2    2    2    0
+1539_02    1    1    2    0    1    0
+1539_03    1    0    2    2    0    2
+\end{Soutput}
+\begin{Sinput}
+> geno.trio <- genoMat(tg.ped, geno.mat)
+> (tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)))
+\end{Sinput}
+\begin{Soutput}
+This pedigree object contains 33 complete trios.
+For access to the data frame use the trios() accessor function.
+\end{Soutput}
+\begin{Sinput}
+> (ts <- TrioSet(tg.ped.comp, geno = geno.trio))
+\end{Sinput}
+\begin{Soutput}
+TrioSet (storageMode: lockedEnvironment)
+assayData: 10 features, 33 samples 
+  element names: geno 
+protocolData: none
+phenoData: none
+featureData
+  featureNames: 1 2 ... 10 (10 total)
+  fvarLabels: position chromosome isSnp
+  fvarMetadata: labelDescription
+experimentData: use 'experimentData(object)'
+Annotation:  
+genome:  hg19 
+\end{Soutput}
+\end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+> assayDataElement(ts, "geno")
+\end{Sinput}
+\begin{Soutput}
+, , F
 
+   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+1  1 2 2 2 0 0 0 0 0  2  2  0  0  2  0  2  2  0  2  2  0  1  2  2  2
+2  1 0 0 0 1 2 0 1 1  1  2  2  1  2  1  0  1  1  1  1  1  2  1  1  0
+3  0 1 2 0 1 2 1 0 0  2  2  1  2  1  2  0  0  2  2  0  2  1  1  1  0
+4  1 0 2 2 2 0 1 1 1  0  2  2  2  1  0  2  0  2  1  1  1  1  2  0  2
+5  2 1 2 1 2 1 2 1 0  0  0  2  2  2  2  0  1  1  2  0  0  0  0  0  2
+6  1 1 1 0 0 2 2 1 2  2  2  0  2  0  1  1  1  0  0  2  0  1  0  0  1
+7  2 0 2 2 1 2 0 1 2  2  2  1  2  2  0  0  1  1  0  0  0  0  2  2  2
+8  0 2 2 1 1 2 1 1 1  2  2  0  0  1  0  2  2  1  2  0  2  1  2  2  1
+9  1 2 2 2 1 2 1 1 2  1  2  1  1  1  1  0  2  1  2  2  1  1  0  1  0
+10 1 2 1 0 2 2 1 2 2  2  0  2  2  2  2  0  1  0  1  1  0  1  2  1  0
+   26 27 28 29 30 31 32 33
+1   0  1  0  0  2  1  2  2
+2   1  0  0  0  1  0  2  0
+3   1  1  1  2  1  1  1  1
+4   0  0  1  0  0  2  1  0
+5   1  2  2  2  2  1  0  2
+6   2  0  2  1  1  2  0  0
+7   1  1  1  0  1  1  2  2
+8   0  2  1  2  1  0  0  0
+9   1  0  2  1  0  0  0  0
+10  1  0  0  2  0  2  2  1
+
+, , M
+
+   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+1  0 1 2 1 2 1 2 1 1  2  0  0  2  0  0  1  0  0  1  0  0  1  1  0  1
+2  0 1 1 2 2 2 2 2 0  1  2  1  2  2  2  1  0  0  0  0  1  2  0  0  0
+3  1 2 0 0 2 1 2 2 1  1  1  0  1  1  2  2  0  1  1  1  0  2  1  0  2
+4  1 2 0 2 0 0 2 1 1  2  2  0  0  2  1  2  1  2  2  2  1  0  1  1  2
+5  2 0 0 2 2 0 1 1 1  2  2  2  2  0  1  0  2  0  0  0  0  2  1  1  2
+6  0 1 2 0 0 2 1 0 1  0  2  1  1  1  1  0  2  1  0  1  0  2  0  0  2
+7  0 1 1 0 2 0 2 2 2  2  2  0  1  1  0  0  0  1  0  2  1  1  0  1  1
+8  1 1 1 1 2 2 2 2 2  1  2  1  2  0  1  0  0  0  0  2  2  0  1  0  1
+9  0 0 2 2 1 1 1 0 0  0  2  2  2  2  0  1  0  2  2  2  1  0  1  1  0
+10 2 0 1 2 2 2 2 2 1  1  2  0  1  2  0  0  1  2  1  1  1  1  2  0  1
+   26 27 28 29 30 31 32 33
+1   0  2  2  2  2  0  2  0
+2   1  1  1  2  1  2  2  0
+3   1  1  2  0  0  0  2  0
+4   1  1  2  2  2  2  2  0
+5   0  2  2  2  0  0  2  1
+6   2  2  2  1  0  0  0  0
+7   2  1  0  1  2  2  2  1
+8   0  1  0  2  2  0  2  1
+9   2  2  1  0  1  1  2  0
+10  0  2  1  1  0  1  0  2
+
+, , O
+
+   1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+1  2 1 2 0 1 1 2 1 2  0  2  0  0  2  1  0  0  0  2  2  1  2  1  0  2
+2  2 0 2 0 2 1 0 2 0  2  0  0  2  2  2  2  0  1  1  1  2  0  2  2  2
+3  2 0 1 2 2 2 1 2 2  2  1  1  0  0  0  1  2  2  0  2  0  2  1  0  1
+4  0 2 2 0 0 1 0 1 2  0  0  2  2  2  2  1  1  2  1  0  2  1  0  2  2
+5  0 2 0 2 0 2 0 1 0  1  1  1  0  0  2  1  0  1  2  2  1  0  2  1  2
+6  1 2 1 1 2 0 0 1 2  1  2  2  2  1  0  0  0  1  2  0  2  0  2  2  1
+7  1 1 2 2 0 0 0 2 0  0  1  1  2  0  2  1  2  2  0  1  1  0  2  1  0
+8  2 2 1 2 0 1 2 2 0  0  2  1  0  1  2  0  1  0  0  0  1  2  2  1  0
+9  2 0 2 1 1 1 2 1 2  0  2  2  2  1  0  0  0  0  1  2  0  1  2  2  1
+10 2 1 1 0 1 0 2 1 2  0  1  0  1  2  1  1  2  0  0  0  2  1  2  1  2
+   26 27 28 29 30 31 32 33
+1   2  2  2  1  1  2  0  0
+2   1  1  0  2  1  2  0  1
+3   1  2  2  1  2  1  2  0
+4   0  1  1  2  1  1  0  2
+5   1  2  1  1  1  2  0  2
+6   2  1  1  1  0  1  0  0
+7   2  2  1  1  1  1  1  1
+8   2  0  1  0  2  0  1  1
+9   1  0  1  2  0  0  0  1
+10  0  2  1  0  0  1  1  1
+\end{Soutput}
+\end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+> ts <- TrioSet(tg.ped.comp)
+\end{Sinput}
+\end{Schunk}
 \end{document}

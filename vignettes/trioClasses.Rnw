@@ -27,7 +27,7 @@ library("trioClasses")
 @
 <<sample-ped>>=
 data(ped)
-#tryCatch(Pedigree(pedigreeInfo = ped.df))
+data(geno)
 pedigreeInfo <- within(ped.df, {
   F <- as.character(fid)
   M <- as.character(mid)
@@ -41,9 +41,20 @@ tg.ped
 id <- offspringNames(tg.ped)
 fid <- fatherNames(tg.ped)
 mid <- motherNames(tg.ped)
-names(fid) <- id
-names(mid) <- id
+names(fid) <- names(mid) <- id
 c(length(unique(id)),length(unique(fid)),length(unique(mid)))
 @
-
+\section{TrioSet}
+<<trioset>>=
+head(geno.mat[,1:6])
+geno.trio <- genoMat(tg.ped, geno.mat )
+( tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)) )
+( ts <- TrioSet( tg.ped.comp, geno = geno.trio ) )
+@ 
+<<geno>>=
+assayDataElement(ts, "geno")
+@ 
+<<eval=FALSE>>=
+ts <- TrioSet( tg.ped.comp ) 
+@ 
 \end{document}
