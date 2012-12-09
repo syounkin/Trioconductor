@@ -24,6 +24,7 @@ Collate: AllClasses.R
 	 iTrio.R
 	 Pedigree.R
 	 test_trioClasses_package.R
+	 zzz.R
 LazyLoad: yes
 biocViews:
 Packaged: Wed Dec  5 11:01:34 EST 2012; syounkin
