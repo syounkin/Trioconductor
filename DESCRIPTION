@@ -1,7 +1,7 @@
 Package: trioClasses
 Type: Package
 Title: A package for trio class definition
-Version: 0.0.7
+Version: 0.0.8
 Date: Wed Dec  5 11:01:34 EST 2012
 Author: Samuel G. Younkin and Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>, Robert B. Scharpf <rscharpf@jhsph.edu>
