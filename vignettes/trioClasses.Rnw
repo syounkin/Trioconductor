@@ -50,10 +50,10 @@ data(geno)
 head(geno.mat[,1:6])
 geno.trio <- genoMat(tg.ped, geno.mat )
 ( tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)) )
-( ts <- TrioSet( tg.ped.comp, geno = geno.trio ) )
+( object.gTrio <- gTrio( tg.ped.comp, geno = geno.trio ) )
 @ 
 <<geno>>=
-geno <- getGeno(ts)
+geno <- getGeno(object.gTrio, type = "holger")
 ( aTDT <- allelicTDT( mat.snp = t(geno), size = 1e4 ) )
 @ 
 \end{document}

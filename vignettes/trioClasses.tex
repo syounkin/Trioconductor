@@ -78,10 +78,10 @@ This pedigree object contains 33 complete trios.
 For access to the data frame use the trios() accessor function.
 \end{Soutput}
 \begin{Sinput}
-> (ts <- TrioSet(tg.ped.comp, geno = geno.trio))
+> (object.gTrio <- gTrio(tg.ped.comp, geno = geno.trio))
 \end{Sinput}
 \begin{Soutput}
-TrioSet (storageMode: lockedEnvironment)
+gTrio (storageMode: lockedEnvironment)
 assayData: 10 features, 33 samples 
   element names: geno 
 protocolData: none
@@ -97,7 +97,7 @@ genome:  hg19
 \end{Schunk}
 \begin{Schunk}
 \begin{Sinput}
-> geno <- getGeno(ts)
+> geno <- getGeno(object.gTrio, type = "holger")
 > (aTDT <- allelicTDT(mat.snp = t(geno), size = 10000))
 \end{Sinput}
 \begin{Soutput}
