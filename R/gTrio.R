@@ -1,6 +1,6 @@
-TrioSet <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
+gTrio <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
  if(is.null(geno)){
-    object <- new("TrioSet", pedigree=pedigreeData)
+    object <- new("gTrio", pedigree=pedigreeData)
  }else{
    data.mat <- geno
    father.names <- fatherNames(pedigreeData)
@@ -15,7 +15,7 @@ TrioSet <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
    genoArray[,,"F"] <- data.mat[,father.names]
    genoArray[,,"M"] <- data.mat[,mother.names]
    genoArray[,,"O"] <- data.mat[,offspring.names]
-   object <- new("TrioSet", geno=genoArray, pedigree=pedigreeData)
+   object <- new("gTrio", geno=genoArray, pedigree=pedigreeData)
  }
 }
 

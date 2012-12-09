@@ -16,11 +16,11 @@ Collate: AllClasses.R
 	 AllValidity.R
 	 methods-AnnotatedDataFrame.R
 	 methods-Pedigree.R
-	 methods-TrioSet.R
+	 methods-gTrio.R
 	 methods-TdtSet.R
 	 methods-annotatedDataFrame.R
 	 functions.R
-	 TrioSet.R
+	 gTrio.R
 	 Pedigree.R
 	 test_trioClasses_package.R
 LazyLoad: yes

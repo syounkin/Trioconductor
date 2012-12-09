@@ -32,8 +32,12 @@ weaveMat <- function( mat.fa, mat.ma, mat.off ){
  return( trio.mat )
 }
 
-geno.mat.fn <- function( ts ){
+geno.mat.fn <- function( ts, type = "holger" ){
   geno.array <- geno(ts)
-  geno.out <- weaveMat( t(geno.array[,,"F"]),t(geno.array[,,"M"]),t(geno.array[,,"O"]) )
-  return( geno.out)
+  if( type == "holger" ){
+    geno.out <- weaveMat( t(geno.array[,,"F"]),t(geno.array[,,"M"]),t(geno.array[,,"O"]) )
+    return( geno.out)
+  }else{
+    stop( "What format type would youlike for output?" )
+  }
 }

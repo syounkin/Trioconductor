@@ -15,11 +15,10 @@ setClass("tSet", contains="gSet",
 setClass("TdtSet", contains="tSet")
 
 
-setClass("TrioSet", contains="gSet",
+setClass("gTrio", contains="gSet",
  	 representation(fatherPhenoData="AnnotatedDataFrame",
  			motherPhenoData="AnnotatedDataFrame",
  			pedigree="Pedigree" ))
- #			mindist="matrixOrNULL"))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~ TrioSetList Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

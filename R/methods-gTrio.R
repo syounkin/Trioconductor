@@ -1,4 +1,4 @@
-setMethod("initialize", "TrioSet",
+setMethod("initialize", "gTrio",
           function(.Object,
                    assayData = assayDataNew(geno=geno),
                    #phenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
@@ -33,13 +33,13 @@ setMethod("initialize", "TrioSet",
                             ...)
           })
 
-setMethod("geno", "TrioSet",
+setMethod("geno", "gTrio",
           function(object) {
             assayDataElement(object, "geno")
           })
 
 
-setMethod("getGeno", "TrioSet",
-            function(object){
-              geno.mat.fn(object)
+setMethod("getGeno", "gTrio",
+            function(object, ... ){
+              geno.mat.fn(object, ... )
             })
