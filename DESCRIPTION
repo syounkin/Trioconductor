@@ -18,7 +18,6 @@ Collate: AllClasses.R
 	 methods-Pedigree.R
 	 methods-gTrio.R
 	 methods-TdtSet.R
-	 methods-annotatedDataFrame.R
 	 functions.R
 	 gTrio.R
 	 Pedigree.R
