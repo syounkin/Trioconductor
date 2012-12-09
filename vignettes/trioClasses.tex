@@ -135,6 +135,26 @@ snp8     1.0000 0.31731
 snp6     0.6923 0.40538
 \end{Soutput}
 \end{Schunk}
+\section{\emph{iTrio} class}
+\begin{Schunk}
+\begin{Sinput}
+> (iTrio.obj <- iTrio(tg.ped.comp, lrr = geno.trio, baf = geno.trio))
+\end{Sinput}
+\begin{Soutput}
+iTrio (storageMode: lockedEnvironment)
+assayData: 10 features, 33 samples 
+  element names: baf, lrr 
+protocolData: none
+phenoData: none
+featureData
+  featureNames: snp1 snp2 ... snp10 (10 total)
+  fvarLabels: position chromosome isSnp
+  fvarMetadata: labelDescription
+experimentData: use 'experimentData(object)'
+Annotation:  
+genome:  hg19 
+\end{Soutput}
+\end{Schunk}
 \end{document}
 %% <<ids, echo = FALSE, eval = FALSE>>=
 %% id <- offspringNames(tg.ped)

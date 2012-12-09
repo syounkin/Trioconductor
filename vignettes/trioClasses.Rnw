@@ -41,17 +41,17 @@ tg.ped
 After we ensure that F, M and O exist in the data frame we create a Pedigree object.  Note the terse show method for the Pedigree object.
 \section{\emph{gTrio} class}
 Next we load the genotype matrix with well-named rows and columns, with rows for subjects and columns for SNPs.
-<<gtrio>>=
+<<genodata>>=
 data(geno)
 head(geno.mat[,1:6])
 @ 
 Now we format the genotype matrix for input into gTrio() and use the copleteTrios method to remove trios that do not have genotype information for all members.
-<<>>=
+<<complete-trios>>=
 geno.trio <- genoMat(tg.ped, geno.mat )
 ( tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)) )
 @ 
 Now we create the gTrio object from a complete pedigree and properly formatted, well-named, genotype matrix.
-<<>>=
+<<gTrio>>=
 ( gTrio.obj <- gTrio( tg.ped.comp, geno = geno.trio ) )
 class(gTrio.obj)
 @ 
@@ -60,6 +60,10 @@ Now we use the getGeno method to retrieve a genotype matrix formatted, in this c
 geno <- getGeno(gTrio.obj, type = "holger")
 dim(geno)
 ( aTDT <- allelicTDT( mat.snp = geno, size = 1e4 ) )
+@ 
+\section{\emph{iTrio} class}
+<<iTrio>>=
+( iTrio.obj <- iTrio( tg.ped.comp, lrr = geno.trio, baf = geno.trio ) )
 @ 
 \end{document}
 %% <<ids, echo = FALSE, eval = FALSE>>=
