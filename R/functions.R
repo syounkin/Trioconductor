@@ -36,7 +36,7 @@ geno.mat.fn <- function( ts, type = "holger" ){
   geno.array <- geno(ts)
   if( type == "holger" ){
     geno.out <- weaveMat( t(geno.array[,,"F"]),t(geno.array[,,"M"]),t(geno.array[,,"O"]) )
-    return( geno.out)
+    return( t(geno.out) )
   }else{
     stop( "What format type would youlike for output?" )
   }
