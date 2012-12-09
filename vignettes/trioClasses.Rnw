@@ -24,10 +24,10 @@ Today is \today.
 rm(list=ls())
 source("~/jhsph/R/reload.R")
 library("trioClasses")
+library("trio")
 @
 <<sample-ped>>=
 data(ped)
-data(geno)
 pedigreeInfo <- within(ped.df, {
   F <- as.character(fid)
   M <- as.character(mid)
@@ -46,15 +46,14 @@ c(length(unique(id)),length(unique(fid)),length(unique(mid)))
 @
 \section{TrioSet}
 <<trioset>>=
+data(geno)
 head(geno.mat[,1:6])
 geno.trio <- genoMat(tg.ped, geno.mat )
 ( tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)) )
 ( ts <- TrioSet( tg.ped.comp, geno = geno.trio ) )
 @ 
 <<geno>>=
-assayDataElement(ts, "geno")
-@ 
-<<eval=FALSE>>=
-ts <- TrioSet( tg.ped.comp ) 
+geno <- getGeno(ts)
+( aTDT <- allelicTDT( mat.snp = t(geno), size = 1e4 ) )
 @ 
 \end{document}
