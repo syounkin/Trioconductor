@@ -20,6 +20,11 @@ setClass("gTrio", contains="gSet",
  			motherPhenoData="AnnotatedDataFrame",
  			pedigree="Pedigree" ))
 
+setClass("iTrio", contains="gSet",
+ 	 representation(fatherPhenoData="AnnotatedDataFrame",
+ 			motherPhenoData="AnnotatedDataFrame",
+ 			pedigree="Pedigree" ))
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~ TrioSetList Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

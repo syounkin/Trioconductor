@@ -17,9 +17,11 @@ Collate: AllClasses.R
 	 methods-AnnotatedDataFrame.R
 	 methods-Pedigree.R
 	 methods-gTrio.R
+	 methods-iTrio.R
 	 methods-TdtSet.R
 	 functions.R
 	 gTrio.R
+	 iTrio.R
 	 Pedigree.R
 	 test_trioClasses_package.R
 LazyLoad: yes
