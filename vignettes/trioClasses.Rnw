@@ -22,7 +22,7 @@ Today is \today.
 %@
 <<packages, cache = FALSE>>=
 rm(list=ls())
-##source("~/jhsph/R/reload.R")
+source("~/jhsph/R/reload.R")
 library("trioClasses")
 @
 <<sample-ped>>=
