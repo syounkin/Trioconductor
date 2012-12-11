@@ -33,6 +33,11 @@ setMethod("trios", "gTrio",
               trios(pedigree(object))
             })
 
+setMethod("show", "gTrio",
+            function(object ){
+              cat(paste0("This object has ", nrow(trios(object)), " trios and ", dim(geno(gTrio.obj))[1], " markers (likely SNPs).\n"))
+            })
+
                    #phenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
                    #fatherPhenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
                    #motherPhenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),
