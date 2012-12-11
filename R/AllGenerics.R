@@ -10,3 +10,5 @@ setGeneric("geno", function(object) standardGeneric("geno"))
 setGeneric("getGeno", function(object, ...) standardGeneric("getGeno"))
 
 setGeneric("completeTrios", function(object, id.vec) standardGeneric("completeTrios"))
+setGeneric("pedigree", function(object) standardGeneric("pedigree"))
+setGeneric("trios", function(object) standardGeneric("trios"))

@@ -16,12 +16,21 @@ setMethod("geno", "gTrio",
             assayDataElement(object, "geno")
           })
 
-
 setMethod("getGeno", "gTrio",
             function(object, ... ){
               if( length(geno(object)) == 0 )
                  stop("No geno data provided.")
               geno.mat.fn(object, ... )
+            })
+
+setMethod("pedigree", "gTrio",
+            function(object ){
+              object@pedigree
+            })
+
+setMethod("trios", "gTrio",
+            function(object ){
+              trios(pedigree(object))
             })
 
                    #phenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),

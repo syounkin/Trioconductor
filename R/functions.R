@@ -10,26 +10,35 @@ genoMat <- function( ped, data.mat ){
   matrix.off <- data.mat[offspringNames(ped.complete),]
   matrix.fa <- data.mat[fatherNames(ped.complete),]
   matrix.ma <- data.mat[motherNames(ped.complete),]  
-  matrix.trio <- weaveMat( mat.fa = matrix.fa, mat.ma = matrix.ma, mat.off = matrix.off ) 
-  colnames(matrix.trio) <- c(t(cbind(fatherNames(ped.complete),motherNames(ped.complete),offspringNames(ped.complete))))
+  matrix.trio <- weaveMat( matrix.fa, matrix.ma, matrix.off ) 
+  colnames(matrix.trio) <- c(rbind(fatherNames(ped.complete),motherNames(ped.complete),offspringNames(ped.complete)))
   rownames(matrix.trio) <- colnames(data.mat)
   return(matrix.trio)
 }
 
-weaveMat <- function( mat.fa, mat.ma, mat.off ){
-  trio.mat <- matrix(c(rbind( mat.fa, mat.ma, mat.off )), nrow = ncol(mat.off), ncol = 3*nrow(mat.off), byrow = FALSE)
-  colnames(trio.mat) <- c(t(cbind( rownames(mat.fa),rownames(mat.ma),rownames(mat.off))))
-  rownames(trio.mat) <- colnames(mat.off)
+weaveMat <- function( x, y, z ){
+trio.mat <- matrix(c(t(cbind(x,y,z))),nrow = ncol(x), ncol = 3*nrow(x))
+#trio.mat <- matrix(c(cbind( mat.fa, mat.ma, mat.off )), nrow = ncol(mat.off), ncol = 3*nrow(mat.off), byrow = TRUE)
+  #colnames(trio.mat) <- c(t(cbind( rownames(mat.fa),rownames(mat.ma),rownames(mat.off))))
+  #rownames(trio.mat) <- colnames(mat.off)
  return( trio.mat )
 }
 
 geno.mat.fn <- function( ts, type = "holger" ){
   geno.array <- geno(ts)
+  id <- trios(gTrio.obj)$O
+  fid <- trios(gTrio.obj)$F
+  mid <- trios(gTrio.obj)$M
+  names(fid) <- id
+  names(mid) <- id
+ 
   if( type == "holger" ){
     geno.out <- weaveMat( t(geno.array[,,"F"]),t(geno.array[,,"M"]),t(geno.array[,,"O"]) )
+    colnames(geno.out) <- c(t(cbind(fid,mid,id)))
+    rownames(geno.out) <- rownames(geno.array[,,"F"])
     return( t(geno.out) )
   }else{
-    stop( "What format type would youlike for output?" )
+    stop( "What format type would you like for output?" )
   }
 }
 
