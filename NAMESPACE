@@ -1,6 +1,6 @@
 exportClasses( Pedigree, TdtSet, gTrio, TrioSetList )
-exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios, geno, getGeno )
-export( Pedigree, gTrio, iTrio, TdtSet, genoMat, weaveMat, geno.mat.fn, pedigree, trios )
+exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios, geno, getGeno, getMAF )
+export( Pedigree, gTrio, iTrio, TdtSet, genoMat, weaveMat, geno.mat.fn, pedigree, trios)
 importFrom(Biobase, assayDataNew )
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------

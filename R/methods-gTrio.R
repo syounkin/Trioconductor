@@ -33,6 +33,14 @@ setMethod("trios", "gTrio",
               trios(pedigree(object))
             })
 
+setMethod("getMAF", "gTrio",
+            function(object){
+              geno <- geno(gTrio.obj)
+              maf <- rowSums(geno[,,1:2],dims=1, na.rm=TRUE)/rowSums(!is.na(geno[,,1:2]),dims=1)/2
+              maf <- ifelse( maf >= 0.5, 1 - maf, maf )
+              return(maf)
+            })
+
 setMethod("show", "gTrio",
             function(object ){
               cat(paste0("This object has ", nrow(trios(object)), " trios and ", dim(geno(gTrio.obj))[1], " markers (likely SNPs).\n"))
