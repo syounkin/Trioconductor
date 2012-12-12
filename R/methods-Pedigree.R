@@ -10,7 +10,8 @@ setMethod("initialize", signature(.Object="Pedigree"),
 	  })
 
 setMethod("show", signature(object="Pedigree"), function(object){
-  cat(paste0("This pedigree object contains ", nrow(trios(object)), " complete trios.\nFor access to the data frame use the trios() accessor function.\n"))
+#  cat(paste0("This pedigree object contains ", nrow(trios(object)), " trios.\n\nNote that members in these trios are not necessarily contained\nin the genotype matrix. See completeTrios() for a\nconvenience function to eliminate trios\nthat have a member missing from the genotype matrix.\nFor access to the data frame\nuse the trios() accessor function.\n"))
+  cat(paste0("This pedigree object contains ", nrow(trios(object)), " trios.\nFor access to the data frame use the trios() accessor function.\n"))
 } )
 #~~~~~~~~~~~~~~~~
 setMethod("trios", signature(object="Pedigree"), function(object) object@trios)
