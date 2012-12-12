@@ -18,7 +18,7 @@ setClass("TdtSet", contains="tSet")
 setClass("gTrio", contains="gSet",
  	 representation(fatherPhenoData="AnnotatedDataFrame",
  			motherPhenoData="AnnotatedDataFrame",
- 			pedigree="Pedigree" ))
+ 			pedigree="Pedigree", map="data.frame" ))
 
 setClass("iTrio", contains="gSet",
  	 representation(fatherPhenoData="AnnotatedDataFrame",

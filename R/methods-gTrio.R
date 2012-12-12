@@ -2,12 +2,14 @@ setMethod("initialize", "gTrio",
           function(.Object,
                    assayData = assayDataNew(geno=geno),
                    geno=array(NA, dim=c(0, 0, 3)),                   
-                   pedigree=Pedigree(), ...)
+                   pedigree=Pedigree(), genome = "hg19", map = data.frame(), ...)
           {
             .Object@pedigree <- pedigree
+            .Object@map <- map
             callNextMethod(.Object,
             assayData=assayData,
             pedigree=pedigree,
+            genome=genome, map = map,
             ...)
           })
 
@@ -33,6 +35,11 @@ setMethod("trios", "gTrio",
               trios(pedigree(object))
             })
 
+setMethod("getMap", "gTrio",
+            function(object ){
+              object@map
+            })
+
 setMethod("getMAF", "gTrio",
             function(object){
               geno <- geno(gTrio.obj)
@@ -43,7 +50,8 @@ setMethod("getMAF", "gTrio",
 
 setMethod("show", "gTrio",
             function(object ){
-              cat(paste0("This object has ", nrow(trios(object)), " trios and ", dim(geno(gTrio.obj))[1], " markers (likely SNPs).\n"))
+              cat(paste0("This object has ", nrow(trios(object)), " trios and ", dim(geno(gTrio.obj))[1], " markers, and a map data frame (with ", nrow(object@map), " rows) that starts like this:\n"))
+              print(head(object@map))
             })
 
                    #phenoData=annotatedDataFrameFrom(assayData, byrow=FALSE),

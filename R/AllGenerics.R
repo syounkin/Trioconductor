@@ -9,6 +9,7 @@ setGeneric("allNames", function(object) standardGeneric("allNames"))
 setGeneric("geno", function(object) standardGeneric("geno"))
 setGeneric("getGeno", function(object, ...) standardGeneric("getGeno"))
 setGeneric("getMAF", function(object) standardGeneric("getMAF"))
+setGeneric("getMap", function(object) standardGeneric("getMap"))
 
 setGeneric("completeTrios", function(object, id.vec) standardGeneric("completeTrios"))
 setGeneric("pedigree", function(object) standardGeneric("pedigree"))

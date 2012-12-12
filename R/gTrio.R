@@ -1,4 +1,4 @@
-gTrio <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
+gTrio <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL, map = data.frame()){
  if(is.null(geno)){
     object <- new("gTrio", pedigree=pedigreeData)
  }else{
@@ -15,7 +15,7 @@ gTrio <- function(pedigreeData=Pedigree(), lrr=NULL, baf=NULL, geno=NULL){
    genoArray[,,"F"] <- data.mat[,father.names]
    genoArray[,,"M"] <- data.mat[,mother.names]
    genoArray[,,"O"] <- data.mat[,offspring.names]
-   object <- new("gTrio", geno=genoArray, pedigree=pedigreeData)
+   object <- new("gTrio", geno=genoArray, pedigree=pedigreeData, map = map)
  }
 }
 
