@@ -4,7 +4,7 @@ THISPKG <- "trioClasses"
 	packageStartupMessage(paste("
 ==================================
 Welcome to trioClasses version ", version, "\n",
-"by Scharpf and Younkin
+"by Scharpf, Schwender and Younkin
 ==================================", sep = "" ) )
 }
 
