@@ -1,8 +1,8 @@
 Package: trioClasses
 Type: Package
 Title: A package for trio class definition
-Version: 0.0.8
-Date: Wed Dec  5 11:01:34 EST 2012
+Version: 0.0.9
+Date: Wed Dec 13 2012
 Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
 Description: Trio class definition
@@ -27,4 +27,4 @@ Collate: AllClasses.R
 	 zzz.R
 LazyLoad: yes
 biocViews:
-Packaged: Wed Dec  5 11:01:34 EST 2012; syounkin
+Packaged: Thu Dec 13 17:59:33 EST 2012
