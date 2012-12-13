@@ -8,6 +8,7 @@ setGeneric("sampleNames", function(object) standardGeneric("sampleNames"))
 setGeneric("allNames", function(object) standardGeneric("allNames"))
 setGeneric("geno", function(object) standardGeneric("geno"))
 setGeneric("getGeno", function(object, ...) standardGeneric("getGeno"))
+setGeneric("aTDT", function(object, ...) standardGeneric("aTDT"))
 setGeneric("getMAF", function(object) standardGeneric("getMAF"))
 setGeneric("getMap", function(object) standardGeneric("getMap"))
 

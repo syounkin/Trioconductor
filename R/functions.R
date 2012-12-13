@@ -53,7 +53,8 @@ originalNames <- function(names){
 }
 
 # Written by Holger Schwender, originally named aTDTchunk
-aTDT <- function(geno, correct=FALSE){
+aTDT <- function(gTrio, correct = FALSE){
+        geno <- getGeno( gTrio, type = "holger" )
 	n.row <- nrow(geno)
 	dad <- geno[seq.int(1, n.row, 3),, drop=FALSE]
 	mom <- geno[seq.int(2, n.row, 3),, drop=FALSE]
@@ -73,5 +74,5 @@ aTDT <- function(geno, correct=FALSE){
 		tmp1 <- abs(tmp1) - 1
 	stat <- tmp1 * tmp1 / (transMinor + transMajor)
       	pval <- pchisq(stat, 1, lower.tail=FALSE)
-        return( stat=stat, pval=pval, transMinor=transMinor, transMajor=transMajor )
+        return( data.frame( stat=stat, pval=pval, transMinor=transMinor, transMajor=transMajor ) )
 }

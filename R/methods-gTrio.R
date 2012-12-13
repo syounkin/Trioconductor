@@ -30,6 +30,11 @@ setMethod("pedigree", "gTrio",
               object@pedigree
             })
 
+setMethod("aTDT", "gTrio",
+            function(object, ... ){
+              aTDT(object, ...)
+            })
+
 setMethod("trios", "gTrio",
             function(object ){
               trios(pedigree(object))
