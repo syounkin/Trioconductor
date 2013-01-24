@@ -1,4 +1,4 @@
-setClass("SNPExperiment", contains="SummarizedExperiment", representation(Pedigree="Pedigree") )
+setClass("SNPExperiment", contains="SummarizedExperiment", representation(Pedigree="data.frame") )
 ##setClass("Pedigree", representation(trios="data.frame", trioIndex="data.frame"))
 
 ## setOldClass("ff_array")

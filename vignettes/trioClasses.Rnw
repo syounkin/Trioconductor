@@ -1,4 +1,4 @@
-% Sweave(file = "./trioClasses.Rnw")
+% Sweave(file = "./trioClasses.Rnw")g
 \documentclass[10pt]{article}
 <<echo=FALSE>>=
   options(width=70, continue = " ")
@@ -7,7 +7,7 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{Classes \emph{gTrio} and \emph{iTrio}: Derivatives of \emph{TrioSet} for use with genotype and intensity data in package \emph{trioClasses}}
+\title{Classes \emph{SNPExperiment} and \emph{CNVExperiment}: Derivatives of \emph{SummarizedExperiment} for use with genotype and intensity data in package \emph{trioClasses}}
 \author{Samuel G. Younkin}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
@@ -16,60 +16,14 @@
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
 \maketitle
-I found it difficult to construct an extension of \emph{gSet} that was flexible with the AssayData, e.g., geno, lrr and baf.  I think it makes sense to begin with the individual class scheme, and to strip the \emph{TrioSet} class down to bare-bones so we can build it up into something that suits our present needs.  Ultimately, I think a one class scheme is best, but I think it will be challenging to implement.  So, what I've done is define two classes \emph{gTrio}, for genotype data, and \emph{iTrio} for probe intensity data (lrr and baf).  Each of these classes is the TrioSet class defined in MD gutted to have only the bare essentials.  I would like to add  \emph{eSet}/\emph{gSet}-type objects in as we go, so that I understand exactly what they do.  The class \emph{gTrio} has somemethods defined for it to as demonstrated in this vignette.  The class \emph{iTrio} has no methods defined for it yet.  Presumably we can simpy port in methods from MD.
-%<<cachedir, echo=FALSE>>=
-%setCacheDir( path = './cache/' )
-%@
-<<packages, cache = FALSE>>=
-rm(list=ls())
-#source("~/jhsph/R/reload.R")
+<<packages>>=
 library("trioClasses")
-library("trio")
-@
-First we load the sample pedigree data frame included in local versions of the trioClasses package.
-<<sample-ped>>=
-data(ped)
-head(ped.df)
-pedigreeInfo <- within(ped.df, {
-  F <- as.character(fid)
-  M <- as.character(mid)
-  O <- as.character(id)
-})
-tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
-tg.ped
-@
-After we ensure that F, M and O exist in the data frame we create a Pedigree object.  Note the terse show method for the Pedigree object.
-\section{\emph{gTrio} class}
-Next we load the genotype matrix with well-named rows and columns, with rows for subjects and columns for SNPs.
-<<genodata>>=
-data(geno)
-head(geno.mat[,1:6])
+library("vcf2R")
+data(targets)
+m <- matrix( 1:130, nrow = 13, ncol = 10 )
+df <- DataFrame( dx = rep(1,10), sex = rep(1,10))
 @ 
-Now we format the genotype matrix for input into gTrio() and use the copleteTrios method to remove trios that do not have genotype information for all members.
-<<complete-trios>>=
-geno.trio <- genoMat(tg.ped, geno.mat )
-( tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)) )
-@ 
-Now we create the gTrio object from a complete pedigree and properly formatted, well-named, genotype matrix.
-<<gTrio>>=
-( gTrio.obj <- gTrio( tg.ped.comp, geno = geno.trio ) )
-class(gTrio.obj)
-@ 
-Now we use the getGeno method to retrieve a genotype matrix formatted, in this case, for use in Holger's trio package.
-<<geno>>=
-geno <- getGeno(gTrio.obj, type = "holger")
-dim(geno)
-( aTDT <- allelicTDT( mat.snp = geno, size = 1e4 ) )
-@ 
-\section{\emph{iTrio} class}
-<<iTrio>>=
-( iTrio.obj <- iTrio( tg.ped.comp, lrr = geno.trio, baf = geno.trio ) )
+<<snpEx>>=
+snpEx <- new("SNPExperiment", Pedigree = data.frame(1:10), assays = SimpleList(m), colData = DataFrame(df), rowData = targets.gr )
 @ 
 \end{document}
-%% <<ids, echo = FALSE, eval = FALSE>>=
-%% id <- offspringNames(tg.ped)
-%% fid <- fatherNames(tg.ped)
-%% mid <- motherNames(tg.ped)
-%% names(fid) <- names(mid) <- id
-%% c(length(unique(id)),length(unique(fid)),length(unique(mid)))
-%% @

@@ -7,4 +7,5 @@
 *.aux
 *.log
 *.out
+*.tex
 data

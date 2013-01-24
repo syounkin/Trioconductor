@@ -12,6 +12,7 @@ Imports:
 Suggests:
 Enhances:
 Collate: AllClasses.R
+	 methods-SNPExperiment.R
          zzz.R
 LazyLoad: yes
 biocViews:
