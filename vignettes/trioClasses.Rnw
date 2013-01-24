@@ -20,10 +20,12 @@
 library("trioClasses")
 library("vcf2R")
 data(targets)
-m <- matrix( 1:130, nrow = 13, ncol = 10 )
-df <- DataFrame( dx = rep(1,10), sex = rep(1,10))
+data("BMP4-european-all.sm")
+df <- DataFrame( dx = rep(1,10), sex = rep(1,10), row.names = paste0("sub",1:10) )
+class(df)
+class(sm)
 @ 
 <<snpEx>>=
-snpEx <- new("SNPExperiment", Pedigree = data.frame(1:10), assays = SimpleList(m), colData = DataFrame(df), rowData = targets.gr )
+snpEx <- new("SNPExperiment", Pedigree = data.frame(1:10), assays = SimpleList(geno = sm[1:13,1:10]), colData = df, rowData = targets.gr )
 @ 
 \end{document}
