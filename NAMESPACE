@@ -1,7 +1,10 @@
-exportClasses( Pedigree, TdtSet, gTrio, TrioSetList )
-exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios, geno, getGeno, getMAF, getMap, aTDT )
-export( Pedigree, gTrio, iTrio, TdtSet, genoMat, weaveMat, geno.mat.fn, pedigree, trios, aTDT)
-importFrom(Biobase, assayDataNew )
+importClassesFrom(MinimumDistance, Pedigree)
+exportClasses( SNPExperiment )
+
+# exportClasses( Pedigree, TdtSet, gTrio, TrioSetList )
+# exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios, geno, getGeno, getMAF, getMap, aTDT )
+## export( Pedigree, gTrio, iTrio, TdtSet, genoMat, weaveMat, geno.mat.fn, pedigree, trios, aTDT)
+## importFrom(Biobase, assayDataNew )
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------
 ##---------------------------------------------------------------------------

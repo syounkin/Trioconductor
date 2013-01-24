@@ -1,30 +1,18 @@
 Package: trioClasses
 Type: Package
 Title: A package for trio class definition
-Version: 0.0.9
-Date: Wed Dec 13 2012
+Version: 0.1.0
+Date: Thu Jan 24 09:34:08 EST 2013
 Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
-Description: Trio class definition
+Description: SNPExperiment class definition
 License: GPL
 Depends: R (>= 2.15), methods, oligoClasses (>= 1.20.0), Biobase
 Imports:
 Suggests:
 Enhances:
 Collate: AllClasses.R
-         AllGenerics.R
-	 AllValidity.R
-	 methods-AnnotatedDataFrame.R
-	 methods-Pedigree.R
-	 methods-gTrio.R
-	 methods-iTrio.R
-	 methods-TdtSet.R
-	 functions.R
-	 gTrio.R
-	 iTrio.R
-	 Pedigree.R
-	 test_trioClasses_package.R
-	 zzz.R
+         zzz.R
 LazyLoad: yes
 biocViews:
-Packaged: Thu Dec 13 17:59:33 EST 2012
+Packaged: Thu Jan 24 09:34:08 EST 2013
