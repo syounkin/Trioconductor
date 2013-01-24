@@ -1,4 +1,4 @@
-% Sweave(file = "./trioClasses.Rnw")g
+% Sweave(file = "./trioClasses.Rnw")
 \documentclass[10pt]{article}
 <<echo=FALSE>>=
   options(width=70, continue = " ")
@@ -24,8 +24,12 @@ data("BMP4-european-all.sm")
 df <- DataFrame( dx = rep(1,10), sex = rep(1,10), row.names = paste0("sub",1:10) )
 class(df)
 class(sm)
+logR <- matrix( runif(130), nrow = 13, ncol = 10 )
+baf <-  matrix( runif(130), nrow = 13, ncol = 10 )
 @ 
 <<snpEx>>=
-snpEx <- new("SNPExperiment", Pedigree = data.frame(1:10), assays = SimpleList(geno = sm[1:13,1:10]), colData = df, rowData = targets.gr )
+snpEx <- new("SNPTrioExperiment", Pedigree = data.frame(1:10), assays = SimpleList(geno = sm[1:13,1:10], logR = logR, baf = baf), colData = df, rowData = targets.gr )
+show(snpEx)
+class(assays(snpEx)[[1]])
 @ 
 \end{document}

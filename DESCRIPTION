@@ -7,12 +7,12 @@ Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
 Description: SNPExperiment class definition
 License: GPL
-Depends: R (>= 2.15), methods, oligoClasses (>= 1.20.0), Biobase
+Depends: R (>= 2.15), methods, Biobase, GenomicRanges
 Imports:
 Suggests:
 Enhances:
 Collate: AllClasses.R
-	 methods-SNPExperiment.R
+	 methods-SNPTrioExperiment.R
          zzz.R
 LazyLoad: yes
 biocViews:

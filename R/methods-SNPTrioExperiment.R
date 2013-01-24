@@ -1,4 +1,4 @@
-setMethod("initialize", "SNPExperiment",
+setMethod("initialize", "SNPTrioExperiment",
           function(.Object,
                    assays = NA,
                    colData = NA,
