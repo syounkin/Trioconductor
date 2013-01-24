@@ -1,6 +1,7 @@
 setGeneric("geno", function(object) standardGeneric("geno"))
 setGeneric("logR", function(object) standardGeneric("logR"))
 setGeneric("baf", function(object) standardGeneric("baf"))
-setGeneric("show", function(object) standardGeneric("show"))
+#setGeneric("show", function(object) standardGeneric("show"))
 setGeneric("pedigree", function(object) standardGeneric("pedigree"))
 setGeneric("completeTrios", function(object) standardGeneric("completeTrios"))
+setGeneric("ids", function(object) standardGeneric("ids"))
