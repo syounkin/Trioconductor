@@ -1,5 +1,5 @@
-setClass("SNPTrioExperiment", contains="SummarizedExperiment", representation(Pedigree="data.frame") )
-##setClass("Pedigree", representation(trios="data.frame", trioIndex="data.frame"))
+setClass("SNPTrioExperiment", contains="SummarizedExperiment", representation(pedigree="PedClass") )
+setClass("PedClass", representation(pedigree="data.frame"))
 
 ## setOldClass("ff_array")
 ## setOldClass("ff_matrix")

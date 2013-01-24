@@ -1,6 +1,6 @@
 #importClassesFrom(MinimumDistance, Pedigree)
-exportClasses( SNPTrioExperiment )
-exportMethods( show, Pedigree, completeTrios, geno, logR, baf )
+exportClasses( SNPTrioExperiment, PedClass )
+exportMethods( show, pedigree, completeTrios, geno, logR, baf )
 importMethodsFrom(snpStats, "[", show)
 # exportClasses( Pedigree, TdtSet, gTrio, TrioSetList )
 # exportMethods( show, trios, trioIndex, offspringNames, fatherNames, motherNames, sampleNames, allNames, completeTrios, geno, getGeno, getMAF, getMap, aTDT )
