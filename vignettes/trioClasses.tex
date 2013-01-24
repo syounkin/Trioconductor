@@ -4,7 +4,7 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{Classes \emph{gTrio} and \emph{iTrio}: Derivatives of \emph{TrioSet} for use with genotype and intensity data in package \emph{trioClasses}}
+\title{Classes \emph{SNPExperiment} and \emph{CNVExperiment}: Derivatives of \emph{SummarizedExperiment} for use with genotype and intensity data in package \emph{trioClasses}}
 \author{Samuel G. Younkin}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
@@ -14,152 +14,66 @@
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
 \maketitle
-I found it difficult to construct an extension of \emph{gSet} that was flexible with the AssayData, e.g., geno, lrr and baf.  I think it makes sense to begin with the individual class scheme, and to strip the \emph{TrioSet} class down to bare-bones so we can build it up into something that suits our present needs.  Ultimately, I think a one class scheme is best, but I think it will be challenging to implement.  So, what I've done is define two classes \emph{gTrio}, for genotype data, and \emph{iTrio} for probe intensity data (lrr and baf).  Each of these classes is the TrioSet class defined in MD gutted to have only the bare essentials.  I would like to add  \emph{eSet}/\emph{gSet}-type objects in as we go, so that I understand exactly what they do.  The class \emph{gTrio} has somemethods defined for it to as demonstrated in this vignette.  The class \emph{iTrio} has no methods defined for it yet.  Presumably we can simpy port in methods from MD.
-%<<cachedir, echo=FALSE>>=
-%setCacheDir( path = './cache/' )
-%@
 \begin{Schunk}
 \begin{Sinput}
-> rm(list = ls())
 > library("trioClasses")
-> library("trio")
-\end{Sinput}
-\end{Schunk}
-First we load the sample pedigree data frame included in local versions of the trioClasses package.
-\begin{Schunk}
-\begin{Sinput}
-> data(ped)
-> head(ped.df)
+> library("vcf2R")
+> data(targets)
+> data("BMP4-european-all.sm")
+> df <- DataFrame(dx = rep(1, 10), sex = rep(1, 10), row.names = paste0("sub", 
+     1:10))
+> class(df)
 \end{Sinput}
 \begin{Soutput}
-             id     mid     fid  Population     PI Ethnicity
-578_01   578_01  578_03  578_02 PHILIPPINES Murray  filipino
-578_02   578_02    <NA>    <NA> PHILIPPINES Murray  filipino
-578_03   578_03    <NA>    <NA> PHILIPPINES Murray  filipino
-1539_01 1539_01 1539_03 1539_02        IOWA Murray  european
-1539_02 1539_02    <NA>    <NA>        IOWA Murray  european
-1539_03 1539_03    <NA>    <NA>        IOWA Murray  european
-\end{Soutput}
-\begin{Sinput}
-> pedigreeInfo <- within(ped.df, {
-     F <- as.character(fid)
-     M <- as.character(mid)
-     O <- as.character(id)
- })
-> tg.ped <- Pedigree(pedigreeInfo = pedigreeInfo)
-> tg.ped
-\end{Sinput}
-\begin{Soutput}
-This pedigree object contains 1812 complete trios.
-For access to the data frame use the trios() accessor function.
-\end{Soutput}
-\end{Schunk}
-After we ensure that F, M and O exist in the data frame we create a Pedigree object.  Note the terse show method for the Pedigree object.
-\section{\emph{gTrio} class}
-Next we load the genotype matrix with well-named rows and columns, with rows for subjects and columns for SNPs.
-\begin{Schunk}
-\begin{Sinput}
-> data(geno)
-> head(geno.mat[, 1:6])
-\end{Sinput}
-\begin{Soutput}
-        snp1 snp2 snp3 snp4 snp5 snp6
-578_01     2    2    0    2    2    1
-578_02     1    0    1    0    2    2
-578_03     0    2    2    0    2    2
-1539_01    2    0    2    2    2    0
-1539_02    1    1    2    0    1    0
-1539_03    1    0    2    2    0    2
-\end{Soutput}
-\end{Schunk}
-Now we format the genotype matrix for input into gTrio() and use the copleteTrios method to remove trios that do not have genotype information for all members.
-\begin{Schunk}
-\begin{Sinput}
-> geno.trio <- genoMat(tg.ped, geno.mat)
-> (tg.ped.comp <- completeTrios(tg.ped, colnames(geno.trio)))
-\end{Sinput}
-\begin{Soutput}
-This pedigree object contains 33 complete trios.
-For access to the data frame use the trios() accessor function.
-\end{Soutput}
-\end{Schunk}
-Now we create the gTrio object from a complete pedigree and properly formatted, well-named, genotype matrix.
-\begin{Schunk}
-\begin{Sinput}
-> (gTrio.obj <- gTrio(tg.ped.comp, geno = geno.trio))
-\end{Sinput}
-\begin{Soutput}
-gTrio (storageMode: lockedEnvironment)
-assayData: 10 features, 33 samples 
-  element names: geno 
-protocolData: none
-phenoData: none
-featureData
-  featureNames: snp1 snp2 ... snp10 (10 total)
-  fvarLabels: position chromosome isSnp
-  fvarMetadata: labelDescription
-experimentData: use 'experimentData(object)'
-Annotation:  
-genome:  hg19 
-\end{Soutput}
-\begin{Sinput}
-> class(gTrio.obj)
-\end{Sinput}
-\begin{Soutput}
-[1] "gTrio"
+[1] "DataFrame"
 attr(,"package")
-[1] "trioClasses"
+[1] "IRanges"
 \end{Soutput}
+\begin{Sinput}
+> class(sm)
+\end{Sinput}
+\begin{Soutput}
+[1] "SnpMatrix"
+attr(,"package")
+[1] "snpStats"
+\end{Soutput}
+\begin{Sinput}
+> logR <- matrix(runif(130), nrow = 13, ncol = 10)
+> baf <- matrix(runif(130), nrow = 13, ncol = 10)
+\end{Sinput}
 \end{Schunk}
-Now we use the getGeno method to retrieve a genotype matrix formatted, in this case, for use in Holger's trio package.
 \begin{Schunk}
 \begin{Sinput}
-> geno <- getGeno(gTrio.obj, type = "holger")
-> dim(geno)
+> ped.df <- data.frame(pedid = c(1, 1, 1, 2, 2, 2, 3, 3, 
+     3, 4), id = paste0("sub", 1:10), fid = c(0, 0, "sub1", 
+     0, 0, "sub4", 0, 0, "sub7", 0), mid = c(0, 0, "sub2", 
+     0, 0, "sub5", 0, 0, "sub8", 0), sex = c(1, 2, 2, 
+     1, 2, 2, 1, 2, 2, 1), dx = 1)
 \end{Sinput}
-\begin{Soutput}
-[1] 99 10
-\end{Soutput}
-\begin{Sinput}
-> (aTDT <- allelicTDT(mat.snp = geno, size = 10000))
-\end{Sinput}
-\begin{Soutput}
-      Allelic TDT
-
-Top 5 SNPs:
-      Statistic p-value
-snp10    3.8571 0.04953
-snp4     2.5714 0.10881
-snp5     1.1429 0.28505
-snp8     1.0000 0.31731
-snp6     0.6923 0.40538
-\end{Soutput}
 \end{Schunk}
-\section{\emph{iTrio} class}
 \begin{Schunk}
 \begin{Sinput}
-> (iTrio.obj <- iTrio(tg.ped.comp, lrr = geno.trio, baf = geno.trio))
+> snpEx <- new("SNPTrioExperiment", Pedigree = ped.df, 
+     assays = SimpleList(geno = sm[1:13, 1:10], logR = logR, 
+         baf = baf), colData = df, rowData = targets.gr)
+> class(geno(snpEx))
 \end{Sinput}
 \begin{Soutput}
-iTrio (storageMode: lockedEnvironment)
-assayData: 10 features, 33 samples 
-  element names: baf, lrr 
-protocolData: none
-phenoData: none
-featureData
-  featureNames: snp1 snp2 ... snp10 (10 total)
-  fvarLabels: position chromosome isSnp
-  fvarMetadata: labelDescription
-experimentData: use 'experimentData(object)'
-Annotation:  
-genome:  hg19 
+[1] "SnpMatrix"
+attr(,"package")
+[1] "snpStats"
+\end{Soutput}
+\begin{Sinput}
+> class(logR(snpEx))
+\end{Sinput}
+\begin{Soutput}
+[1] "matrix"
+\end{Soutput}
+\begin{Sinput}
+> class(baf(snpEx))
+\end{Sinput}
+\begin{Soutput}
+[1] "matrix"
 \end{Soutput}
 \end{Schunk}
 \end{document}
-%% <<ids, echo = FALSE, eval = FALSE>>=
-%% id <- offspringNames(tg.ped)
-%% fid <- fatherNames(tg.ped)
-%% mid <- motherNames(tg.ped)
-%% names(fid) <- names(mid) <- id
-%% c(length(unique(id)),length(unique(fid)),length(unique(mid)))
-%% @

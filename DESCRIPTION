@@ -12,6 +12,7 @@ Imports:
 Suggests:
 Enhances:
 Collate: AllClasses.R
+	 AllGenerics.R
 	 methods-SNPTrioExperiment.R
          zzz.R
 LazyLoad: yes
