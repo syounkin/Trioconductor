@@ -1,19 +1,18 @@
 setMethod("initialize", "SNPTrioExperiment",
-          function(.Object,
-                   assays = NA,
-                   colData = NA,
-                   rowData = NA,
-                   pedigree = NA,
-                   ...){
+          function(.Object, pedigree, ... ){
+            .Object <- callNextMethod()
             .Object@pedigree <- pedigree
-            callNextMethod(.Object, assays=assays, colData = colData, rowData = rowData, ...)
+            .Object
           })
 
-
+#setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "data.frame"), function(se, pedigree){
+#  new("SNPTrioExperiment", se, pedigree)
+#})
 
 setMethod("show", signature(object="SNPTrioExperiment"), function(object){
+  callNextMethod()
   #GenomicRanges::show(object)
-  cat("pedigree has rows =", dim(pedigree(pedigree(object)))[1], "\n")
+  cat("pedigree(", nrow(pedigree(object)), "): FAMID ID FID MID SEX DX\n", sep = "")
   })
 
 setMethod("geno", signature(object="SNPTrioExperiment"), function(object) assays(object)$geno )
@@ -24,7 +23,7 @@ setMethod("baf",  signature(object="SNPTrioExperiment"), function(object) assays
 setMethod("pedigree",  signature(object="SNPTrioExperiment"), function(object) object@pedigree )
 
 setMethod("completeTrios",  signature(object="SNPTrioExperiment"), function(object){
-  ped.df <- pedigree(pedigree(object))
+  ped.df <- pedigree(object)
   index.vec <- with( ped.df, id %in% colnames(snpEx) & fid %in% colnames(snpEx) & mid %in% colnames(snpEx) )
   ped.df[index.vec,]
 })
