@@ -7,8 +7,8 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{Classes \emph{SNPExperiment} and \emph{CNVExperiment}: Derivatives of \emph{SummarizedExperiment} for use with genotype and intensity data in package \emph{trioClasses}}
-\author{Samuel G. Younkin}
+\title{The R package \emph{trioClasses} for definition of the class \emph{SNPTrioExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
+\author{Samuel G. Younkin, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
 %\input{/home/sgy/jhsph/latex/sgy}
@@ -20,32 +20,23 @@
 library("trioClasses")
 library("snpStats")
 library("vcf2R")
-data(targets)
+@
+<<data>>=
 data("BMP4-european-all.sm")
-df <- DataFrame( dx = rep(1,10), sex = rep(1,10), row.names = paste0("sub",1:10) )
-class(df)
-class(sm)
-logR <- matrix( runif(130), nrow = 13, ncol = 10 )
-baf <-  matrix( runif(130), nrow = 13, ncol = 10 )
-@ 
-<<peddf, echo = FALSE>>=
-ped.df <- data.frame( pedid = c(1,1,1,2,2,2,3,3,3,4), id = paste0("sub",1:10), fid = c(0,0,"sub1",0,0,"sub4",0,0,"sub7",0), mid = c(0,0,"sub2",0,0,"sub5",0,0,"sub8",0), sex = c(1,2,2,1,2,2,1,2,2,1), dx = 1, stringsAsFactors=FALSE )
+data("ped")
 @ 
 <<se>>=
-se <- SummarizedExperiment(assays = SimpleList(geno = sm[1:13,1:10], logR = logR, baf = baf), colData = df, rowData = targets.gr ) 
-ste <- new( "SNPTrioExperiment", se, pedigree = ped.df ) 
+gr <- GRanges( seqnames = paste0("snv",1:nrow(sm)), ranges = IRanges(start = 1:nrow(sm), width = 1) )
+df <- DataFrame( dx = rep(1,ncol(sm)), sex = rep(1,ncol(sm)), row.names = colnames(sm) )
+se <- SummarizedExperiment(assays = SimpleList(geno = sm), colData = df, rowData = gr )
 @ 
 <<ste>>=
+ste <- new( "SNPTrioExperiment", se, pedigree = ped.df ) 
+@ 
+<<ste-show>>=
 ste
 @ 
 <<classes>>=
-class(ste@pedigree)
 class(geno(ste))
-class(logR(ste))
-class(baf(ste))
-@ 
-<<methods>>=
-#pedigree(ste)
-#completeTrios(ste)
 @ 
 \end{document}
