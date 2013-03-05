@@ -34,26 +34,33 @@ gr <- GRanges( seqnames = "chr14", ranges = IRanges(start = 1:ncol(sm), width = 
 names(gr) <- colnames(sm)
 @ 
 \subsection{SnpMatrix, DataFrame, GRanges} 
+The four key ingredients are the SNP matrix, the pedigree information as a DataFrame, position of the SNPs given by a GRanges object, and covariate data given as a DataFrame.
 <<grdf2>>=
-class(sm)
-class(ped.DF)
-class(gr)
+sm
+ped.DF
+gr
 @ 
 \subsection{SummarizedExperiment}
+We combine three of the key ingredients when we create the SummarizedExperiment object.
 <<se>>=
 se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
 @ 
 \subsection{SNPTrioExperiment}
+Now, we include the pedigree information as an object of class PedClass.  We keep PedClass independent of SNPTrioExperiment for flexibility.
 <<ste>>=
-ste <- SNPTrioExperiment(se, pedigree = PedClass(ped.DF) )
+ped <- PedClass(ped.DF)
+ste <- SNPTrioExperiment(se, pedigree = ped )
 @ 
+Here is the show method.
 <<ste-show>>=
 ste
 @ 
+And now we verify that it is indeed an extension of SummarizedExperiment.
 <<ste-class>>=
 getClass("SNPTrioExperiment")
 @ 
 \subsection{PedClass}
+Now we investigate the pedigree slot of the SNPTrioExperiment object.
 <<classes>>=
 class(pedigree(ste))
 getClass("PedClass")
