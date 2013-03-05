@@ -92,6 +92,10 @@ rowData(ste)
 <<coldata>>=
 colData(ste)
 @ 
+Now create a list of three SnpMatrices for trio analyses.
+<<genotrio>>=
+GenoTrio(ste)
+@ 
 \section{Validity}
 \section{Methods}
 \end{document}

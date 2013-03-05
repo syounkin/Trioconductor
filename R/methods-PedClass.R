@@ -21,6 +21,7 @@ setMethod("trios",  signature(object="PedClass"), function(object) {
   trio.df[,c("id","fid","mid")]
 })
 
+
 ## setMethod("ids",  signature(object="PedClass"), function(object){
 ##   ped.df <- pedigree(object)
 ##   with(ped.df, unique(c( id, fid, mid)))

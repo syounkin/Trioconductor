@@ -30,7 +30,15 @@ setMethod("baf",  signature(object="SNPTrioExperiment"), function(object) assays
 setMethod("pedigree",  signature(object="SNPTrioExperiment"), function(object) object@pedigree )
 
 setMethod("completeTrios",  signature(object="SNPTrioExperiment"), function(object){
-  ped.df <- pedigree(object)
-  index.vec <- with( ped.df, id %in% colnames(snpEx) & fid %in% colnames(snpEx) & mid %in% colnames(snpEx) )
-  ped.df[index.vec,]
+  ped <- pedigree(object)
+  trios <- trios(ped)
+  ids <- colnames(object)
+  index <- (trios[,"id"] %in% ids) & (trios[,"fid"] %in% ids )& (trios[,"mid"] %in% ids)
+  trios[index,]
+})
+
+setMethod("GenoTrio",  signature(object="SNPTrioExperiment"), function(object){
+  ct <- completeTrios(object)
+  geno <- geno(object)
+  list( O = geno[as.character(ct[,"id"]),], F = geno[as.character(ct[,"fid"]),], M = geno[as.character(ct[,"mid"]),] )
 })
