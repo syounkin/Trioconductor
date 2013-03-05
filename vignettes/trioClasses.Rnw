@@ -31,7 +31,7 @@ df <- DataFrame( dx = rep(1,ncol(sm)), sex = rep(1,ncol(sm)), row.names = colnam
 se <- SummarizedExperiment(assays = SimpleList(geno = sm), colData = df, rowData = gr )
 @ 
 <<ste>>=
-ste <- new( "SNPTrioExperiment", se, pedigree = ped.df ) 
+ste <- new( "SNPTrioExperiment", se, pedigree = PedClass(ped.df) ) 
 @ 
 <<ste-show>>=
 ste

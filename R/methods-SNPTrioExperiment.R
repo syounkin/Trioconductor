@@ -1,7 +1,9 @@
 setMethod("initialize", "SNPTrioExperiment",
           function(.Object, pedigree, ... ){
-            .Object <- callNextMethod()
+            
             .Object@pedigree <- pedigree
+            .Object <- callNextMethod()
+             
             .Object
           })
 

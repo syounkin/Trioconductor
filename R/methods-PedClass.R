@@ -1,11 +1,10 @@
-## setMethod("initialize", signature(.Object="PedClass"),
-##          function(.Object,
-##                   pedigree=data.frame(fid=character(),
-##                     mid=character(),
-##                     id=character(), stringsAsFactors=FALSE),
-##                   ...){
-##            callNextMethod(.Object, pedigree = pedigree, ...)
-##          })
+setMethod("initialize", signature(.Object="PedClass"),
+         function(.Object, ...){
+           .Object
+           callNextMethod(.Object, ... )
+         })
+
+setMethod( "PedClass", signature(object = "data.frame"), function(object) new("PedClass", object) )
 
 ## setMethod("pedigree",  signature(object="PedClass"), function(object) object@pedigree )
 
