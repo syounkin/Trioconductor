@@ -2,11 +2,11 @@ Package: trioClasses
 Type: Package
 Title: A package for trio class definition
 Version: 0.1.0
-Date: Thu Jan 24 09:34:08 EST 2013
-Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender
+Date: Tue Mar  5 12:26:58 EST 2013
+Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender, Ingo Ruczinski
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
-Description: SNPExperiment class definition
-License: GPL
+Description: The package trioClasses defines the class SNPTrioExperiment along with corresponding methods useful in genetic analysis of pedigree data, in particular case-parent trio data.
+License: THE BEER-WARE LICENSE
 Depends: R (>= 2.15), methods, Biobase, GenomicRanges
 Imports:
 Suggests:
@@ -18,4 +18,4 @@ Collate: AllClasses.R
          zzz.R
 LazyLoad: yes
 biocViews:
-Packaged: Thu Jan 24 09:34:08 EST 2013
+Packaged: Tue Mar  5 12:26:58 EST 2013
