@@ -1,7 +1,7 @@
 #importClassesFrom(MinimumDistance, Pedigree)
 #exportClasses( SNPTrioExperiment, PedClass )
 exportClasses( SNPTrioExperiment, PedClass )
-exportMethods(  pedigree, completeTrios, ids, geno, logR, baf, PedClass)
+exportMethods(  pedigree, completeTrios, ids, geno, logR, baf, PedClass, SNPTrioExperiment)
 #importMethodsFrom(snpStats, "[", show)
 #importMethodsFrom(GenomicRanges, show)
 # exportClasses( Pedigree, TdtSet, gTrio, TrioSetList )

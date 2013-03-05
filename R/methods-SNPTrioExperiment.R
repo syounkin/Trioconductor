@@ -7,17 +7,22 @@ setMethod("initialize", "SNPTrioExperiment",
             .Object
           })
 
-#setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "data.frame"), function(se, pedigree){
-#  new("SNPTrioExperiment", se, pedigree)
-#})
+setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "PedClass"), function(se, pedigree){
+  new("SNPTrioExperiment", pedigree, se)
+})
 
 setMethod("show", signature(object="SNPTrioExperiment"), function(object){
   callNextMethod()
   #GenomicRanges::show(object)
-  cat("pedigree(", nrow(pedigree(object)), "): FAMID ID FID MID SEX DX\n", sep = "")
+  cat("pedigree(", nrow(pedigree(object)), "): famid id fid mid sex dx\n", sep = "")
   })
 
-setMethod("geno", signature(object="SNPTrioExperiment"), function(object) assays(object)$geno )
+setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
+  geno <- t(assays(object)$geno)
+  colnames(geno) <- as.character(names(rowData(object)))
+  rownames(geno) <- as.character(rownames(colData(object)))
+  geno
+})
 setMethod("logR", signature(object="SNPTrioExperiment"), function(object) assays(object)$logR )
 setMethod("baf",  signature(object="SNPTrioExperiment"), function(object) assays(object)$baf )
 

@@ -4,7 +4,7 @@ setMethod("initialize", signature(.Object="PedClass"),
            callNextMethod(.Object, ... )
          })
 
-setMethod( "PedClass", signature(object = "data.frame"), function(object) new("PedClass", object) )
+setMethod( "PedClass", signature(object = "DataFrame"), function(object) new("PedClass", object) )
 
 ## setMethod("pedigree",  signature(object="PedClass"), function(object) object@pedigree )
 

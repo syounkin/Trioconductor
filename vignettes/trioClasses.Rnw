@@ -16,27 +16,59 @@
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
 \maketitle
-<<packages>>=
+\section{Classes}
+<<packages, echo = FALSE>>=
 library("trioClasses")
 library("snpStats")
 library("vcf2R")
 @
-<<data>>=
+<<data, echo = FALSE>>=
 data("BMP4-european-all.sm")
-data("ped")
+#data("ped")
+#ped.DF <- as(ped.df, "DataFrame")
+rownames(sm) <- paste0("subject", 1:nrow(sm))
+ped.DF <- DataFrame( famid = NA, id = rownames(sm), fid = NA, mid = NA, sex = NA, dx = NA ) 
+col.DF <- DataFrame( id = rownames(sm) )
+rownames(col.DF) <- col.DF$id
+gr <- GRanges( seqnames = "chr14", ranges = IRanges(start = 1:ncol(sm), width = 1) )
+names(gr) <- colnames(sm)
 @ 
+\subsection{SnpMatrix, DataFrame, GRanges} 
+<<grdf2>>=
+class(sm)
+class(ped.DF)
+class(gr)
+@ 
+\subsection{SummarizedExperiment}
 <<se>>=
-gr <- GRanges( seqnames = paste0("snv",1:nrow(sm)), ranges = IRanges(start = 1:nrow(sm), width = 1) )
-df <- DataFrame( dx = rep(1,ncol(sm)), sex = rep(1,ncol(sm)), row.names = colnames(sm) )
-se <- SummarizedExperiment(assays = SimpleList(geno = sm), colData = df, rowData = gr )
+se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
 @ 
+\subsection{SNPTrioExperiment}
 <<ste>>=
-ste <- new( "SNPTrioExperiment", se, pedigree = PedClass(ped.df) ) 
+ste <- SNPTrioExperiment(se, pedigree = PedClass(ped.DF) )
 @ 
 <<ste-show>>=
 ste
 @ 
-<<classes>>=
-class(geno(ste))
+<<ste-class>>=
+getClass("SNPTrioExperiment")
 @ 
+\subsection{PedClass}
+<<classes>>=
+class(pedigree(ste))
+getClass("PedClass")
+pedigree(ste)
+@
+\subsection{geno accessor}
+<<geno>>=
+class(geno(ste))
+getClass("SnpMatrix")
+geno(ste)
+@ 
+\subsection{RowData}
+<<rowdata>>=
+rowData(ste)
+@ 
+\section{Validity}
+\section{Methods}
 \end{document}

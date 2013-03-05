@@ -1,5 +1,5 @@
-setClass("PedClass", contains = "data.frame",
-         prototype = data.frame(
+setClass("PedClass", contains = "DataFrame",
+         prototype = DataFrame(
            famid=paste0("fam",rep(1:3,3)),
            id=paste0("pseudo",1:9),
            fid=paste0("pseudo",1:9),
