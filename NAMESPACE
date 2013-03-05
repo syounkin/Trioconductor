@@ -1,2 +1,2 @@
 exportClasses( SNPTrioExperiment, PedClass )
-exportMethods(  pedigree, completeTrios, ids, geno, logR, baf, PedClass, SNPTrioExperiment)
+exportMethods(  pedigree, completeTrios, ids, geno, logR, baf, PedClass, SNPTrioExperiment, trios)
