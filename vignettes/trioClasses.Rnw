@@ -44,11 +44,11 @@ with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
 Or run Holger's functions.
 <<trio>>=
 geno <- ctcbind(gtrio)
-aTDT(geno[,1:10])
+table(aTDT(geno)$transMinor)
 @ 
-This function is not working yet.  It requires the subset method ``]'' be written fro SNPTrioExperiment first.  As it is now the second argument, the GRanges object, is ignored.
+I haven't confirmed yet that TransCount is working properly.  The counts seem high, but I'm not sure if the comparision is correct.
 <<transcount>>=
-TransCount(ste,gr[51:100])
+TransCount(ste,gr[1])
 @ 
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -49,8 +49,26 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
 })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges"), function( object, gr ){
-  #ste <- object[subjectHits(findOverlaps(gr, rowData(object))),]
-  ste <- object # temporary patch
+  ste <- object[subjectHits(findOverlaps(gr, rowData(object))),]
+  #ste <- object # temporary patch
   gtrio <- GenoTrio(ste)
-  with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
+  t <- numeric(6)
+  t[1] <-   with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
+  t[2] <-   with( gtrio, sum( F == 1 & M == 0 & O == 1, na.rm = TRUE) )
+  t[3] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
+  t[4] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
+  t[5] <-   with( gtrio, sum( F == 1 & M == 1 & O == 1, na.rm = TRUE) )
+  t[6] <- 2*with( gtrio, sum( F == 1 & M == 1 & O == 2, na.rm = TRUE) )
+  return(sum(t))
+})
+
+setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
+  se <- as( x, "SummarizedExperiment" )
+  if( !missing(j) ){
+    se <- se[i,j]
+  }else{
+    se <- se[i,]
+  }
+  return(SNPTrioExperiment(se, pedigree(x)))
+    
 })
