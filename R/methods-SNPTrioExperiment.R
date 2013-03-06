@@ -42,3 +42,9 @@ setMethod("GenoTrio",  signature(object="SNPTrioExperiment"), function(object){
   geno <- geno(object)
   list( O = geno[as.character(ct[,"id"]),], F = geno[as.character(ct[,"fid"]),], M = geno[as.character(ct[,"mid"]),] )
 })
+
+setMethod("ctcbind", signature( object = "list"), function( object ){
+  holger <- with( object, matrix(c(t(cbind( as(O,"matrix"), as(F,"matrix"), as(M,"matrix")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
+  x <- ifelse( holger == 01, 0L, ifelse( holger == 02, 1L, ifelse( holger == 03, 2L, NA )))
+  x
+})

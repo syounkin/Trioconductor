@@ -9,3 +9,4 @@ setGeneric("SNPTrioExperiment", function(se, pedigree) standardGeneric("SNPTrioE
 setGeneric("PedClass", function(object) standardGeneric("PedClass"))
 setGeneric("trios", function(object) standardGeneric("trios"))
 setGeneric("GenoTrio", function(object) standardGeneric("GenoTrio"))
+setGeneric("ctcbind", function(object) standardGeneric("ctcbind"))

@@ -16,16 +16,40 @@
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
 \maketitle
-\section{Sample Data}
-<<data, echo = TRUE>>=
-data("sample")
-@ 
-\section{Classes}
-<<packages, echo = FALSE>>=
+\section{Packages}
+<<packages>>=
 library("trioClasses")
 #library("snpStats")
 #library("vcf2R")
 @
+\section{Sample Data}
+<<data, echo = TRUE>>=
+data("sample")
+se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
+ped <- PedClass(ped.DF)
+ste <- SNPTrioExperiment(se, pedigree = ped )
+@ 
+<<ste-show>>=
+ste
+@ 
+\section{Methods}
+Now create a list of three SnpMatrices for trio analyses using GenoTrio().
+<<genotrio>>=
+gtrio <- GenoTrio(ste)
+@ 
+Now we can do things easily, such as count transmissions.
+<<trans>>=
+trans.011 <- with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
+@ 
+Or run Holger's functions.
+<<trio>>=
+geno <- ctcbind(gtrio)
+aTDT(geno[,1:10])
+@ 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Classes}
 \subsection{SnpMatrix, DataFrame, GRanges} 
 The four key ingredients are the SNP matrix, the pedigree information as a DataFrame, position of the SNPs given by a GRanges object, and covariate data given as a DataFrame.
 <<grdf2>>=
@@ -70,18 +94,8 @@ geno(ste)
 rowData(ste)
 @ 
 \subsection{ColData}
-<<coldata>>=
+<<coldata, eval = FALSE, echo = FALSE>>=
 colData(ste)
 @ 
-Now create a list of three SnpMatrices for trio analyses.
-<<genotrio>>=
-gtrio <- GenoTrio(ste)
-#O.geno <- as(gtrio$O, "numeric" )
-#F.geno <- as(gtrio$F, "numeric" )
-#M.geno <- as(gtrio$M, "numeric" )
-trans.011 <- sum(gtrio$F == 0 & gtrio$M == 1 & gtrio$O == 1, na.rm = TRUE)
-#trans.011 <- sum(F.geno == 0 & M.geno == 1 & O.geno == 1, na.rm = TRUE)
-@ 
 \section{Validity}
-\section{Methods}
 \end{document}

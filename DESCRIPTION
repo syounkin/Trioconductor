@@ -7,12 +7,13 @@ Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender, Ingo Ruczinski
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
 Description: The package trioClasses defines the class SNPTrioExperiment along with corresponding methods useful in genetic analysis of pedigree data, in particular case-parent trio data.
 License: THE BEER-WARE LICENSE
-Depends: R (>= 2.15), methods, Biobase, GenomicRanges
+Depends: R (>= 2.15), methods, Biobase, GenomicRanges, snpStats
 Imports:
 Suggests:
 Enhances:
 Collate: AllClasses.R
 	 AllGenerics.R
+	 functions.R
 	 methods-SNPTrioExperiment.R
 	 methods-PedClass.R
 	 reload.R
