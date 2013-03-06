@@ -20,30 +20,31 @@
 <<packages, echo = FALSE>>=
 library("trioClasses")
 library("snpStats")
-library("vcf2R")
+#library("vcf2R")
 @
 <<data, echo = FALSE>>=
-data("BMP4-european-all.sm")
-data("ped")
-ped.df <- subset( ped.df, !is.na(id) )
-coldata.df <- subset(ped.df, id %in% rownames(sm))
-ped.DF <- with(ped.df, {
-  DataFrame(
-    famid = ped,
-    id = id,
-    fid = fid,
-    mid = mid,
-    sex = sex,
-    dx = affected
-    )
-})
+data("sample")
+#data("BMP4-european-all.sm")
+#data("ped")
+#ped.df <- subset( ped.df, !is.na(id) )
+#coldata.df <- subset(ped.df, id %in% rownames(sm))
+#ped.DF <- with(ped.df, {
+#  DataFrame(
+#    famid = ped,
+#    id = id,
+#    fid = fid,
+#    mid = mid,
+#    sex = sex,
+#    dx = affected
+#    )
+#})
 #ped.DF <- as(ped.df, "DataFrame")
 #rownames(sm) <- paste0("subject", 1:nrow(sm))
 #ped.DF <- DataFrame( famid = NA, id = rownames(sm), fid = NA, mid = NA, sex = NA, dx = NA ) 
-col.DF <- as( coldata.df, "DataFrame" )
-rownames(col.DF) <- col.DF$id
-gr <- GRanges( seqnames = "chr14", ranges = IRanges(start = 1:ncol(sm), width = 1) )
-names(gr) <- colnames(sm)
+#col.DF <- as( coldata.df, "DataFrame" )
+#rownames(col.DF) <- col.DF$id
+#gr <- GRanges( seqnames = "chr14", ranges = IRanges(start = 1:ncol(sm), width = 1) )
+#names(gr) <- colnames(sm)
 @ 
 \subsection{SnpMatrix, DataFrame, GRanges} 
 The four key ingredients are the SNP matrix, the pedigree information as a DataFrame, position of the SNPs given by a GRanges object, and covariate data given as a DataFrame.
