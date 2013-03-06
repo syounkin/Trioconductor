@@ -15,6 +15,7 @@ Collate: AllClasses.R
 	 AllGenerics.R
 	 methods-SNPTrioExperiment.R
 	 methods-PedClass.R
+	 reload.R
          zzz.R
 LazyLoad: yes
 biocViews:
