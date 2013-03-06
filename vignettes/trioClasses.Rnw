@@ -35,17 +35,22 @@ ste
 \section{Methods}
 Now create a list of three SnpMatrices for trio analyses using GenoTrio().
 <<genotrio>>=
-gtrio <- GenoTrio(ste)
+( gtrio <- GenoTrio(ste) )
 @ 
 Now we can do things easily, such as count transmissions.
 <<trans>>=
-trans.011 <- with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
+with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
 @ 
 Or run Holger's functions.
 <<trio>>=
 geno <- ctcbind(gtrio)
 aTDT(geno[,1:10])
 @ 
+This function is not working yet.  It requires the subset method ``]'' be written fro SNPTrioExperiment first.  As it is now the second argument, the GRanges object, is ignored.
+<<transcount>>=
+TransCount(ste,gr[51:100])
+@ 
+\clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

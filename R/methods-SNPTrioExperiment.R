@@ -13,7 +13,6 @@ setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "PedClass"), fu
 
 setMethod("show", signature(object="SNPTrioExperiment"), function(object){
   callNextMethod()
-  #GenomicRanges::show(object)
   cat("pedigree(", nrow(pedigree(object)), "): famid id fid mid sex dx\n", sep = "")
   })
 
@@ -47,4 +46,11 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
   holger <- with( object, matrix(c(t(cbind( as(O,"matrix"), as(F,"matrix"), as(M,"matrix")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
   x <- ifelse( holger == 01, 0L, ifelse( holger == 02, 1L, ifelse( holger == 03, 2L, NA )))
   x
+})
+
+setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges"), function( object, gr ){
+  #ste <- object[subjectHits(findOverlaps(gr, rowData(object))),]
+  ste <- object # temporary patch
+  gtrio <- GenoTrio(ste)
+  with( gtrio, sum( F == 0 & M == 1 & O == 1, na.rm = TRUE) )
 })
