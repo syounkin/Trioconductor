@@ -16,36 +16,16 @@
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
 \maketitle
+\section{Sample Data}
+<<data, echo = TRUE>>=
+data("sample")
+@ 
 \section{Classes}
 <<packages, echo = FALSE>>=
 library("trioClasses")
-library("snpStats")
+#library("snpStats")
 #library("vcf2R")
 @
-<<data, echo = FALSE>>=
-data("sample")
-#data("BMP4-european-all.sm")
-#data("ped")
-#ped.df <- subset( ped.df, !is.na(id) )
-#coldata.df <- subset(ped.df, id %in% rownames(sm))
-#ped.DF <- with(ped.df, {
-#  DataFrame(
-#    famid = ped,
-#    id = id,
-#    fid = fid,
-#    mid = mid,
-#    sex = sex,
-#    dx = affected
-#    )
-#})
-#ped.DF <- as(ped.df, "DataFrame")
-#rownames(sm) <- paste0("subject", 1:nrow(sm))
-#ped.DF <- DataFrame( famid = NA, id = rownames(sm), fid = NA, mid = NA, sex = NA, dx = NA ) 
-#col.DF <- as( coldata.df, "DataFrame" )
-#rownames(col.DF) <- col.DF$id
-#gr <- GRanges( seqnames = "chr14", ranges = IRanges(start = 1:ncol(sm), width = 1) )
-#names(gr) <- colnames(sm)
-@ 
 \subsection{SnpMatrix, DataFrame, GRanges} 
 The four key ingredients are the SNP matrix, the pedigree information as a DataFrame, position of the SNPs given by a GRanges object, and covariate data given as a DataFrame.
 <<grdf2>>=
@@ -95,7 +75,12 @@ colData(ste)
 @ 
 Now create a list of three SnpMatrices for trio analyses.
 <<genotrio>>=
-GenoTrio(ste)
+gtrio <- GenoTrio(ste)
+#O.geno <- as(gtrio$O, "numeric" )
+#F.geno <- as(gtrio$F, "numeric" )
+#M.geno <- as(gtrio$M, "numeric" )
+trans.011 <- sum(gtrio$F == 0 & gtrio$M == 1 & gtrio$O == 1, na.rm = TRUE)
+#trans.011 <- sum(F.geno == 0 & M.geno == 1 & O.geno == 1, na.rm = TRUE)
 @ 
 \section{Validity}
 \section{Methods}
