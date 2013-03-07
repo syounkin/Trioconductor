@@ -26,29 +26,51 @@ library("trioClasses")
 <<data, echo = TRUE>>=
 data("sample")
 se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
+@ 
+\subsection{Pedigree}
+<<ped>>=
 ped <- PedClass(ped.DF)
+@ 
+\subsection{SNPTrioExperiment}
+<<ste>>=
 ste <- SNPTrioExperiment(se, pedigree = ped )
 @ 
 <<ste-show>>=
 ste
 @ 
 \section{Methods}
-We can create a list of three SnpMatrices for trio analyses using GenoTrio().
-<<genotrio>>=
-( gtrio <- GenoTrio(ste) )
-@ 
-To convert to Holger's format we use ctcbind() and GenoTrio().  (``ctcbind()'' gets its name from the composition of three functions c(t(cbind())).)
+\subsection{Holger-style Genotype Matrix}
+Coercion to matrix for \emph{trio}
 <<trio>>=
-geno <- ctcbind(gtrio)
-sum(aTDT(geno)$transMinor[1:10])
+geno <- as(ste, "matrix")
+#library("trio")
+#trio:::aTDT(geno[,1:10])
 @ 
+Or apply the aTDT method to the SNPTrioExperiment directly.
+<<trio2>>=
+aTDT(ste)
+@ 
+\subsection{Count of Transmission of Rare Variants (\emph{TransCount()})}
+\subsubsection{In a block}
 <<block>>=
-wd <- 10e3
-block <- GRanges( seqnames = "chr14", IRanges(start(gr[1]), width = wd), strand = "*")
+world <- range(gr)
+block <- GRanges( seqnames = "chr14", IRanges(start(gr[100]), width = 10e3), strand = "*")
 @ 
 <<transcount>>=
+block
 TransCount( ste[MAF(ste) <= 0.01,], block )
 @ 
+\subsubsection{Not In the block}
+<<transcount>>=
+setdiff(world,block)
+TransCount( ste[MAF(ste) <= 0.01,], setdiff(world,block) )
+@ 
+\subsubsection{In the ``world''}
+<<transcount>>=
+world
+TransCount( ste[MAF(ste) <= 0.01,], world )
+@ 
+
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
