@@ -44,20 +44,11 @@ with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
 Or run Holger's functions.
 <<trio>>=
 geno <- ctcbind(gtrio)
-aTDT(geno)$transMinor[1:10]
+sum(aTDT(geno)$transMinor[1:10])
 @ 
-I haven't confirmed yet that TransCount is working properly.  The counts seem high, but I'm not sure if the comparision is correct.
+
 <<transcount>>=
-TransCount(ste,gr[1])
-TransCount(ste,gr[2])
-TransCount(ste,gr[3])
-TransCount(ste,gr[4])
-TransCount(ste,gr[5])
-TransCount(ste,gr[6])
-TransCount(ste,gr[7])
-TransCount(ste,gr[8])
-TransCount(ste,gr[9])
-TransCount(ste,gr[10])
+TransCount(ste,gr[1:10])
 @ 
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

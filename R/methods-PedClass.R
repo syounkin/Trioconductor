@@ -22,7 +22,6 @@ setMethod("trios",  signature(object="PedClass"), function(object) {
 })
 
 
-## setMethod("ids",  signature(object="PedClass"), function(object){
-##   ped.df <- pedigree(object)
-##   with(ped.df, unique(c( id, fid, mid)))
-## })
+setMethod("parents",  signature(object="PedClass"), function(object){
+    with(as(object,"data.frame"), unique(c(as.character(fid), as.character(mid))))
+})

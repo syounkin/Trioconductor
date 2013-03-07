@@ -43,15 +43,13 @@ setMethod("GenoTrio",  signature(object="SNPTrioExperiment"), function(object){
 })
 
 setMethod("ctcbind", signature( object = "list"), function( object ){
-  holger <- with( object, matrix(c(t(cbind( as(O,"matrix"), as(F,"matrix"), as(M,"matrix")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
+  holger <- with( object, matrix(c(t(cbind( as(F,"matrix"), as(M,"matrix"), as(O,"matrix")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
   x <- ifelse( holger == 01, 0L, ifelse( holger == 02, 1L, ifelse( holger == 03, 2L, NA )))
   x
 })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges"), function( object, gr ){
   ste <- object[subjectHits(findOverlaps(gr, rowData(object))),]
-  show(ste)
-  #ste <- object # temporary patch
   gtrio <- GenoTrio(ste)
   t <- numeric(6)
   t[1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
@@ -65,11 +63,22 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges")
 
 setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
   se <- as( x, "SummarizedExperiment" )
-  if( !missing(j) ){
+  if( !missing(i) & !missing(j)){
     se <- se[i,j]
-  }else{
+  }else if( !missing(i) & missing(j)){
     se <- se[i,]
+  }else if( missing(i) & !missing(j)){
+    se <- se[,j]
+  }else {
+    se <- se [,]
   }
   return(SNPTrioExperiment(se, pedigree(x)))
-    
+})
+
+setMethod("parents",  signature(object="SNPTrioExperiment"), function(object){
+  with(as(pedigree(object),"data.frame"), unique(c(as.character(fid), as.character(mid))))
+})
+
+setMethod("MAF", signature(object="SNPTrioExperiment"), function(object){
+  with(col.summary(geno(ste[,which(colnames(ste) %in% parents(ste))])),MAF)
 })
