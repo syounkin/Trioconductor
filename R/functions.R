@@ -1,4 +1,4 @@
-aTDT <- function(geno, correct=FALSE){
+aTDT.fn <- function(geno, correct=FALSE){
   n.row <- nrow(geno)
   dad <- geno[seq.int(1, n.row, 3),, drop=FALSE]
   mom <- geno[seq.int(2, n.row, 3),, drop=FALSE]

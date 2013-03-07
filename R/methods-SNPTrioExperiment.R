@@ -14,7 +14,7 @@ setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "PedClass"), fu
 setMethod("show", signature(object="SNPTrioExperiment"), function(object){
   callNextMethod()
   cat("pedigree(", nrow(pedigree(object)), "): famid id fid mid sex dx\n", sep = "")
-  })
+})
 
 setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
   geno <- t(assays(object)$geno)
@@ -24,7 +24,6 @@ setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
 })
 setMethod("logR", signature(object="SNPTrioExperiment"), function(object) assays(object)$logR )
 setMethod("baf",  signature(object="SNPTrioExperiment"), function(object) assays(object)$baf )
-
 
 setMethod("pedigree",  signature(object="SNPTrioExperiment"), function(object) object@pedigree )
 
@@ -83,15 +82,14 @@ setMethod("MAF", signature(object="SNPTrioExperiment"), function(object){
   with(col.summary(geno(ste[,which(colnames(ste) %in% parents(ste))])),MAF)
 })
 
-#setMethod("as", signature(x="SNPTrioExperiment", type = "character"), function(x, type){
-#  return(x)
-#  if( to == "Holger" ){
-#    gtrio <- GenoTrio(object)
-#    holger <- ctcbind(gtrio)
-#    return(object)
- # }else{
-   # return(NULL)
-  #}
-#})
+setMethod("aTDT", signature(object="SNPTrioExperiment"), function(object){
+  geno <- as( object, "matrix" )
+  aTDT.fn(geno)
+})
 
+setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
+    gtrio <- GenoTrio(from)
+    holger <- ctcbind(gtrio)
+    return(holger)
+})
 
