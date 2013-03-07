@@ -33,22 +33,21 @@ ste <- SNPTrioExperiment(se, pedigree = ped )
 ste
 @ 
 \section{Methods}
-Now create a list of three SnpMatrices for trio analyses using GenoTrio().
+We can create a list of three SnpMatrices for trio analyses using GenoTrio().
 <<genotrio>>=
 ( gtrio <- GenoTrio(ste) )
 @ 
-Now we can do things easily, such as count transmissions.
-<<trans>>=
-with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
-@ 
-Or run Holger's functions.
+To convert to Holger's format we use ctcbind() and GenoTrio().  (``ctcbind()'' gets its name from the composition of three functions c(t(cbind())).)
 <<trio>>=
 geno <- ctcbind(gtrio)
 sum(aTDT(geno)$transMinor[1:10])
 @ 
-
+<<block>>=
+wd <- 10e3
+block <- GRanges( seqnames = "chr14", IRanges(start(gr[1]), width = wd), strand = "*")
+@ 
 <<transcount>>=
-TransCount(ste,gr[1:10])
+TransCount( ste[MAF(ste) <= 0.01,], block )
 @ 
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

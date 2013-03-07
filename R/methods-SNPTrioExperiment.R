@@ -82,3 +82,16 @@ setMethod("parents",  signature(object="SNPTrioExperiment"), function(object){
 setMethod("MAF", signature(object="SNPTrioExperiment"), function(object){
   with(col.summary(geno(ste[,which(colnames(ste) %in% parents(ste))])),MAF)
 })
+
+#setMethod("as", signature(x="SNPTrioExperiment", type = "character"), function(x, type){
+#  return(x)
+#  if( to == "Holger" ){
+#    gtrio <- GenoTrio(object)
+#    holger <- ctcbind(gtrio)
+#    return(object)
+ # }else{
+   # return(NULL)
+  #}
+#})
+
+
