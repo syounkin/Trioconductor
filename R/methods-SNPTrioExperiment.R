@@ -46,38 +46,6 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
   x
 })
 
-
-setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
-  index <- subjectHits(findOverlaps(region, rowData(object)))
-  #t <- matrix(0,nrow=length(index), ncol = 6)
-  t <- numeric(6)
-  if( length(index) != 0 ){
-    #for( i in 1:length(index) ){
-      ste <- object[index,]
-      gtrio <- GenoTrio(ste)
-      t[1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
-      t[2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
-      t[3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
-      t[4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
-      t[5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
-      t[6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
-    #}
-    #return(rowSums(t, na.rm = TRUE))
-    return( sum(t, na.rm = TRUE ))
-  }else{
-    return(-1)
-  }
-})
-
-setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRangesList"), function( object, region ){
-  result <- numeric(length(region))
-  for( i in 1:length(region) ){
-    gr <- region[[i]]
-    result[i] <- TransCount(object = object, region = gr )
-  }
-  return(result)
-})
-
 setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
   se <- as( x, "SummarizedExperiment" )
   if( !missing(i) & !missing(j)){
@@ -114,4 +82,57 @@ setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
   gtrio <- GenoTrio(from)
   holger <- ctcbind(gtrio)
   return(holger)
+})
+
+setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
+  index <- subjectHits(findOverlaps(region, rowData(object)))
+  t <- numeric(6)
+  if( length(index) != 0 ){
+      ste <- object[index,]
+      gtrio <- GenoTrio(ste)
+      t[1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
+      t[2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
+      t[3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
+      t[4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
+      t[5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
+      t[6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
+      return( sum(t, na.rm = TRUE ))
+  }else{
+    return(NA)
+  }
+})
+
+setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRangesList"), function( object, region ){
+  result <- numeric(length(region))
+  for( i in 1:length(region) ){
+    gr <- region[[i]]
+    result[i] <- TransCount(object = object, region = gr )
+  }
+  return(result)
+})
+
+setMethod("setdiff.sgy", signature( subject = "GRanges", query = "GRangesList" ), function( subject, query ){
+  results <- list()
+  for( i in 1:length(query) ){
+    results <- c( results, list(setdiff( subject, query[[i]])))
+  }
+  return(GRangesList(results))
+})
+    
+setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRangesList", block = "GRanges"), function(object, window, block){
+  trans <- TransCount(object, window)
+  window.out <- setdiff.sgy( query = window, subject = block )
+  trans.out <- TransCount(object, window.out)
+
+  ## Need count of observeable transmissions.
+  
+  return(cbind(trans,trans.out))
+})
+
+setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
+  results <- list()
+  for( i in 1:length(object) ){
+    results <- c( results, list(object[i]) )
+  }
+  return(GRangesList(results))
 })
