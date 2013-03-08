@@ -87,6 +87,11 @@ setMethod("aTDT", signature(object="SNPTrioExperiment"), function(object){
   aTDT.fn(geno)
 })
 
+setMethod("aTDT", signature(object="matrix"), function(object){
+  geno <- object
+  aTDT.fn(geno)
+})
+
 setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
     gtrio <- GenoTrio(from)
     holger <- ctcbind(gtrio)

@@ -17,10 +17,8 @@
 \setlength{\parindent}{0pt}
 \maketitle
 \section{Packages}
-<<packages>>=
+<<package>>=
 library("trioClasses")
-#library("snpStats")
-#library("vcf2R")
 @
 \section{Sample Data}
 <<data, echo = TRUE>>=
@@ -43,19 +41,19 @@ ste
 Coercion to matrix for \emph{trio}
 <<trio>>=
 geno <- as(ste, "matrix")
-#library("trio")
-#trio:::aTDT(geno[,1:10])
+aTDT(geno[,1:5])
 @ 
 Or apply the aTDT method to the SNPTrioExperiment directly.
 <<trio2>>=
-aTDT(ste)
+aTDT(ste[1:5])
 @ 
 \subsection{Count of Transmission of Rare Variants (\emph{TransCount()})}
-\subsubsection{In a block}
+First we define the world and a block.
 <<block>>=
 world <- range(gr)
 block <- GRanges( seqnames = "chr14", IRanges(start(gr[100]), width = 10e3), strand = "*")
 @ 
+\subsubsection{In a block}
 <<transcount>>=
 block
 TransCount( ste[MAF(ste) <= 0.01,], block )
