@@ -46,20 +46,36 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
   x
 })
 
-setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges"), function( object, gr ){
-  t <- matrix(0,nrow=length(gr), ncol = 6)
-  for( i in 1:length(gr) ){
-    gr.row <- gr[i]
-    ste <- object[subjectHits(findOverlaps(gr.row, rowData(object))),]
-    gtrio <- GenoTrio(ste)
-    t[i,1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
-    t[i,2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
-    t[i,3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
-    t[i,4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
-    t[i,5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
-    t[i,6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
+
+setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
+  index <- subjectHits(findOverlaps(region, rowData(object)))
+  #t <- matrix(0,nrow=length(index), ncol = 6)
+  t <- numeric(6)
+  if( length(index) != 0 ){
+    #for( i in 1:length(index) ){
+      ste <- object[index,]
+      gtrio <- GenoTrio(ste)
+      t[1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
+      t[2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
+      t[3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
+      t[4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
+      t[5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
+      t[6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
+    #}
+    #return(rowSums(t, na.rm = TRUE))
+    return( sum(t, na.rm = TRUE ))
+  }else{
+    return(-1)
   }
-  return(rowSums(t, na.rm = TRUE))
+})
+
+setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRangesList"), function( object, region ){
+  result <- numeric(length(region))
+  for( i in 1:length(region) ){
+    gr <- region[[i]]
+    result[i] <- TransCount(object = object, region = gr )
+  }
+  return(result)
 })
 
 setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){

@@ -70,10 +70,12 @@ TransCount( ste[MAF(ste) <= 0.01,], world )
 @ 
 \subsection{Iteratively}
 <<iter>>=
-trans.vec <- TransCount( ste[MAF(ste) <= 0.01,], gr[1:10] + 1e3 )
+grlist <- GRangesList(gr[1],gr[2])
+trans.vec <- TransCount( ste, grlist )
+#trans.vec <- TransCount( ste[MAF(ste) <= 0.01,], grlist )
 @ 
 <<transvec>>=
-table(trans.vec)
+trans.vec
 @ 
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
