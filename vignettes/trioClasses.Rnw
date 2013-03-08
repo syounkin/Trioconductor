@@ -8,7 +8,7 @@
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
 \title{The R package \emph{trioClasses} for definition of the class \emph{SNPTrioExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
-\author{Samuel G. Younkin, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
+\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
 %\input{/home/sgy/jhsph/latex/sgy}
@@ -63,6 +63,7 @@ aTDT(ste[1:5])
 <<windows>>=
 window <- GRanges( seqnames =  "chr14", IRanges(start(gr[100]), width = 10e3), strand = "*")
 window2 <- GRanges( seqnames = "chr14", IRanges(start(gr[100]), width = 1e3), strand = "*")
+block <- range(rowData(ste))
 @ 
 <<transcount>>=
 #window
@@ -71,7 +72,7 @@ TransCount( ste, window )
 \subsection{Not in window, but in block}
 <<transcount>>=
 #setdiff(block,window)
-TransCount( ste, setdiff(block,window) )
+TransCount( ste, setdiff(block, window) )
 @ 
 \subsection{In the whole block}
 <<transcount>>=
