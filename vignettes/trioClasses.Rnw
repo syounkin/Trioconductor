@@ -70,7 +70,7 @@ TransCount( ste[MAF(ste) <= 0.01,], world )
 @ 
 \subsection{Iteratively}
 <<iter>>=
-trans.vec <- TransCount( ste[MAF(ste) <= 0.01,], gr + 1e3 )
+trans.vec <- TransCount( ste[MAF(ste) <= 0.01,], gr[1:10] + 1e3 )
 @ 
 <<transvec>>=
 table(trans.vec)

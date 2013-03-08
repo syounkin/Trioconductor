@@ -1,11 +1,8 @@
-setMethod("initialize", "SNPTrioExperiment",
-          function(.Object, pedigree, ... ){
-            
-            .Object@pedigree <- pedigree
-            .Object <- callNextMethod()
-             
-            .Object
-          })
+setMethod("initialize", "SNPTrioExperiment", function(.Object, pedigree, ... ){
+  .Object@pedigree <- pedigree
+  .Object <- callNextMethod()
+  .Object
+})
 
 setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "PedClass"), function(se, pedigree){
   new("SNPTrioExperiment", pedigree, se)
@@ -22,7 +19,9 @@ setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
   rownames(geno) <- as.character(rownames(colData(object)))
   geno
 })
+
 setMethod("logR", signature(object="SNPTrioExperiment"), function(object) assays(object)$logR )
+
 setMethod("baf",  signature(object="SNPTrioExperiment"), function(object) assays(object)$baf )
 
 setMethod("pedigree",  signature(object="SNPTrioExperiment"), function(object) object@pedigree )
@@ -96,8 +95,7 @@ setMethod("aTDT", signature(object="matrix"), function(object){
 })
 
 setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
-    gtrio <- GenoTrio(from)
-    holger <- ctcbind(gtrio)
-    return(holger)
+  gtrio <- GenoTrio(from)
+  holger <- ctcbind(gtrio)
+  return(holger)
 })
-

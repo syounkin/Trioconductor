@@ -17,6 +17,6 @@ aTDT.fn <- function(geno, correct=FALSE){
   if(correct)
     tmp1 <- abs(tmp1) - 1
   stat <- tmp1 * tmp1 / (transMinor + transMajor)
-         pval <- pchisq(stat, 1, lower.tail=FALSE)
-          return( list(stat=stat, pval=pval, transMinor=transMinor, transMajor=transMajor ))
+  pval <- pchisq(stat, 1, lower.tail=FALSE)
+  return( list(stat=stat, pval=pval, transMinor=transMinor, transMajor=transMajor ))
 }
