@@ -4,8 +4,7 @@ THISPKG <- "trioClasses"
 	packageStartupMessage(paste("
 ==================================
 Welcome to trioClasses version ", version, "\n",
-"by Scharpf, Schwender and Younkin
-==================================", sep = "" ) )
+"==================================", sep = "" ) )
 }
 
 .onUnload <- function(libpath){

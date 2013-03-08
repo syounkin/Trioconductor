@@ -111,6 +111,14 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
   return(result)
 })
 
+setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
+  results <- list()
+  for( i in 1:length(object) ){
+    results <- c( results, list(object[i]) )
+  }
+  return(GRangesList(results))
+})
+
 setMethod("setdiff.sgy", signature( subject = "GRanges", query = "GRangesList" ), function( subject, query ){
   results <- list()
   for( i in 1:length(query) ){
@@ -118,21 +126,15 @@ setMethod("setdiff.sgy", signature( subject = "GRanges", query = "GRangesList" )
   }
   return(GRangesList(results))
 })
-    
-setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRangesList", block = "GRanges"), function(object, window, block){
-  trans <- TransCount(object, window)
-  window.out <- setdiff.sgy( query = window, subject = block )
-  trans.out <- TransCount(object, window.out)
+
+setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
+  window.list <- relist.sgy(window)
+  window.out <- setdiff.sgy( query = window.list, subject = block )  
+  inside <- TransCount(object, window.list)
+  outside <- TransCount(object, window.out)
 
   ## Need count of observeable transmissions.
-  
-  return(cbind(trans,trans.out))
-})
-
-setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
-  results <- list()
-  for( i in 1:length(object) ){
-    results <- c( results, list(object[i]) )
-  }
-  return(GRangesList(results))
+  mat <- cbind(inside, outside)
+  rownames(mat) <- names(window)
+  return(mat)
 })
