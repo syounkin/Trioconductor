@@ -119,17 +119,17 @@ setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
   return(GRangesList(results))
 })
 
-setMethod("setdiff.sgy", signature( subject = "GRanges", query = "GRangesList" ), function( subject, query ){
+setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x, y, ... ){
   results <- list()
-  for( i in 1:length(query) ){
-    results <- c( results, list(setdiff( subject, query[[i]])))
+  for( i in 1:length(x) ){
+    results <- c( results, list(setdiff( y, x[[i]], ...)))
   }
   return(GRangesList(results))
 })
 
 setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
   window.list <- relist.sgy(window)
-  window.out <- setdiff.sgy( query = window.list, subject = block )  
+  window.out <- setdiff( window.list, block )  
   inside <- TransCount(object, window.list)
   outside <- TransCount(object, window.out)
 
