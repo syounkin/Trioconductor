@@ -48,16 +48,19 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
 })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges"), function( object, gr ){
-  ste <- object[subjectHits(findOverlaps(gr, rowData(object))),]
-  gtrio <- GenoTrio(ste)
-  t <- numeric(6)
-  t[1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
-  t[2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
-  t[3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
-  t[4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
-  t[5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
-  t[6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
-  return(sum(t))
+  t <- matrix(0,nrow=length(gr), ncol = 6)
+  for( i in 1:length(gr) ){
+    gr.row <- gr[i]
+    ste <- object[subjectHits(findOverlaps(gr.row, rowData(object))),]
+    gtrio <- GenoTrio(ste)
+    t[i,1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
+    t[i,2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
+    t[i,3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
+    t[i,4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
+    t[i,5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
+    t[i,6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
+  }
+  return(rowSums(t, na.rm = TRUE))
 })
 
 setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){

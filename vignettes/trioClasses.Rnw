@@ -68,7 +68,13 @@ TransCount( ste[MAF(ste) <= 0.01,], setdiff(world,block) )
 world
 TransCount( ste[MAF(ste) <= 0.01,], world )
 @ 
-
+\subsection{Iteratively}
+<<iter>>=
+trans.vec <- TransCount( ste[MAF(ste) <= 0.01,], gr + 1e3 )
+@ 
+<<transvec>>=
+table(trans.vec)
+@ 
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
