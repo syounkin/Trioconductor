@@ -48,19 +48,43 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
 })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", gr = "GRanges"), function( object, gr ){
-  t <- matrix(0,nrow=length(gr), ncol = 6)
+  minor <- matrix(0,nrow=length(gr), ncol = 6)
+  major <- matrix(0,nrow=length(gr), ncol = 6)
+  mendel <- matrix(0,nrow=length(gr), ncol = 4)
   for( i in 1:length(gr) ){
     gr.row <- gr[i]
     ste <- object[subjectHits(findOverlaps(gr.row, rowData(object))),]
     gtrio <- GenoTrio(ste)
-    t[i,1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
-    t[i,2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
-    t[i,3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
-    t[i,4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
-    t[i,5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
-    t[i,6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
+#    with( gtrio, {
+      F <- as(with(gtrio,F), "numeric")
+      M <- as(with(gtrio,M), "numeric")
+      O <- as(with(gtrio,O), "numeric")
+      
+      mendel[i,1] <- sum( F == 0 & M == 0 & ( O == 1 | O == 2 ), na.rm = TRUE)
+      mendel[i,2] <- sum( F == 2 & M == 2 & ( O == 0 | O == 1 ), na.rm = TRUE)
+      mendel[i,3] <- sum( F == 0 & M == 2 & ( O == 0 | O == 2 ), na.rm = TRUE)
+      mendel[i,4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)      
+    
+      minor[i,1] <- sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
+      major[i,1] <- sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
+
+      minor[i,2] <- sum( F == 1 & M == 0 & O == 1, na.rm = TRUE)
+      major[i,2] <- sum( F == 1 & M == 0 & O == 0, na.rm = TRUE)
+
+      minor[i,3] <- sum( F == 1 & M == 2 & O == 2, na.rm = TRUE)
+      major[i,3] <- sum( F == 1 & M == 2 & O == 1, na.rm = TRUE)
+
+      minor[i,4] <- sum( F == 2 & M == 1 & O == 2, na.rm = TRUE)
+      major[i,4] <- sum( F == 2 & M == 1 & O == 1, na.rm = TRUE)
+
+      minor[i,5] <- sum( F == 1 & M == 1 & O == 1, na.rm = TRUE)
+      major[i,5] <- minor[i,5]
+
+      minor[i,6] <- 2*sum( F == 1 & M == 1 & O == 2, na.rm = TRUE)
+      major[i,6] <- 2*sum( F == 1 & M == 1 & O == 0, na.rm = TRUE)
+ #   })
   }
-  return(rowSums(t, na.rm = TRUE))
+  return(list( minor = rowSums(minor, na.rm = TRUE), major = rowSums(major, na.rm = TRUE), mendel = rowSums(mendel, na.rm = TRUE)))
 })
 
 setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
