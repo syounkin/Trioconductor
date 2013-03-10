@@ -21,7 +21,6 @@ setMethod("trios",  signature(object="PedClass"), function(object) {
   trio.df[,c("id","fid","mid")]
 })
 
-
 setMethod("parents",  signature(object="PedClass"), function(object){
     with(as(object,"data.frame"), unique(c(as.character(fid), as.character(mid))))
 })

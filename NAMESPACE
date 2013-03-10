@@ -1,4 +1,4 @@
 exportClasses( SNPTrioExperiment, PedClass )
-exportMethods(  pedigree, completeTrios, ids, geno, logR, baf, PedClass, SNPTrioExperiment, trios, TransCount, "[", parents, MAF, aTDT )
+exportMethods(  pedigree, completeTrios, ids, geno, logR, baf, PedClass, SNPTrioExperiment, trios, TransCount, "[", parents, MAF, aTDT, ScanTrio )
 export(aTDT)
-importMethodsFrom(GenomicRanges, "[")
+importMethodsFrom(GenomicRanges, "[", setdiff)

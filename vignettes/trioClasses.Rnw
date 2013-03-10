@@ -8,7 +8,7 @@
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
 \title{The R package \emph{trioClasses} for definition of the class \emph{SNPTrioExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
-\author{Samuel G. Younkin, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
+\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
 %\input{/home/sgy/jhsph/latex/sgy}
@@ -37,6 +37,12 @@ ste <- SNPTrioExperiment(se, pedigree = ped )
 ste
 @ 
 \section{Methods}
+\subsection{ScanTrio}
+Run ScanTrio for windows of size 1 kB centered at each of the first ten rare variants.
+<<scantrio>>=
+ste.rare <- ste[MAF(ste)<=0.01]
+(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:10]) + 1e3/2 , block = range(rowData(ste))))
+@ 
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
 <<trio>>=
@@ -47,38 +53,52 @@ Or apply the aTDT method to the SNPTrioExperiment directly.
 <<trio2>>=
 aTDT(ste[1:5])
 @ 
-\subsection{Count of Transmission of Rare Variants (\emph{TransCount()})}
-First we define the world and a block.
-<<block>>=
-world <- range(gr)
-block <- GRanges( seqnames = "chr14", IRanges(start(gr[100]), width = 10e3), strand = "*")
-@ 
-\subsubsection{In a block}
-<<transcount>>=
-block
-TransCount( ste[MAF(ste) <= 0.01,], block )
-@ 
-\subsubsection{Not In the block}
-<<transcount>>=
-setdiff(world,block)
-TransCount( ste[MAF(ste) <= 0.01,], setdiff(world,block) )
-@ 
-\subsubsection{In the ``world''}
-<<transcount>>=
-world
-TransCount( ste[MAF(ste) <= 0.01,], world )
-@ 
-\subsection{Iteratively}
-<<iter>>=
-trans.vec <- TransCount( ste[MAF(ste) <= 0.01,], gr + 1e3 )
-@ 
-<<transvec>>=
-table(trans.vec)
-@ 
 \clearpage
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\appendix
+\section{Count of Transmission of Variants (\emph{TransCount()})}
+\subsection{Window}
+<<windows>>=
+window <- GRanges( seqnames =  "chr14", IRanges(start(gr[100]), width = 10e3), strand = "*")
+window2 <- GRanges( seqnames = "chr14", IRanges(start(gr[100]), width = 1e3), strand = "*")
+block <- range(rowData(ste))
+@ 
+<<transcount>>=
+#window
+TransCount( ste, window )
+@ 
+\subsection{Not in window, but in block}
+<<transcount>>=
+#setdiff(block,window)
+TransCount( ste, setdiff(block, window) )
+@ 
+\subsection{In the whole block}
+<<transcount>>=
+#block
+TransCount( ste, block )
+@ 
+\subsection{In both windows}
+<<iter>>=
+TransCount( ste, GRangesList(window, window2) )
+@ 
+\subsection{Not ``In both windows,'' but in block}
+<<iter>>=
+TransCount( ste, GRangesList(setdiff(block,window), setdiff(block,window2)))
+@ 
+\section{Count of Transmission of Rare Variants (\emph{TransCount()})}
+<<ste.rare>>=
+ste.rare <- ste[MAF(ste)<=0.01]
+@ 
+\subsection{In both windows}
+<<iter>>=
+TransCount( ste.rare, GRangesList(window, window2) )
+@ 
+\subsection{Not ``In both windows,'' but in block}
+<<iter>>=
+TransCount( ste.rare, GRangesList(setdiff(block,window), setdiff(block,window2)))
+@ 
 \section{Classes}
 \subsection{SnpMatrix, DataFrame, GRanges} 
 The four key ingredients are the SNP matrix, the pedigree information as a DataFrame, position of the SNPs given by a GRanges object, and covariate data given as a DataFrame.
