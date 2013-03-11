@@ -30,20 +30,20 @@ setMethod("completeTrios",  signature(object="SNPTrioExperiment"), function(obje
   ped <- pedigree(object)
   trios <- trios(ped)
   ids <- colnames(object)
-  index <- (trios[,"id"] %in% ids) & (trios[,"fid"] %in% ids )& (trios[,"mid"] %in% ids)
+  index <- (trios$id %in% ids) & (trios$fid %in% ids ) & (trios$mid %in% ids)
   trios[index,]
 })
 
 setMethod("GenoTrio",  signature(object="SNPTrioExperiment"), function(object){
   ct <- completeTrios(object)
   geno <- geno(object)
-  list( O = geno[as.character(ct[,"id"]),], F = geno[as.character(ct[,"fid"]),], M = geno[as.character(ct[,"mid"]),] )
+  list( O = geno[as.character(ct$id),], F = geno[as.character(ct$fid),], M = geno[as.character(ct$mid),] )
 })
 
 setMethod("ctcbind", signature( object = "list"), function( object ){
-  holger <- with( object, matrix(c(t(cbind( as(F,"matrix"), as(M,"matrix"), as(O,"matrix")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
-  x <- ifelse( holger == 01, 0L, ifelse( holger == 02, 1L, ifelse( holger == 03, 2L, NA )))
-  x
+  holger <- with( object, matrix(c(t(cbind( as(F,"numeric"), as(M,"numeric"), as(O,"numeric")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
+  #x <- ifelse( holger == 0, 0, ifelse( holger == 1, 1, ifelse( holger == 03, 2L, NA )))
+  holger
 })
 
 
@@ -122,13 +122,13 @@ setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x,
 setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
   minor <- numeric(6)#matrix(0,nrow=length(region), ncol = 6)
   major <- numeric(6)#matrix(0,nrow=length(region), ncol = 6)
-  mendel <- numeric(4)#matrix(0,nrow=length(region), ncol = 4)
+  mendel <- numeric(8)#matrix(0,nrow=length(region), ncol = 4)
 #  for( i in 1:length(region) ){
 #    gr.row <- region[i]
     ste <- object[subjectHits(findOverlaps(region, rowData(object))),]
     gtrio <- GenoTrio(ste)
 #    with( gtrio, {
-      F <- as(with(gtrio,F), "numeric")
+       F <- as(with(gtrio,F), "numeric")
       M <- as(with(gtrio,M), "numeric")
       O <- as(with(gtrio,O), "numeric")
       
@@ -137,17 +137,21 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
       mendel[3] <- sum( F == 0 & M == 2 & ( O == 0 | O == 2 ), na.rm = TRUE)
       mendel[4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)
     
-      minor[1] <- sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
-      major[1] <- sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
+      minor[1] <-  sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
+      major[1] <-  sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
+      mendel[5] <- sum( F == 0 & M == 1 & O == 2, na.rm = TRUE)
 
-      minor[2] <- sum( F == 1 & M == 0 & O == 1, na.rm = TRUE)
-      major[2] <- sum( F == 1 & M == 0 & O == 0, na.rm = TRUE)
+      minor[2] <-  sum( F == 1 & M == 0 & O == 1, na.rm = TRUE)
+      major[2] <-  sum( F == 1 & M == 0 & O == 0, na.rm = TRUE)
+      mendel[6] <- sum( F == 1 & M == 0 & O == 2, na.rm = TRUE)
 
-      minor[3] <- sum( F == 1 & M == 2 & O == 2, na.rm = TRUE)
-      major[3] <- sum( F == 1 & M == 2 & O == 1, na.rm = TRUE)
-
-      minor[4] <- sum( F == 2 & M == 1 & O == 2, na.rm = TRUE)
-      major[4] <- sum( F == 2 & M == 1 & O == 1, na.rm = TRUE)
+      minor[3] <-  sum( F == 1 & M == 2 & O == 2, na.rm = TRUE)
+      major[3] <-  sum( F == 1 & M == 2 & O == 1, na.rm = TRUE)
+      mendel[7] <- sum( F == 1 & M == 2 & O == 0, na.rm = TRUE)
+  
+      minor[4] <-  sum( F == 2 & M == 1 & O == 2, na.rm = TRUE)
+      major[4] <-  sum( F == 2 & M == 1 & O == 1, na.rm = TRUE)
+      mendel[8] <- sum( F == 2 & M == 1 & O == 0, na.rm = TRUE)
 
       minor[5] <- sum( F == 1 & M == 1 & O == 1, na.rm = TRUE)
       major[5] <- minor[5]
