@@ -38,10 +38,10 @@ ste
 @ 
 \section{Methods}
 \subsection{ScanTrio}
-Run ScanTrio for windows of size 1 kB centered at each of the first ten rare variants.
+%Run ScanTrio for windows of size 1 kB centered at each of the first ten rare variants.
 <<scantrio>>=
 ste.rare <- ste[MAF(ste)<=0.01]
-(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:10]) + 1e3/2 , block = range(rowData(ste))))
+(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:10])  , block = range(rowData(ste))))
 @ 
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}

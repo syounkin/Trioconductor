@@ -85,6 +85,22 @@ setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
   return(holger)
 })
 
+setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
+  results <- list()
+  for( i in 1:length(object) ){
+    results <- c( results, list(object[i]) )
+  }
+  return(GRangesList(results))
+})
+
+setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x, y, ... ){
+  results <- list()
+  for( i in 1:length(x) ){
+    results <- c( results, list(setdiff( y, x[[i]], ...)))
+  }
+  return(GRangesList(results))
+})
+
 ## setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
 ##   index <- subjectHits(findOverlaps(region, rowData(object)))
 ##   t <- numeric(6)
@@ -104,79 +120,71 @@ setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
 ## })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
-  minor <- matrix(0,nrow=length(region), ncol = 6)
-  major <- matrix(0,nrow=length(region), ncol = 6)
-  mendel <- matrix(0,nrow=length(region), ncol = 4)
-  for( i in 1:length(region) ){
-    gr.row <- region[i]
-    ste <- object[subjectHits(findOverlaps(gr.row, rowData(object))),]
+  minor <- numeric(6)#matrix(0,nrow=length(region), ncol = 6)
+  major <- numeric(6)#matrix(0,nrow=length(region), ncol = 6)
+  mendel <- numeric(4)#matrix(0,nrow=length(region), ncol = 4)
+#  for( i in 1:length(region) ){
+#    gr.row <- region[i]
+    ste <- object[subjectHits(findOverlaps(region, rowData(object))),]
     gtrio <- GenoTrio(ste)
 #    with( gtrio, {
       F <- as(with(gtrio,F), "numeric")
       M <- as(with(gtrio,M), "numeric")
       O <- as(with(gtrio,O), "numeric")
       
-      mendel[i,1] <- sum( F == 0 & M == 0 & ( O == 1 | O == 2 ), na.rm = TRUE)
-      mendel[i,2] <- sum( F == 2 & M == 2 & ( O == 0 | O == 1 ), na.rm = TRUE)
-      mendel[i,3] <- sum( F == 0 & M == 2 & ( O == 0 | O == 2 ), na.rm = TRUE)
-      mendel[i,4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)      
+      mendel[1] <- sum( F == 0 & M == 0 & ( O == 1 | O == 2 ), na.rm = TRUE)
+      mendel[2] <- sum( F == 2 & M == 2 & ( O == 0 | O == 1 ), na.rm = TRUE)
+      mendel[3] <- sum( F == 0 & M == 2 & ( O == 0 | O == 2 ), na.rm = TRUE)
+      mendel[4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)      
     
-      minor[i,1] <- sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
-      major[i,1] <- sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
+      minor[1] <- sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
+      major[1] <- sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
 
-      minor[i,2] <- sum( F == 1 & M == 0 & O == 1, na.rm = TRUE)
-      major[i,2] <- sum( F == 1 & M == 0 & O == 0, na.rm = TRUE)
+      minor[2] <- sum( F == 1 & M == 0 & O == 1, na.rm = TRUE)
+      major[2] <- sum( F == 1 & M == 0 & O == 0, na.rm = TRUE)
 
-      minor[i,3] <- sum( F == 1 & M == 2 & O == 2, na.rm = TRUE)
-      major[i,3] <- sum( F == 1 & M == 2 & O == 1, na.rm = TRUE)
+      minor[3] <- sum( F == 1 & M == 2 & O == 2, na.rm = TRUE)
+      major[3] <- sum( F == 1 & M == 2 & O == 1, na.rm = TRUE)
 
-      minor[i,4] <- sum( F == 2 & M == 1 & O == 2, na.rm = TRUE)
-      major[i,4] <- sum( F == 2 & M == 1 & O == 1, na.rm = TRUE)
+      minor[4] <- sum( F == 2 & M == 1 & O == 2, na.rm = TRUE)
+      major[4] <- sum( F == 2 & M == 1 & O == 1, na.rm = TRUE)
 
-      minor[i,5] <- sum( F == 1 & M == 1 & O == 1, na.rm = TRUE)
-      major[i,5] <- minor[i,5]
+      minor[5] <- sum( F == 1 & M == 1 & O == 1, na.rm = TRUE)
+      major[5] <- minor[5]
 
-      minor[i,6] <- 2*sum( F == 1 & M == 1 & O == 2, na.rm = TRUE)
-      major[i,6] <- 2*sum( F == 1 & M == 1 & O == 0, na.rm = TRUE)
+      minor[6] <- 2*sum( F == 1 & M == 1 & O == 2, na.rm = TRUE)
+      major[6] <- 2*sum( F == 1 & M == 1 & O == 0, na.rm = TRUE)
  #   })
-  }
-#  return(list( minor = rowSums(minor, na.rm = TRUE), major = rowSums(major, na.rm = TRUE), mendel = rowSums(mendel, na.rm = TRUE)))
-  return(sum(minor, na.rm = TRUE))
+ # }
+  return(list( minor = sum(minor, na.rm = TRUE), major = sum(major, na.rm = TRUE), mendel = sum(mendel, na.rm = TRUE)))
+#  return(list(transMinor = sum(minor, na.rm = TRUE),transMajor = sum(major, na.rm = TRUE)))
 })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRangesList"), function( object, region ){
   minor <- numeric(length(region))
+  major <- numeric(length(region))
+  mendel <- numeric(length(region))  
   for( i in 1:length(region) ){
     gr <- region[[i]]
-    minor[i] <- TransCount(object = object, region = gr )
+    trans <- TransCount(object = object, region = gr )
+    minor[i] <- trans$minor
+    major[i] <- trans$major
+    mendel[i] <- trans$mendel
   }
-  return(minor)
-})
-
-setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
-  results <- list()
-  for( i in 1:length(object) ){
-    results <- c( results, list(object[i]) )
-  }
-  return(GRangesList(results))
-})
-
-setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x, y, ... ){
-  results <- list()
-  for( i in 1:length(x) ){
-    results <- c( results, list(setdiff( y, x[[i]], ...)))
-  }
-  return(GRangesList(results))
+  return(list( minor = minor, major = major, mendel = mendel))
 })
 
 setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
   window.list <- relist.sgy(window)
   window.out <- setdiff( window.list, block )  
-  inside <- TransCount(object, window.list)
-  outside <- TransCount(object, window.out)
+  trans.window <- TransCount(object, window.list)
+  trans.outside <- TransCount(object, window.out)
 
   ## Need count of observeable transmissions.
-  mat <- cbind(inside, outside)
+  #mat <- cbind(trans.window$minor, trans.window$major ) 
+  #rownames(mat) <- names(window)
+  mat <- cbind( trans.window$minor, trans.window$major, trans.window$mendel, trans.outside$minor, trans.outside$major, trans.outside$mendel )
   rownames(mat) <- names(window)
+  colnames(mat) <- c("minor.win","major.win","mendel.win","minor.out","major.out","mendel.out" )
   return(mat)
 })
