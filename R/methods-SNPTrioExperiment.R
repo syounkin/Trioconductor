@@ -135,7 +135,7 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
       mendel[1] <- sum( F == 0 & M == 0 & ( O == 1 | O == 2 ), na.rm = TRUE)
       mendel[2] <- sum( F == 2 & M == 2 & ( O == 0 | O == 1 ), na.rm = TRUE)
       mendel[3] <- sum( F == 0 & M == 2 & ( O == 0 | O == 2 ), na.rm = TRUE)
-      mendel[4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)      
+      mendel[4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)
     
       minor[1] <- sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
       major[1] <- sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
