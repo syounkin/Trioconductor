@@ -16,27 +16,32 @@
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
 \maketitle
-\section{Packages}
+\section{Packages \& Data}
 <<package>>=
 library("trioClasses")
 data("sample")
 data("8q24-european-all.sm")
+#data("BMP4-european-all.sm")
+#data("BMP4-chinese-all.sm")
+@
+<<prelim, echo = FALSE, eval = TRUE>>=
 pos <- as(do.call("rbind", strsplit(colnames(sm),split = ":") )[,2], "integer" )
 chr <- do.call("rbind", strsplit(colnames(sm),split = ":") )[,1]
 gr <- GRanges( seqnames = chr, ranges = IRanges(start = pos, width = 1), strand = "*" )
 names(gr) <- colnames(sm)
-col.DF <- col.DF[ col.DF$id %in% rownames(sm), ]
-table(as(sm,"numeric"), useNA = "ifany")
-@
-\section{Sample Data}
+col.DF <- DataFrame( id = rownames(sm) )
+rownames(col.DF) <- rownames(sm)
+#table(as(sm,"numeric"), useNA = "ifany")
+@ 
+\section{SummarizedExperiment}
 <<data, echo = TRUE>>=
 se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
 @ 
-\subsection{Pedigree}
+\section{Pedigree}
 <<ped>>=
 ped <- PedClass(ped.DF)
 @ 
-\subsection{SNPTrioExperiment}
+\section{SNPTrioExperiment}
 <<ste>>=
 ste <- SNPTrioExperiment(se, pedigree = ped )
 @ 
@@ -45,18 +50,22 @@ ste
 @ 
 <<gtrio>>=
 gtrio <- trioClasses:::GenoTrio(ste)
-F <- as(with(gtrio,F), "numeric")
-M <- as(with(gtrio,M), "numeric")
-O <- as(with(gtrio,O), "numeric")
+index <- with(gtrio, !( is.na(F) | is.na(M) | is.na(O) ) )
+F <- as(with(gtrio,F), "numeric")[index]
+M <- as(with(gtrio,M), "numeric")[index]
+O <- as(with(gtrio,O), "numeric")[index]
 table(paste0(F,M,O))
 #table(paste0(F[!is.na(F) & !is.na(M) & !is.na(O)],M[!is.na(F) & !is.na(M) & !is.na(O)],O[!is.na(F) & !is.na(M) & !is.na(O)]))
 @ 
 \section{Methods}
 \subsection{ScanTrio}
 %Run ScanTrio for windows of size 1 kB centered at each of the first ten rare variants.
+<<sterare>>=
+ste.rare <- ste[!(MAF(ste) >= 0.01 | is.na(MAF(ste)))]
+ste.rare
+@ 
 <<scantrio>>=
-#ste.common <- ste[MAF(ste)>0.01]
-(scan.trio <- ScanTrio( object = ste, window = rowData(ste[1:10])  , block = range(rowData(ste))))
+(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:500]) + 10e3, block = range(rowData(ste.rare))))
 @ 
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
@@ -103,15 +112,15 @@ TransCount( ste, GRangesList(window, window2) )
 TransCount( ste, GRangesList(setdiff(block,window), setdiff(block,window2)))
 @ 
 \section{Count of Transmission of Rare Variants (\emph{TransCount()})}
-<<ste.rare>>=
+<<ste.rare, eval = FALSE, echo = FALSE>>=
 ste.rare <- ste[MAF(ste)<=0.01]
 @ 
 \subsection{In both windows}
-<<iter>>=
+<<iter, eval = FALSE, echo = FALSE>>=
 TransCount( ste.rare, GRangesList(window, window2) )
 @ 
 \subsection{Not ``In both windows,'' but in block}
-<<iter>>=
+<<iter, eval = FALSE, echo = FALSE>>=
 TransCount( ste.rare, GRangesList(setdiff(block,window), setdiff(block,window2)))
 @ 
 \section{Classes}

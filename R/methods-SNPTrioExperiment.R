@@ -11,12 +11,11 @@ setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "PedClass"), fu
 setMethod("show", signature(object="SNPTrioExperiment"), function(object){
   callNextMethod()
   cat("pedigree(", nrow(pedigree(object)), "): famid id fid mid sex dx\n", sep = "")
+  cat("complete trios(", nrow(completeTrios(object)), "):\n", sep = "")
 })
 
 setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
   geno <- t(assays(object)$geno)
-#  colnames(geno) <- as.character(names(rowData(object)))
-#  rownames(geno) <- as.character(rownames(colData(object)))
   geno
 })
 
@@ -44,7 +43,6 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
   holger <- with( object, matrix(c(t(cbind( as(F,"numeric"), as(M,"numeric"), as(O,"numeric")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
   holger
 })
-
 
 setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
   se <- as( x, "SummarizedExperiment" )
@@ -108,8 +106,8 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
     gtrio <- GenoTrio(ste)
 
       Fa <- with(gtrio,F)
-      Ma <- with(gtrio,O) # What the heck!!
-      Off <- with(gtrio,M) # What the heck!!
+      Ma <- with(gtrio,M)
+      Off <- with(gtrio,O)
       
       mendel[1] <- sum( Fa == 0 & Ma == 0 & ( Off == 1 | Off == 2 ), na.rm = TRUE)
       mendel[2] <- sum( Fa == 2 & Ma == 2 & ( Off == 0 | Off == 1 ), na.rm = TRUE)
@@ -160,12 +158,17 @@ setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRanges", 
   window.out <- setdiff( window.list, block )  
   trans.window <- TransCount(object, window.list)
   trans.outside <- TransCount(object, window.out)
-
-  ## Need count of observeable transmissions.
-  #mat <- cbind(trans.window$minor, trans.window$major ) 
-  #rownames(mat) <- names(window)
-  mat <- cbind( trans.window$minor, trans.window$major, trans.window$mendel, trans.outside$minor, trans.outside$major, trans.outside$mendel )
-  rownames(mat) <- names(window)
-  colnames(mat) <- c("minor.win","major.win","mendel.win","minor.out","major.out","mendel.out" )
-  return(mat)
+  df <-data.frame( minor.in = trans.window$minor, major.in = trans.window$major, mendel.in = trans.window$mendel, minor.out = trans.outside$minor, major.out = trans.outside$major, mendel.out = trans.outside$mendel )
+  rownames(df) <- names(window)
+  with( df, {
+    n <- (minor.in+minor.out+1)/(minor.in + minor.out + major.in + major.out + 2)
+    y.in <- minor.in
+    y.out <- minor.out
+    n.in <- minor.in + major.in
+    n.out <- minor.out + major.out    
+    p.in <- (minor.in+1)/(n.in +2)
+    p.out <- (minor.out+1)/(n.out +2)
+    lr <- (p.in/n)^y.in*(p.out/n)^y.out*((1-p.in)/(1-n))^(n.in-y.in)*((1-p.out)/(1-n))^(n.out-y.out)
+    DataFrame(lr = lr, minor.in = minor.in, major.in = major.in, minor.out = minor.out, major.out = major.out, mendel.in = mendel.in, mendel.out = mendel.out )
+  })
 })
