@@ -59,8 +59,13 @@ table(paste0(F,M,O))
 summary(MAF(ste.rare))
 @ 
 <<scantrio>>=
-(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:25]) + 10e3, block = range(rowData(ste.rare))))
+(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:100]) + 250e3, block = range(rowData(ste.rare))))
 @ 
+\begin{figure}
+<<plotscantrio, fig = TRUE>>=
+with( as( scan.trio, "data.frame" ), plot( lr, pch = 20 ) )
+@ 
+\end{figure}
 \clearpage
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
