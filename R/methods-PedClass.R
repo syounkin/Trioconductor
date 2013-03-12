@@ -19,9 +19,9 @@ setMethod( "PedClass", signature(object = "DataFrame"), function(object) {
 setMethod("trios",  signature(object="PedClass"), function(object) {
   trio.df <- subset( as(object, "data.frame" ), !is.na(fid) & !is.na(mid) & !is.na(id) )
 #  id.char <- as.character(trio.df$id)#,
-  trio.df.2 <- data.frame( id = as.character(trio.df$fid),
-    fid = as.character(trio.df$fid),
-   mid = as.character(trio.df$mid), stringsAsFactors=FALSE )
+  trio.df.2 <- data.frame( id = as.character(trio.df$id),
+                          fid = as.character(trio.df$fid),
+                          mid = as.character(trio.df$mid), stringsAsFactors=FALSE )
 #                          )
   return(trio.df.2)
 })

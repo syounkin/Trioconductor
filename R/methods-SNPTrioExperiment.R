@@ -15,8 +15,8 @@ setMethod("show", signature(object="SNPTrioExperiment"), function(object){
 
 setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
   geno <- t(assays(object)$geno)
-  colnames(geno) <- as.character(names(rowData(object)))
-  rownames(geno) <- as.character(rownames(colData(object)))
+#  colnames(geno) <- as.character(names(rowData(object)))
+#  rownames(geno) <- as.character(rownames(colData(object)))
   geno
 })
 
@@ -31,18 +31,17 @@ setMethod("completeTrios",  signature(object="SNPTrioExperiment"), function(obje
   trios <- trios(ped)
   ids <- colnames(object)
   index <- (trios$id %in% ids) & (trios$fid %in% ids ) & (trios$mid %in% ids)
-  trios[index,]
+  return(data.frame( id = trios$id[index], mid = trios$mid[index], fid = trios$fid[index], stringsAsFactors = FALSE) )
 })
 
 setMethod("GenoTrio",  signature(object="SNPTrioExperiment"), function(object){
   ct <- completeTrios(object)
   geno <- geno(object)
-  list( O = geno[as.character(ct$id),], F = geno[as.character(ct$fid),], M = geno[as.character(ct$mid),] )
+  return(list( O = as(geno[ct$id,],"numeric"), F = as(geno[ct$fid,],"numeric"), M = as(geno[ct$mid,],"numeric") ))
 })
 
 setMethod("ctcbind", signature( object = "list"), function( object ){
   holger <- with( object, matrix(c(t(cbind( as(F,"numeric"), as(M,"numeric"), as(O,"numeric")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
-  #x <- ifelse( holger == 0, 0, ifelse( holger == 1, 1, ifelse( holger == 03, 2L, NA )))
   holger
 })
 
@@ -101,67 +100,45 @@ setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x,
   return(GRangesList(results))
 })
 
-## setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
-##   index <- subjectHits(findOverlaps(region, rowData(object)))
-##   t <- numeric(6)
-##   if( length(index) != 0 ){
-##       ste <- object[index,]
-##       gtrio <- GenoTrio(ste)
-##       t[1] <-   with( gtrio, sum( F == 1 & M == 2 & O == 2, na.rm = TRUE) )
-##       t[2] <-   with( gtrio, sum( F == 2 & M == 1 & O == 2, na.rm = TRUE) )
-##       t[3] <-   with( gtrio, sum( F == 2 & M == 3 & O == 3, na.rm = TRUE) )
-##       t[4] <-   with( gtrio, sum( F == 3 & M == 2 & O == 3, na.rm = TRUE) )
-##       t[5] <-   with( gtrio, sum( F == 2 & M == 2 & O == 2, na.rm = TRUE) )
-##       t[6] <- 2*with( gtrio, sum( F == 2 & M == 2 & O == 3, na.rm = TRUE) )
-##       return( sum(t, na.rm = TRUE ))
-##   }else{
-##     return(NA)
-##   }
-## })
-
 setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
-  minor <- numeric(6)#matrix(0,nrow=length(region), ncol = 6)
-  major <- numeric(6)#matrix(0,nrow=length(region), ncol = 6)
-  mendel <- numeric(8)#matrix(0,nrow=length(region), ncol = 4)
-#  for( i in 1:length(region) ){
-#    gr.row <- region[i]
+  minor <- numeric(6)
+  major <- numeric(6)
+  mendel <- numeric(8)
     ste <- object[subjectHits(findOverlaps(region, rowData(object))),]
     gtrio <- GenoTrio(ste)
-#    with( gtrio, {
-       F <- as(with(gtrio,F), "numeric")
-      M <- as(with(gtrio,M), "numeric")
-      O <- as(with(gtrio,O), "numeric")
+
+      Fa <- with(gtrio,F)
+      Ma <- with(gtrio,O) # What the heck!!
+      Off <- with(gtrio,M) # What the heck!!
       
-      mendel[1] <- sum( F == 0 & M == 0 & ( O == 1 | O == 2 ), na.rm = TRUE)
-      mendel[2] <- sum( F == 2 & M == 2 & ( O == 0 | O == 1 ), na.rm = TRUE)
-      mendel[3] <- sum( F == 0 & M == 2 & ( O == 0 | O == 2 ), na.rm = TRUE)
-      mendel[4] <- sum( F == 2 & M == 0 & ( O == 0 | O == 2 ), na.rm = TRUE)
+      mendel[1] <- sum( Fa == 0 & Ma == 0 & ( Off == 1 | Off == 2 ), na.rm = TRUE)
+      mendel[2] <- sum( Fa == 2 & Ma == 2 & ( Off == 0 | Off == 1 ), na.rm = TRUE)
+      mendel[3] <- sum( Fa == 0 & Ma == 2 & ( Off == 0 | Off == 2 ), na.rm = TRUE)
+      mendel[4] <- sum( Fa == 2 & Ma == 0 & ( Off == 0 | Off == 2 ), na.rm = TRUE)
     
-      minor[1] <-  sum( F == 0 & M == 1 & O == 1, na.rm = TRUE)
-      major[1] <-  sum( F == 0 & M == 1 & O == 0, na.rm = TRUE)
-      mendel[5] <- sum( F == 0 & M == 1 & O == 2, na.rm = TRUE)
+      minor[1] <-  sum( Fa == 0 & Ma == 1 & Off == 1, na.rm = TRUE)
+      major[1] <-  sum( Fa == 0 & Ma == 1 & Off == 0, na.rm = TRUE)
+      mendel[5] <- sum( Fa == 0 & Ma == 1 & Off == 2, na.rm = TRUE)
 
-      minor[2] <-  sum( F == 1 & M == 0 & O == 1, na.rm = TRUE)
-      major[2] <-  sum( F == 1 & M == 0 & O == 0, na.rm = TRUE)
-      mendel[6] <- sum( F == 1 & M == 0 & O == 2, na.rm = TRUE)
+      minor[2] <-  sum( Fa == 1 & Ma == 0 & Off == 1, na.rm = TRUE)
+      major[2] <-  sum( Fa == 1 & Ma == 0 & Off == 0, na.rm = TRUE)
+      mendel[6] <- sum( Fa == 1 & Ma == 0 & Off == 2, na.rm = TRUE)
 
-      minor[3] <-  sum( F == 1 & M == 2 & O == 2, na.rm = TRUE)
-      major[3] <-  sum( F == 1 & M == 2 & O == 1, na.rm = TRUE)
-      mendel[7] <- sum( F == 1 & M == 2 & O == 0, na.rm = TRUE)
+      minor[3] <-  sum( Fa == 1 & Ma == 2 & Off == 2, na.rm = TRUE)
+      major[3] <-  sum( Fa == 1 & Ma == 2 & Off == 1, na.rm = TRUE)
+      mendel[7] <- sum( Fa == 1 & Ma == 2 & Off == 0, na.rm = TRUE)
   
-      minor[4] <-  sum( F == 2 & M == 1 & O == 2, na.rm = TRUE)
-      major[4] <-  sum( F == 2 & M == 1 & O == 1, na.rm = TRUE)
-      mendel[8] <- sum( F == 2 & M == 1 & O == 0, na.rm = TRUE)
+      minor[4] <-  sum( Fa == 2 & Ma == 1 & Off == 2, na.rm = TRUE)
+      major[4] <-  sum( Fa == 2 & Ma == 1 & Off == 1, na.rm = TRUE)
+      mendel[8] <- sum( Fa == 2 & Ma == 1 & Off == 0, na.rm = TRUE)
 
-      minor[5] <- sum( F == 1 & M == 1 & O == 1, na.rm = TRUE)
+      minor[5] <- sum( Fa == 1 & Ma == 1 & Off == 1, na.rm = TRUE)
       major[5] <- minor[5]
 
-      minor[6] <- 2*sum( F == 1 & M == 1 & O == 2, na.rm = TRUE)
-      major[6] <- 2*sum( F == 1 & M == 1 & O == 0, na.rm = TRUE)
- #   })
- # }
+      minor[6] <- 2*sum( Fa == 1 & Ma == 1 & Off == 2, na.rm = TRUE)
+      major[6] <- 2*sum( Fa == 1 & Ma == 1 & Off == 0, na.rm = TRUE)
+
   return(list( minor = sum(minor, na.rm = TRUE), major = sum(major, na.rm = TRUE), mendel = sum(mendel, na.rm = TRUE)))
-#  return(list(transMinor = sum(minor, na.rm = TRUE),transMajor = sum(major, na.rm = TRUE)))
 })
 
 setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRangesList"), function( object, region ){
