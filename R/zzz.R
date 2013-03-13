@@ -2,9 +2,9 @@ THISPKG <- "trioClasses"
 .onAttach <- function(libname, pkgname) {
 	version <- packageDescription("trioClasses", field="Version")
 	packageStartupMessage(paste("
-==================================
+====================================
 Welcome to trioClasses version ", version, "\n",
-"==================================", sep = "" ) )
+"====================================", sep = "" ) )
 }
 
 .onUnload <- function(libpath){

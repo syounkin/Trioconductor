@@ -144,6 +144,7 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
   major <- numeric(length(region))
   mendel <- numeric(length(region))  
   for( i in 1:length(region) ){
+    cat( "window: ", i, "\n" )
     gr <- region[[i]]
     trans <- TransCount(object = object, region = gr )
     minor[i] <- trans$minor
@@ -155,10 +156,11 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
 
 setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
   window.list <- relist.sgy(window)
-  window.out <- setdiff( window.list, block )  
+#  window.out <- setdiff( window.list, block )  
   trans.window <- TransCount(object, window.list)
-  trans.outside <- TransCount(object, window.out)
-  df <-data.frame( minor.in = trans.window$minor, major.in = trans.window$major, mendel.in = trans.window$mendel, minor.out = trans.outside$minor, major.out = trans.outside$major, mendel.out = trans.outside$mendel )
+#  trans.outside <- TransCount(object, window.out)
+  trans.block <- TransCount(object, block)
+  df <-data.frame( minor.in = trans.window$minor, major.in = trans.window$major, mendel.in = trans.window$mendel, minor.out = trans.block$minor - trans.window$minor, major.out = trans.block$major - trans.window$major, mendel.out = trans.block$mendel - trans.window$mendel )
   rownames(df) <- names(window)
   with( df, {
     n <- (minor.in+minor.out+1)/(minor.in + minor.out + major.in + major.out + 2)

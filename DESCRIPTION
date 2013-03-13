@@ -15,6 +15,7 @@ Collate: AllClasses.R
 	 AllGenerics.R
 	 functions.R
 	 methods-SNPTrioExperiment.R
+	 methods-CNVTrioExperiment.R
 	 methods-PedClass.R
 	 reload.R
          zzz.R
