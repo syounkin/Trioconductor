@@ -20,8 +20,8 @@
 <<package>>=
 library("trioClasses")
 data("sample")
-data("8q24-european-all.sm")
-#data("BMP4-european-all.sm")
+#data("8q24-european-all.sm")
+data("BMP4-european-all.sm")
 #data("BMP4-chinese-all.sm")
 @
 <<prelim, echo = FALSE, eval = TRUE>>=
@@ -59,7 +59,7 @@ table(paste0(F,M,O))
 summary(MAF(ste.rare))
 @ 
 <<scantrio>>=
-(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare[1:100]) + 250e3, block = range(rowData(ste.rare))))
+(scan.trio <- ScanTrio( object = ste.rare, window = rowData(ste.rare) + 1e3, block = range(rowData(ste.rare))))
 @ 
 \begin{figure}
 <<plotscantrio, fig = TRUE>>=
