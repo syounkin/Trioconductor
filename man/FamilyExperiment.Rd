@@ -1,4 +1,4 @@
-\name{SNPTrioExperiment}
+\name{FamilyExperiment}
 \Rdversion{0.1}
 \docType{class}
 \alias{STE}
@@ -12,4 +12,4 @@
 Samuel G. Younkin
 }
 
-\keyword{SNPTrioExperiment}
+\keyword{FamilyExperiment}

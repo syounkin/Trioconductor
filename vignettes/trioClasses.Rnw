@@ -7,7 +7,7 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{The R package \emph{trioClasses} for definition of the class \emph{SNPTrioExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
+\title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
 \author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
 \date{\today}
 %\input{/home/bst/student/syounkin/jhsph/latex/sgy}
@@ -41,9 +41,9 @@ se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, 
 <<ped>>=
 ped <- PedClass(ped.DF)
 @ 
-\section{SNPTrioExperiment}
+\section{FamilyExperiment}
 <<ste>>=
-(ste <- SNPTrioExperiment(se, pedigree = ped ))
+(ste <- FamilyExperiment(se, pedigree = ped ))
 @ 
 <<gtrio, echo = FALSE, eval = FALSE>>=
 gtrio <- trioClasses:::GenoTrio(ste)
@@ -103,7 +103,7 @@ Coercion to matrix for \emph{trio}
 geno <- as(ste, "matrix")
 aTDT(geno[,1:5])
 @ 
-Or apply the aTDT method to the SNPTrioExperiment directly.
+Or apply the aTDT method to the FamilyExperiment directly.
 <<trio2>>=
 aTDT(ste[1:5])
 @ 
@@ -164,11 +164,11 @@ We combine three of the key ingredients when we create the SummarizedExperiment 
 <<se, eval = FALSE>>=
 se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
 @ 
-\subsection{SNPTrioExperiment}
-Now, we include the pedigree information as an object of class PedClass.  We keep PedClass independent of SNPTrioExperiment for flexibility.
+\subsection{FamilyExperiment}
+Now, we include the pedigree information as an object of class PedClass.  We keep PedClass independent of FamilyExperiment for flexibility.
 <<ste, eval = FALSE>>=
 ped <- PedClass(ped.DF)
-ste <- SNPTrioExperiment(se, pedigree = ped )
+ste <- FamilyExperiment(se, pedigree = ped )
 @ 
 Here is the show method.
 <<ste-show, eval = FALSE>>=
@@ -176,10 +176,10 @@ ste
 @ 
 And now we verify that it is indeed an extension of SummarizedExperiment.
 <<ste-class, eval = FALSE>>=
-getClass("SNPTrioExperiment")
+getClass("FamilyExperiment")
 @ 
 \subsection{PedClass}
-Now we investigate the pedigree slot of the SNPTrioExperiment object.
+Now we investigate the pedigree slot of the FamilyExperiment object.
 <<classes, eval = FALSE>>=
 class(pedigree(ste))
 getClass("PedClass")

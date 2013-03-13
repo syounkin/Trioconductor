@@ -1,31 +1,31 @@
-setMethod("initialize", "SNPTrioExperiment", function(.Object, pedigree, ... ){
+setMethod("initialize", "FamilyExperiment", function(.Object, pedigree, ... ){
   .Object@pedigree <- pedigree
   .Object <- callNextMethod()
   .Object
 })
 
-setMethod("SNPTrioExperiment", signature("SummarizedExperiment", "PedClass"), function(se, pedigree){
-  new("SNPTrioExperiment", pedigree, se)
+setMethod("FamilyExperiment", signature("SummarizedExperiment", "PedClass"), function(se, pedigree){
+  new("FamilyExperiment", pedigree, se)
 })
 
-setMethod("show", signature(object="SNPTrioExperiment"), function(object){
+setMethod("show", signature(object="FamilyExperiment"), function(object){
   callNextMethod()
   cat("pedigree(", nrow(pedigree(object)), "): famid id fid mid sex dx\n", sep = "")
   cat("complete trios(", nrow(completeTrios(object)), "):\n", sep = "")
 })
 
-setMethod("geno", signature(object="SNPTrioExperiment"), function(object) {
+setMethod("geno", signature(object="FamilyExperiment"), function(object) {
   geno <- t(assays(object)$geno)
   geno
 })
 
-setMethod("logR", signature(object="SNPTrioExperiment"), function(object) assays(object)$logR )
+setMethod("logR", signature(object="FamilyExperiment"), function(object) assays(object)$logR )
 
-setMethod("baf",  signature(object="SNPTrioExperiment"), function(object) assays(object)$baf )
+setMethod("baf",  signature(object="FamilyExperiment"), function(object) assays(object)$baf )
 
-setMethod("pedigree",  signature(object="SNPTrioExperiment"), function(object) object@pedigree )
+setMethod("pedigree",  signature(object="FamilyExperiment"), function(object) object@pedigree )
 
-setMethod("completeTrios",  signature(object="SNPTrioExperiment"), function(object){
+setMethod("completeTrios",  signature(object="FamilyExperiment"), function(object){
   ped <- pedigree(object)
   trios <- trios(ped)
   ids <- colnames(object)
@@ -33,7 +33,7 @@ setMethod("completeTrios",  signature(object="SNPTrioExperiment"), function(obje
   return(data.frame( id = trios$id[index], mid = trios$mid[index], fid = trios$fid[index], stringsAsFactors = FALSE) )
 })
 
-setMethod("GenoTrio",  signature(object="SNPTrioExperiment"), function(object){
+setMethod("GenoTrio",  signature(object="FamilyExperiment"), function(object){
   ct <- completeTrios(object)
   geno <- geno(object)
   return(list( O = as(geno[ct$id,],"numeric"), F = as(geno[ct$fid,],"numeric"), M = as(geno[ct$mid,],"numeric") ))
@@ -44,7 +44,7 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
   holger
 })
 
-setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
+setMethod("[", "FamilyExperiment", function( x, i, j, ..., drop = TRUE ){
   se <- as( x, "SummarizedExperiment" )
   if( !missing(i) & !missing(j)){
     se <- se[i,j]
@@ -55,18 +55,18 @@ setMethod("[", "SNPTrioExperiment", function( x, i, j, ..., drop = TRUE ){
   }else {
     se <- se [,]
   }
-  return(SNPTrioExperiment(se, pedigree(x)))
+  return(FamilyExperiment(se, pedigree(x)))
 })
 
-setMethod("parents",  signature(object="SNPTrioExperiment"), function(object){
+setMethod("parents",  signature(object="FamilyExperiment"), function(object){
   with(as(pedigree(object),"data.frame"), unique(c(as.character(fid), as.character(mid))))
 })
 
-setMethod("MAF", signature(object="SNPTrioExperiment"), function(object){
+setMethod("MAF", signature(object="FamilyExperiment"), function(object){
   with(col.summary(geno(object[,which(colnames(object) %in% parents(object))])),MAF)
 })
 
-setMethod("aTDT", signature(object="SNPTrioExperiment"), function(object){
+setMethod("aTDT", signature(object="FamilyExperiment"), function(object){
   geno <- as( object, "matrix" )
   aTDT.fn(geno)
 })
@@ -76,7 +76,7 @@ setMethod("aTDT", signature(object="matrix"), function(object){
   aTDT.fn(geno)
 })
 
-setAs( from = "SNPTrioExperiment", to = "matrix", function(from){
+setAs( from = "FamilyExperiment", to = "matrix", function(from){
   gtrio <- GenoTrio(from)
   holger <- ctcbind(gtrio)
   return(holger)
@@ -98,7 +98,7 @@ setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x,
   return(GRangesList(results))
 })
 
-setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRanges"), function( object, region ){
+setMethod("TransCount", signature( object = "FamilyExperiment", region = "GRanges"), function( object, region ){
   minor <- numeric(6)
   major <- numeric(6)
   mendel <- numeric(8)
@@ -139,7 +139,7 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
   return(list( minor = sum(minor, na.rm = TRUE), major = sum(major, na.rm = TRUE), mendel = sum(mendel, na.rm = TRUE)))
 })
 
-setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRangesList"), function( object, region ){
+setMethod("TransCount", signature( object = "FamilyExperiment", region = "GRangesList"), function( object, region ){
   minor <- numeric(length(region))
   major <- numeric(length(region))
   mendel <- numeric(length(region))  
@@ -153,7 +153,7 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
   return(list( minor = minor, major = major, mendel = mendel))
 })
 
-setMethod("ScanTrio", signature(object="SNPTrioExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
+setMethod("ScanTrio", signature(object="FamilyExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
   window.list <- relist.sgy(window)
 #  window.out <- setdiff( window.list, block )  
   trans.window <- TransCount(object, window.list)
