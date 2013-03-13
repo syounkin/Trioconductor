@@ -144,7 +144,6 @@ setMethod("TransCount", signature( object = "SNPTrioExperiment", region = "GRang
   major <- numeric(length(region))
   mendel <- numeric(length(region))  
   for( i in 1:length(region) ){
-    cat( "window: ", i, "\n" )
     gr <- region[[i]]
     trans <- TransCount(object = object, region = gr )
     minor[i] <- trans$minor

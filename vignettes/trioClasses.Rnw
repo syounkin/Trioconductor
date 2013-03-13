@@ -74,8 +74,8 @@ end <- end(range(rowData(ste.rare)))
 window <- GRanges( seqnames = levels(seqnames(rowData(ste.rare))), ranges = IRanges( start = start(rowData(ste.rare))[i.vec], end = start(rowData(ste.rare))[j.vec] ), strand = "*" )
 window <- window[-length(window)]
 @ 
-Create a GRanges object such that each range contain \Sexpr{n.snp} rare variants.
-<<window, echo = FALSE>>=
+%Create a GRanges object such that each range contain \Sexpr{n.snp} rare variants.
+<<window, echo = FALSE, eval = FALSE>>=
 n.snp
 table(countOverlaps( window, rowData(ste.rare)))
 @ 
@@ -93,6 +93,9 @@ axis(1, at = at <- seq(start,end,length.out=4), labels = round(at/1e6,1) )
 })
 @ 
 \end{figure}
+<<save>>=
+save(scan.trio, file = "./../data/scan-trio.RData")
+@ 
 \clearpage
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
