@@ -1,11 +1,11 @@
 Package: trioClasses
 Type: Package
-Title: A package for trio class definition
+Title: trioC
 Version: 1.0.0
 Date: Fri Mar  8 12:03:29 EST 2013
-Author: Samuel G. Younkin, Robert B. Scharpf, Holger Schwender, Ingo Ruczinski
+Author: Samuel G. Younkin, Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
-Description: The package trioClasses defines the class SNPTrioExperiment along with corresponding methods useful in genetic analysis of pedigree data, in particular case-parent trio data.
+Description: The package trioC presents the classes SNPTrioExperiment and CNVTrioExperiment, extensions of SummarizedExperiment.  These classes are useful for analyzing genetic sequence data in parent-offspring study designs.  The package trioC takes advantage of the vcf file format through the packages GGTools and Rsamtools.
 License: THE BEER-WARE LICENSE
 Depends: R (>= 2.15), methods, GenomicRanges, snpStats
 Imports:
