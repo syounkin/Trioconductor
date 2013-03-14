@@ -40,5 +40,7 @@ ped <- PedClass(beaty.ped)
 <<trioStates>>=
 trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
 trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+dimnames(trioStates) <- dimnames(trioAssay$O)
+table(trioStates[,1])
 @ 
 \end{document}
