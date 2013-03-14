@@ -10,8 +10,6 @@
 \title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
 \author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
 \date{\today}
-%\input{/home/bst/student/syounkin/jhsph/latex/sgy}
-%\input{/home/sgy/jhsph/latex/sgy}
 \begin{document}
 \setlength{\parskip}{0.2\baselineskip}
 \setlength{\parindent}{0pt}
@@ -19,16 +17,10 @@
 \section{Packages \& Data}
 <<package>>=
 library("trioClasses")
-#data("sample")
-#data("8q24-european-all.sm")
 data("cnv", package = "trioClasses")
 data("pedigrees", package="CleftCNVAssoc")
-#data("penncnvjoint", package = "CleftCNVAssoc" )
-#data("8q24-chinese-all.sm")
-#data("BMP4-european-all.sm")
-#data("BMP4-chinese-all.sm")
 @
-See vignette ``CNVMatrix.''
+See vignette ``CNVMatrix'' method for description of cnv object.
 \section{SummarizedExperiment}
 <<data, echo = TRUE, eval = TRUE>>=
 (se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv$cnv.mat)), colData = DataFrame(id=rownames(cnv$cnv.mat), row.names = rownames(cnv$cnv.mat)), rowData = cnv$cmp.gr ))
@@ -42,7 +34,11 @@ beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1
 ped <- PedClass(beaty.ped)
 @ 
 \section{FamilyExperiment}
-<<ste>>=
-(ste <- FamilyExperiment(se, pedigree = ped ))
+<<fe>>=
+(fe <- FamilyExperiment(se, pedigree = ped ))
+@ 
+<<trioStates>>=
+trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
+trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
 @ 
 \end{document}

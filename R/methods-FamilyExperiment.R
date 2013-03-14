@@ -19,6 +19,11 @@ setMethod("geno", signature(object="FamilyExperiment"), function(object) {
   geno
 })
 
+setMethod("cnv", signature(object="FamilyExperiment"), function(object) {
+  geno <- t(assays(object)$cnv)
+  geno
+})
+
 setMethod("logR", signature(object="FamilyExperiment"), function(object) assays(object)$logR )
 
 setMethod("baf",  signature(object="FamilyExperiment"), function(object) assays(object)$baf )
@@ -33,10 +38,13 @@ setMethod("completeTrios",  signature(object="FamilyExperiment"), function(objec
   return(data.frame( id = trios$id[index], mid = trios$mid[index], fid = trios$fid[index], stringsAsFactors = FALSE) )
 })
 
-setMethod("GenoTrio",  signature(object="FamilyExperiment"), function(object){
+setMethod("TrioAssay",  signature(object="FamilyExperiment"), function(object, type = "geno"){
   ct <- completeTrios(object)
-  geno <- geno(object)
-  return(list( O = as(geno[ct$id,],"numeric"), F = as(geno[ct$fid,],"numeric"), M = as(geno[ct$mid,],"numeric") ))
+  if( type == "geno" )
+    assay.mat <- geno(object)
+  if( type == "cnv" )
+    assay.mat <- cnv(object)
+  return(list( O = assay.mat[ct$id,], F = assay.mat[ct$fid,], M = assay.mat[ct$mid,]))
 })
 
 setMethod("ctcbind", signature( object = "list"), function( object ){
@@ -77,7 +85,7 @@ setMethod("aTDT", signature(object="matrix"), function(object){
 })
 
 setAs( from = "FamilyExperiment", to = "matrix", function(from){
-  gtrio <- GenoTrio(from)
+  gtrio <- TrioAssay(from)
   holger <- ctcbind(gtrio)
   return(holger)
 })
@@ -95,7 +103,7 @@ setMethod("TransCount", signature( object = "FamilyExperiment", region = "GRange
   major <- numeric(6)
   mendel <- numeric(8)
     ste <- object[subjectHits(findOverlaps(region, rowData(object))),]
-    gtrio <- GenoTrio(ste)
+    gtrio <- TrioAssay(ste)
 
       Fa <- with(gtrio,F)
       Ma <- with(gtrio,M)

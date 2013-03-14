@@ -46,7 +46,7 @@ ped <- PedClass(ped.DF)
 (ste <- FamilyExperiment(se, pedigree = ped ))
 @ 
 <<gtrio, echo = FALSE, eval = FALSE>>=
-gtrio <- trioClasses:::GenoTrio(ste)
+gtrio <- trioClasses:::TrioAssay(ste)
 index <- with(gtrio, !( is.na(F) | is.na(M) | is.na(O) ) )
 F <- as(with(gtrio,F), "numeric")[index]
 M <- as(with(gtrio,M), "numeric")[index]
