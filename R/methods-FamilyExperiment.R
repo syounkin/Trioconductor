@@ -41,7 +41,7 @@ setMethod("completeTrios",  signature(object="FamilyExperiment"), function(objec
 setMethod("TrioAssay",  signature(object="FamilyExperiment"), function(object, type = "geno"){
   ct <- completeTrios(object)
   if( type == "geno" )
-    assay.mat <- geno(object)
+    assay.mat <- as(geno(object),"numeric")
   if( type == "cnv" )
     assay.mat <- cnv(object)
   return(list( O = assay.mat[ct$id,], F = assay.mat[ct$fid,], M = assay.mat[ct$mid,]))
