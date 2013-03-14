@@ -82,18 +82,10 @@ setAs( from = "FamilyExperiment", to = "matrix", function(from){
   return(holger)
 })
 
-setMethod("relist.sgy", signature( object = "GRanges" ), function(object){
+setMethod("TrivialGRangesList", signature( object = "GRanges" ), function(object){
   results <- list()
   for( i in 1:length(object) ){
     results <- c( results, list(object[i]) )
-  }
-  return(GRangesList(results))
-})
-
-setMethod("setdiff", signature( x = "GRangesList", y = "GRanges" ), function( x, y, ... ){
-  results <- list()
-  for( i in 1:length(x) ){
-    results <- c( results, list(setdiff( y, x[[i]], ...)))
   }
   return(GRangesList(results))
 })
@@ -154,10 +146,8 @@ setMethod("TransCount", signature( object = "FamilyExperiment", region = "GRange
 })
 
 setMethod("ScanTrio", signature(object="FamilyExperiment", window = "GRanges", block = "GRanges"), function(object, window, block){
-  window.list <- relist.sgy(window)
-#  window.out <- setdiff( window.list, block )  
+  window.list <- TrivialGRangesList(window)
   trans.window <- TransCount(object, window.list)
-#  trans.outside <- TransCount(object, window.out)
   trans.block <- TransCount(object, block)
   df <-data.frame( minor.in = trans.window$minor, major.in = trans.window$major, mendel.in = trans.window$mendel, minor.out = trans.block$minor - trans.window$minor, major.out = trans.block$major - trans.window$major, mendel.out = trans.block$mendel - trans.window$mendel )
   rownames(df) <- names(window)

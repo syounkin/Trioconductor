@@ -14,5 +14,5 @@ setGeneric("ScanTrio", function(object, window, block) standardGeneric("ScanTrio
 setGeneric("parents", function(object) standardGeneric("parents"))
 setGeneric("MAF", function(object) standardGeneric("MAF"))
 setGeneric("aTDT", function(object) standardGeneric("aTDT"))
-setGeneric("relist.sgy", function(object) standardGeneric("relist.sgy"))
+setGeneric("TrivialGRangesList", function(object) standardGeneric("TrivialGRangesList"))
 setGeneric("CNVMatrix", function(object) standardGeneric("CNVMatrix"))
