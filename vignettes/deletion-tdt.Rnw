@@ -1,0 +1,48 @@
+% Sweave(file = "./deletion-tdt.Rnw")
+\documentclass[10pt]{article}
+<<echo=FALSE>>=
+  options(width=70, continue = " ")
+@
+\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/deletion-tdt}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
+\title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
+\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
+\date{\today}
+%\input{/home/bst/student/syounkin/jhsph/latex/sgy}
+%\input{/home/sgy/jhsph/latex/sgy}
+\begin{document}
+\setlength{\parskip}{0.2\baselineskip}
+\setlength{\parindent}{0pt}
+\maketitle
+\section{Packages \& Data}
+<<package>>=
+library("trioClasses")
+#data("sample")
+#data("8q24-european-all.sm")
+data("cnv", package = "trioClasses")
+data("pedigrees", package="CleftCNVAssoc")
+#data("penncnvjoint", package = "CleftCNVAssoc" )
+#data("8q24-chinese-all.sm")
+#data("BMP4-european-all.sm")
+#data("BMP4-chinese-all.sm")
+@
+See vignette ``CNVMatrix.''
+\section{SummarizedExperiment}
+<<data, echo = TRUE, eval = TRUE>>=
+(se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv$cnv.mat)), colData = DataFrame(id=rownames(cnv$cnv.mat), row.names = rownames(cnv$cnv.mat)), rowData = cnv$cmp.gr ))
+@ 
+\section{Pedigree}
+<<beaty-ped>>=
+beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
+beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
+@ 
+<<ped, eval = TRUE>>=
+ped <- PedClass(beaty.ped)
+@ 
+\section{FamilyExperiment}
+<<ste>>=
+(ste <- FamilyExperiment(se, pedigree = ped ))
+@ 
+\end{document}
