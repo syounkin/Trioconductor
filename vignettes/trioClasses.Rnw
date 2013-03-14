@@ -80,7 +80,7 @@ n.snp
 table(countOverlaps( window, rowData(ste.rare)))
 @ 
 <<scantrio>>=
-window <- rowData(ste)[1:10] + 1e3
+#window <- rowData(ste.rare)[1:10] + 1e3
 system.time( scan.trio <- ScanTrio( object = ste.rare, window = window, block = range(rowData(ste.rare))))
 scan.trio
 @ 
@@ -99,12 +99,12 @@ save(scan.trio, file = "./../data/scan-trio.RData")
 \clearpage
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
-<<trio>>=
+<<trio, eval = FALSE>>=
 geno <- as(ste, "matrix")
 aTDT(geno[,1:5])
 @ 
 Or apply the aTDT method to the FamilyExperiment directly.
-<<trio2>>=
+<<trio2, eval = FALSE>>=
 aTDT(ste[1:5])
 @ 
 \clearpage
