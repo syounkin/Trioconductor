@@ -103,7 +103,7 @@ setMethod("TransCount", signature( object = "FamilyExperiment", region = "GRange
   major <- numeric(6)
   mendel <- numeric(8)
     ste <- object[subjectHits(findOverlaps(region, rowData(object))),]
-    gtrio <- TrioAssay(ste)
+    gtrio <- TrioAssay(ste, type = "geno")
 
       Fa <- with(gtrio,F)
       Ma <- with(gtrio,M)
