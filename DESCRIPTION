@@ -1,11 +1,11 @@
 Package: trioClasses
 Type: Package
-Title: trioC
-Version: 1.0.0
-Date: Fri Mar  8 12:03:29 EST 2013
+Title: trioClasses
+Version: 1.0.1
+Date: Thu Mar 14 11:55:12 EDT 2013
 Author: Samuel G. Younkin, Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
-Description: The package trioC presents the class FamilyExperiment, an extension of SummarizedExperiment.  This class is useful for analyzing genetic sequence data in parent-offspring study designs.  The package trioC takes advantage of the vcf file format through the packages GGTools and Rsamtools.
+Description: The package trioClasses presents the class FamilyExperiment, an extension of SummarizedExperiment.  This class is useful for analyzing genetic sequence data in parent-offspring study designs.  The package trioClasses takes advantage of the vcf file format through the SummarizedExperiment class and the VCFTools package.
 License: THE BEER-WARE LICENSE
 Depends: R (>= 2.15), methods, GenomicRanges, snpStats
 Imports:
@@ -21,4 +21,4 @@ Collate: AllClasses.R
          zzz.R
 LazyLoad: yes
 biocViews:
-Packaged: Fri Mar  8 12:03:29 EST 2013
+Packaged: Thu Mar 14 11:55:12 EDT 2013
