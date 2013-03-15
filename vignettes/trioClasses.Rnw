@@ -18,6 +18,7 @@
 \maketitle
 \section{Packages \& Data}
 <<package>>=
+Rprof(filename = "trioClasses.Rprof")
 library("trioClasses")
 data("sample")
 data("8q24-european-all.sm")
@@ -59,7 +60,7 @@ table(paste0(F,M,O))
 (ste.rare <- ste[!(MAF(ste) >= 0.01 | is.na(MAF(ste)))])
 @ 
 <<window-by-snv, eval = TRUE, echo = FALSE>>=
-n.win <- 100
+n.win <- 10
 n.snp <- ceiling(length(rowData(ste.rare))/n.win)
 p <- length(rowData(ste.rare))
 i.vec <- seq(1,p,by = n.snp )
