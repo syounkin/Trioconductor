@@ -16,6 +16,7 @@ Collate: AllClasses.R
 	 functions.R
 	 methods-FamilyExperiment.R
 	 methods-GRanges.R
+	 methods-GWASTools.R
 	 methods-PedClass.R
 	 reload.R
          zzz.R
