@@ -11,3 +11,8 @@ setMethod("CNVMatrix",  signature(object="GRanges"), function(object){
   names(cmp) <- colnames(cnv)
   return(list(cnv.mat = cnv, cmp.gr = cmp ))
 })
+
+
+setMethod("intersect2", signature(object="GRanges"), function( object ){
+  disjoin(object)[countOverlaps(disjoin(object),object) == length(object)]
+})

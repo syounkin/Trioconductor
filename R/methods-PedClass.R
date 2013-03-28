@@ -29,3 +29,7 @@ setMethod("trios",  signature(object="PedClass"), function(object) {
 setMethod("parents",  signature(object="PedClass"), function(object){
     with(as(object,"data.frame"), unique(c(as.character(fid), as.character(mid))))
 })
+
+setMethod("allSubjects",  signature(object="PedClass"), function(object){
+    with(as(object,"data.frame"), unique(c(as.character(id), as.character(fid), as.character(mid))))
+})
