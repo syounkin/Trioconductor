@@ -30,11 +30,11 @@ gr.deletion <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in%
 #data("BMP4-chinese-all.sm")
 @
 <<cnvmatrix>>=
-#system.time( cnv <- CNVMatrix( gr.deletion ) )
-#system.time( cnv.mat <- CNVMatrix( gr.beaty[1:4e3] ) )
-system.time( cnv.mat <- CNVMatrix( gr.beaty[1:1e2] ) )
+#system.time( cnv.obj <- CNVMatrix( gr.deletion ) )
+#system.time( cnv.obj <- CNVMatrix( gr.beaty[1:4e3] ) )
+system.time( cnv.obj <- CNVMatrix( gr.deletion ) )
 @ 
 <<savecnv>>=
-save( cnv, file = "./../data/cnv.RData" )
+save( cnv.obj, file = "./../data/cnv.RData" )
 @ 
 \end{document}

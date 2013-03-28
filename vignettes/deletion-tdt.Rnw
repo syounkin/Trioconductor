@@ -23,7 +23,7 @@ data("pedigrees", package="CleftCNVAssoc")
 See vignette ``CNVMatrix'' method for description of cnv object.
 \section{SummarizedExperiment}
 <<data, echo = TRUE, eval = TRUE>>=
-(se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv$cnv.mat)), colData = DataFrame(id=rownames(cnv$cnv.mat), row.names = rownames(cnv$cnv.mat)), rowData = cnv$cmp.gr ))
+(se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr ))
 @ 
 \section{Pedigree}
 <<beaty-ped>>=
@@ -51,6 +51,6 @@ Now, I need a function that acts on tables.
 <<transtab>>=
 trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
 head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
-reduce(cnv$cmp.gr[which(trans.vec <= 0.05/length(trans.vec))])
+reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/length(trans.vec))])
 @ 
 \end{document}
