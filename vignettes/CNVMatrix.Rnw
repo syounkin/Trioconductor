@@ -22,6 +22,7 @@ library("trioClasses")
 library("CleftCNVAssoc")
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
+length(gr.deletion)
 #data("sample")
 #data("8q24-european-all.sm")
 #data("penncnvjoint", package = "CleftCNVAssoc")
