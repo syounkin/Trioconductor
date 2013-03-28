@@ -9,5 +9,4 @@
 *.out
 *.tex
 data
-inst
 foo
