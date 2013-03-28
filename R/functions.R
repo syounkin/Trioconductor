@@ -20,3 +20,13 @@ aTDT.fn <- function(geno, correct=FALSE){
   pval <- pchisq(stat, 1, lower.tail=FALSE)
   return( list(stat=stat, pval=pval, transMinor=transMinor, transMajor=transMajor ))
 }
+
+trans.tab <- function( object ) {
+  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 5 ){
+    T <- sum(object[c("101","011")],na.rm=TRUE)
+    U <- sum(object[c("100","010")],na.rm=TRUE)
+    return(binom.test(x = T,n = T+U,p = 0.5, alternative = "greater")$p.value)
+  }else{
+    return(NA)
+  }
+}

@@ -19,17 +19,20 @@
 \section{Packages \& Data}
 <<package>>=
 library("trioClasses")
+library("CleftCNVAssoc")
+source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
+gr.deletion <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
 #data("sample")
 #data("8q24-european-all.sm")
-data("penncnvjoint", package = "CleftCNVAssoc")
+#data("penncnvjoint", package = "CleftCNVAssoc")
 #data("8q24-chinese-all.sm")
 #data("BMP4-european-all.sm")
 #data("BMP4-chinese-all.sm")
 @
 <<cnvmatrix>>=
-system.time( cnv <- CNVMatrix( gr.beaty ) )
+#system.time( cnv <- CNVMatrix( gr.deletion ) )
 #system.time( cnv.mat <- CNVMatrix( gr.beaty[1:4e3] ) )
-#system.time( cnv.mat <- CNVMatrix( gr.beaty[1:8e3] ) )
+system.time( cnv.mat <- CNVMatrix( gr.beaty[1:1e2] ) )
 @ 
 <<savecnv>>=
 save( cnv, file = "./../data/cnv.RData" )

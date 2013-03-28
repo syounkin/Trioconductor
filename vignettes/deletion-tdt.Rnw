@@ -41,6 +41,16 @@ ped <- PedClass(beaty.ped)
 trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
 trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
 dimnames(trioStates) <- dimnames(trioAssay$O)
-table(trioStates[,1])
+#table(trioStates[,1])
+@ 
+<<table-list>>=
+table.list <- apply(trioStates, 2, "table")
+head(table.list)
+@ 
+Now, I need a function that acts on tables.
+<<transtab>>=
+trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
+head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
+reduce(cnv$cmp.gr[which(trans.vec <= 0.05/length(trans.vec))])
 @ 
 \end{document}
