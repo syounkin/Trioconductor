@@ -1,0 +1,37 @@
+% Sweave(file = "./trioClasses.Rnw")
+\documentclass[10pt]{article}
+<<echo=FALSE>>=
+  options(width=70, continue = " ")
+@
+\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/trioClasses}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
+\title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
+\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
+\date{\today}
+%\input{/home/bst/student/syounkin/jhsph/latex/sgy}
+%\input{/home/sgy/jhsph/latex/sgy}
+\begin{document}
+\setlength{\parskip}{0.2\baselineskip}
+\setlength{\parindent}{0pt}
+\maketitle
+\section{Packages \& Data}
+<<package>>=
+library("trioClasses")
+#data("sample")
+#data("8q24-european-all.sm")
+data("penncnvjoint", package = "CleftCNVAssoc")
+#data("8q24-chinese-all.sm")
+#data("BMP4-european-all.sm")
+#data("BMP4-chinese-all.sm")
+@
+<<cnvmatrix>>=
+system.time( cnv <- CNVMatrix( gr.beaty ) )
+#system.time( cnv.mat <- CNVMatrix( gr.beaty[1:4e3] ) )
+#system.time( cnv.mat <- CNVMatrix( gr.beaty[1:8e3] ) )
+@ 
+<<savecnv>>=
+save( cnv, file = "./../data/cnv.RData" )
+@ 
+\end{document}
