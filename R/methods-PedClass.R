@@ -30,6 +30,10 @@ setMethod("parents",  signature(object="PedClass"), function(object){
     with(as(object,"data.frame"), unique(c(as.character(fid), as.character(mid))))
 })
 
+setMethod("offspring",  signature(object="PedClass"), function(object){
+    with(as(object,"data.frame"), unique(as.character(id)))
+})
+
 setMethod("allSubjects",  signature(object="PedClass"), function(object){
     with(as(object,"data.frame"), unique(c(as.character(id), as.character(fid), as.character(mid))))
 })
