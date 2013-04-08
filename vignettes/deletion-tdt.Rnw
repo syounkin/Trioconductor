@@ -7,50 +7,145 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
+%\input{./sgy-custom}
+\title{Foo!}
 \author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
 \date{\today}
 \begin{document}
-\setlength{\parskip}{0.2\baselineskip}
-\setlength{\parindent}{0pt}
 \maketitle
-\section{Packages \& Data}
-<<package>>=
+\begin{abstract}
+  
+  Copy number variants (CNVs) may play an important part in the
+  development of common birth defects such as oral clefts, and
+  individual patients with multiple birth defects (including clefts)
+  have been shown to carry small and large chromosomal deletions.  In
+  this paper we investigate the transmission rates of deletions in
+  cleft offspring-parent trios.
+    
+  %%   We compare de-novo deletion frequencies in Caucasian
+  %% children with cleft lip with or without cleft palate
+  %% (CL/P) to frequencies in Caucasian children from triads
+  %% not ascertained for a specific phenotype.
+
+  %% We identified a genome-wide significant 62 kB non-coding
+  %% region on chromosome 7p14.1 where de-novo deletions occur
+  %% more frequently in oral cleft cases than controls.
+  
+  %% We also observed an increase in the width of de-novo
+  %% deletions in oral cleft probands, with cleft lip with or
+  %% without cleft palate (CL/P) cases exhibiting wider de-novo
+  %% deletions than cleft palate (CP) and cleft lip (CL) cases.
+
+  %% De-novo deletions appear to be involved in the etiology of
+  %% \clp, although the underlying biological mechanism are
+  %% still unknown.
+  
+  %% Larger de-novo deletions are more likely to interfere with
+  %% regular development and may result in oral clefting.
+  
+  %% Study protocol and sample DNA source can severely affect
+  %% estimates of de-novo deletion frequencies.
+    
+  %% Follow-up studies are needed to validate the findings.
+
+\end{abstract}
+\section*{Background}
+
+Oral clefts are among the most common birth defects, and include three
+anatomical defects: cleft lip (CL); cleft lip and palate (CLP) and
+cleft palate (CP). Because there are similarities in embryological and
+epidemiological evidence, CL and CLP are often grouped together as
+cleft lip with/without cleft palate (CL/P), although there is debate
+about whether all three groups may have distinct etiologies
+\cite{Harville2005, Forrester2007}. Collectively, oral clefts
+represent half of all craniofacial malformations and create a major
+public health burden for both affected children and their
+families. The overall prevalence of oral clefts is estimated at 1 per
+700 live births worldwide, but there is dramatic variation across
+populations and between racial and ethnic groups, in particular for
+CL/P \cite{Mossey2002,Mossey2009b}.
+
+Oral clefts show strong familial aggregation, and the recurrence risk
+among first degree relatives is approximately 32 times greater than
+the general population risk for CL/P, and approximately 56 times
+greater for CP \cite{Sivertsen2008a}.  Twin studies also suggest a
+major role for genes controlling risk to oral clefts with monozygotic
+twins showing much higher concordance rates than dizygotic twins, 31\%
+versus 2\% for CL/P, and 43\% versus 7\% for CP \cite{Mitchell2002}.
+Normal development of craniofacial features is a complex process and
+disruption of any one of numerous steps can lead to development of
+oral clefts \cite{Stanier2004}, further supported by mounting evidence
+that multiple genes, in addition to environmental influences, play a
+role in the etiology of oral clefts \cite{Farrall1992,
+  Schliekelman2002, Jugessur2009a, Beaty2010, Dixon2011, Ludwig2012}.
+
+Assessment of chromosomal anomalies such as microdeletions and
+translocations also played an important role in the identification of
+genes and genomic regions underlying facial disorders
+\cite{Bocian1987, Sander1994, Sander1995, Brewer1998, Brewer1999a,
+  Schutte1999a, FitzPatrick2003, Alkuraya2006, Benko2009}.  In
+particular, high throughput technologies such as CGH and SNP arrays
+have gained popularity in assessing chromosomal alterations
+\cite{Milunsky2008,Osoegawa2008}. For example, Sivertsen et.al
+assessed the prevalence of duplications and deletions in the 22q11
+region (DiGeorge syndrome region) in Norwegian offspring with open CP,
+but did not detect an association \cite{Sivertsen2007}.  Shi et.~al
+used SNP genotyping, DNA sequencing, high-resolution DNA microarray
+analysis, and long-range PCR to characterize deletions in 333
+candidate genes for orofacial clefting using 2,823 samples from 725
+two and three-generation families ascertained through a proband having
+CL/P \cite{Shi2009}.  The authors confirmed several de-novo deletions
+in some of these candidate genes, in particular SUMO1, TBX1, and
+TFAP2A, raising the possibility that genes or regulatory elements
+contained within deleted regions might play a role in the etiology of
+oral clefts. Further, high rates of Mendelian inconsistencies were
+observed in 11 different genes, suggesting the existence of additional
+micro-deletions.
+
+
+
+\section*{Results and Discussion}
+\section*{Conclusions}
+\section*{Methods}
+<<package, eval = FALSE>>=
 library("trioClasses")
 data("cnv", package = "trioClasses")
 data("pedigrees", package="CleftCNVAssoc")
 @
 See vignette ``CNVMatrix'' method for description of cnv object.
-\section{SummarizedExperiment}
-<<data, echo = TRUE, eval = TRUE>>=
+\subsection{GRanges: SummarizedExperiment}
+<<data, echo = TRUE, eval = FALSE>>=
 (se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr ))
 @ 
-\section{Pedigree}
-<<beaty-ped>>=
+\subsection{Pedigree}
+<<beaty-ped, eval = FALSE>>=
 beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
 beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
 @ 
-<<ped, eval = TRUE>>=
+<<ped, eval = FALSE>>=
 ped <- PedClass(beaty.ped)
 @ 
-\section{FamilyExperiment}
-<<fe>>=
+\subsection{FamilyExperiment}
+<<fe, eval = FALSE>>=
 (fe <- FamilyExperiment(se, pedigree = ped ))
 @ 
-<<trioStates>>=
+\subsection{Trio-States}
+<<trioStates, eval = FALSE>>=
 trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
 trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
 dimnames(trioStates) <- dimnames(trioAssay$O)
-#table(trioStates[,1])
 @ 
-<<table-list>>=
+<<table-list, eval = FALSE>>=
 table.list <- apply(trioStates, 2, "table")
 head(table.list)
 @ 
-Now, I need a function that acts on tables.
-<<transtab>>=
+<<transtab, eval = FALSE>>=
 trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
 head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
 reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/length(trans.vec))])
 @ 
+\section*{Authors contributions}
+\section*{Acknowledgements}
+\bibliographystyle{bmc_article} 
+\bibliography{sgy-master}
 \end{document}
