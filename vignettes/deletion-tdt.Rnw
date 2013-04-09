@@ -1,5 +1,5 @@
 % Sweave(file = "./deletion-tdt.Rnw")
-\documentclass[10pt]{article}
+\documentclass[10pt, final]{bmc_article}
 <<echo=FALSE>>=
   options(width=70, continue = " ")
 @
@@ -7,12 +7,43 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage{ifthen}  % Conditional 
+\usepackage{multicol}   %Columns
 %\input{./sgy-custom}
-\title{Foo!}
-\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
-\date{\today}
+%\title{Foo!}
+%\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
+%\date{\today}
+%Review style settings
+%\newenvironment{bmcformat}{\begin{raggedright}\baselineskip20pt\sloppy\setboolean{publ}{false}}{\end{raggedright}\baselineskip20pt\sloppy}
+
+\newboolean{publ}
+
+%Review style settings
+\newenvironment{bmcformat}{\begin{raggedright}\baselineskip20pt\sloppy\setboolean{publ}{false}}{\end{raggedright}\baselineskip20pt\sloppy}
+
+%Publication style settings
+%\newenvironment{bmcformat}{\fussy\setboolean{publ}{true}}{\fussy}
+
 \begin{document}
+\begin{bmcformat}
+
+\title{Inherited deletions!}
+\author{Samuel G Younkin$^1$\and Robert B Scharpf$^2$\and Holger Schwender$^3$\and Alan F Scott$^4$\and Mary L Marazita$^5$\and Terri H Beaty$^6$ and Ingo Ruczinski\correspondingauthor$^1$\email{ingo@jhu.edu}}
+
+\address{
+  \iid(1) Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health, Baltimore, MD, USA; 
+  \iid(2) Department of Oncology, Johns Hopkins School of Medicine, Baltimore, MD, USA;
+  \iid(3) Mathematical Institute, Heinrich-Heine-University, D\"usseldorf, Germany;
+  \iid(4) Department of Medicine, Johns Hopkins School of Medicine, Baltimore, MD, USA;
+  \iid(5) School of Dental Medicine, University of Pittsburgh, Pittsburgh, PA, USA;
+  \iid(6) Department of Epidemiology, Johns Hopkins Bloomberg School of Public Health, Baltimore, MD, USA
+}
+
 \maketitle
+
+
+%\begin{document}
+%\maketitle
 \begin{abstract}
   
   Copy number variants (CNVs) may play an important part in the
@@ -49,6 +80,9 @@
   %% Follow-up studies are needed to validate the findings.
 
 \end{abstract}
+
+\ifthenelse{\boolean{publ}}{\begin{multicols}{2}}{}
+
 \section*{Background}
 
 Oral clefts are among the most common birth defects, and include three
@@ -102,50 +136,102 @@ oral clefts. Further, high rates of Mendelian inconsistencies were
 observed in 11 different genes, suggesting the existence of additional
 micro-deletions.
 
-
-
+%\setcounter{section}{1}
+%\renewcommand{\thesection}{\arabic{section}}
 \section*{Results and Discussion}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Donec a diam lectus.  Sed sit amet ipsum
+mauris.  Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit.  Donec et mollis
+dolor.  Praesent et diam eget libero egestas mattis sit amet vitae augue.  Nam tincidunt congue enim,
+ut porta lorem lacinia consectetur.  Donec ut libero sed arcu vehicula ultricies a non tortor.  Lorem
+ipsum dolor sit amet, consectetur adipiscing elit.  Aenean ut gravida lorem.  Ut turpis felis,
+pulvinar a semper sed, adipiscing id dolor.  Pellentesque auctor nisi id magna consequat
+sagittis.  Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet.  Ut
+convallis libero in urna ultrices accumsan.  Donec sed odio eros.  Donec viverra mi quis quam pulvinar
+at malesuada arcu rhoncus.  Cum sociis natoque penatibus et magnis dis parturient montes, nascetur
+ridiculus mus.  In rutrum accumsan ultricies.  Mauris vitae nisi at sem facilisis semper ac in est.
+
+
+Vivamus fermentum semper porta.  Nunc diam velit, adipiscing ut tristique vitae, sagittis vel
+odio.  Maecenas convallis ullamcorper ultricies.  Curabitur ornare, ligula semper consectetur
+sagittis, nisi diam iaculis velit, id fringilla sem nunc vel mi.  Nam dictum, odio nec pretium
+volutpat, arcu ante placerat erat, non tristique elit urna et turpis.  Quisque mi metus, ornare sit
+amet fermentum et, tincidunt et orci.  Fusce eget orci a orci congue vestibulum.  Ut dolor diam,
+elementum et vestibulum eu, porttitor vel elit.  Curabitur venenatis pulvinar tellus gravida
+ornare.  Sed et erat faucibus nunc euismod ultricies ut id justo.  Nullam cursus suscipit nisi, et
+ultrices justo sodales nec.  Fusce venenatis facilisis lectus ac semper.  Aliquam at massa
+ipsum.  Quisque bibendum purus convallis nulla ultrices ultricies.  Nullam aliquam, mi eu aliquam
+tincidunt, purus velit laoreet tortor, viverra pretium nisi quam vitae mi.  Fusce vel volutpat
+elit.  Nam sagittis nisi dui.
+
+
+Suspendisse lectus leo, consectetur in tempor sit amet, placerat quis neque.  Etiam luctus porttitor
+lorem, sed suscipit est rutrum non.  Curabitur lobortis nisl a enim congue semper.  Aenean commodo
+ultrices imperdiet.  Vestibulum ut justo vel sapien venenatis tincidunt.  Phasellus eget dolor sit
+amet ipsum dapibus condimentum vitae quis lectus.  Aliquam ut massa in turpis dapibus
+convallis.  Praesent elit lacus, vestibulum at malesuada et, ornare et est.  Ut augue nunc, sodales ut
+euismod non, adipiscing vitae orci.  Mauris ut placerat justo.  Mauris in ultricies enim.  Quisque nec
+est eleifend nulla ultrices egestas quis ut quam.  Donec sollicitudin lectus a mauris pulvinar id
+aliquam urna cursus.  Cras quis ligula sem, vel elementum mi.  Phasellus non ullamcorper urna.
+
+
+Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.  In
+euismod ultrices facilisis.  Vestibulum porta sapien adipiscing augue congue id pretium lectus
+molestie.  Proin quis dictum nisl.  Morbi id quam sapien, sed vestibulum sem.  Duis elementum rutrum
+mauris sed convallis.  Proin vestibulum magna mi.  Aenean tristique hendrerit magna, ac facilisis
+nulla hendrerit ut.  Sed non tortor sodales quam auctor elementum.  Donec hendrerit nunc eget elit
+pharetra pulvinar.  Suspendisse id tempus tortor.  Aenean luctus, elit commodo laoreet commodo, justo
+nisi consequat massa, sed vulputate quam urna quis eros.  Donec vel.
+
+
 \section*{Conclusions}
+Foo!
 \section*{Methods}
-<<package, eval = FALSE>>=
+<<package, eval = TRUE>>=
 library("trioClasses")
 data("cnv", package = "trioClasses")
 data("pedigrees", package="CleftCNVAssoc")
 @
 See vignette ``CNVMatrix'' method for description of cnv object.
-\subsection{GRanges: SummarizedExperiment}
-<<data, echo = TRUE, eval = FALSE>>=
+\subsection*{GRanges: SummarizedExperiment}
+<<data, echo = TRUE, eval = TRUE>>=
 (se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr ))
 @ 
-\subsection{Pedigree}
-<<beaty-ped, eval = FALSE>>=
+\subsection*{Pedigree}
+<<beaty-ped, eval = TRUE>>=
 beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
 beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
 @ 
-<<ped, eval = FALSE>>=
+<<ped, eval = TRUE>>=
 ped <- PedClass(beaty.ped)
 @ 
-\subsection{FamilyExperiment}
-<<fe, eval = FALSE>>=
+\subsection*{FamilyExperiment}
+<<fe, eval = TRUE>>=
 (fe <- FamilyExperiment(se, pedigree = ped ))
 @ 
-\subsection{Trio-States}
-<<trioStates, eval = FALSE>>=
+\subsection*{Trio-States}
+<<trioStates, eval = TRUE>>=
 trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
 trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
 dimnames(trioStates) <- dimnames(trioAssay$O)
 @ 
-<<table-list, eval = FALSE>>=
+<<table-list, eval = TRUE>>=
 table.list <- apply(trioStates, 2, "table")
 head(table.list)
 @ 
-<<transtab, eval = FALSE>>=
+<<transtab, eval = TRUE>>=
 trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
 head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
 reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/length(trans.vec))])
 @ 
 \section*{Authors contributions}
 \section*{Acknowledgements}
-\bibliographystyle{bmc_article} 
-\bibliography{sgy-master}
+
+
+{\ifthenelse{\boolean{publ}}{\footnotesize}{\small}
+ \bibliographystyle{bmc_article} 
+  \bibliography{sgy-master} }  
+
+\ifthenelse{\boolean{publ}}{\end{multicols}}{}
+
+\end{bmcformat}
 \end{document}
