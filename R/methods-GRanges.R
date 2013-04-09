@@ -9,7 +9,7 @@ setMethod("CNVMatrix",  signature(object="GRanges"), function(object){
   rownames(cnv) <- id.vec
   colnames(cnv) <- paste0("comp",1:length(cmp))
   names(cmp) <- colnames(cnv)
-  return(list(cnv.mat = cnv, cmp.gr = cmp ))
+  return(list(cnv.mat = cnv, cmp.gr = cmp, gr = object ))
 })
 
 

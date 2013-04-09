@@ -9,18 +9,11 @@
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
 \usepackage{ifthen}  % Conditional 
 \usepackage{multicol}   %Columns
-%\input{./sgy-custom}
-%\title{Foo!}
-%\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
-%\date{\today}
-%Review style settings
-%\newenvironment{bmcformat}{\begin{raggedright}\baselineskip20pt\sloppy\setboolean{publ}{false}}{\end{raggedright}\baselineskip20pt\sloppy}
+\input{./sgy-custom}
 
 \newboolean{publ}
-
 %Review style settings
 \newenvironment{bmcformat}{\begin{raggedright}\baselineskip20pt\sloppy\setboolean{publ}{false}}{\end{raggedright}\baselineskip20pt\sloppy}
-
 %Publication style settings
 %\newenvironment{bmcformat}{\fussy\setboolean{publ}{true}}{\fussy}
 
@@ -41,9 +34,6 @@
 
 \maketitle
 
-
-%\begin{document}
-%\maketitle
 \begin{abstract}
   
   Copy number variants (CNVs) may play an important part in the
@@ -83,7 +73,7 @@
 
 \ifthenelse{\boolean{publ}}{\begin{multicols}{2}}{}
 
-\section*{Background}
+\section*{Background (from Manuscript \#1)}
 
 Oral clefts are among the most common birth defects, and include three
 anatomical defects: cleft lip (CL); cleft lip and palate (CLP) and
@@ -182,47 +172,99 @@ nulla hendrerit ut.  Sed non tortor sodales quam auctor elementum.  Donec hendre
 pharetra pulvinar.  Suspendisse id tempus tortor.  Aenean luctus, elit commodo laoreet commodo, justo
 nisi consequat massa, sed vulputate quam urna quis eros.  Donec vel.
 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \section*{Conclusions}
-Foo!
-\section*{Methods}
-<<package, eval = TRUE>>=
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor. Praesent et diam eget libero egestas mattis sit amet vitae augue. Nam tincidunt congue enim, ut porta lorem lacinia consectetur. Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut gravida lorem. Ut turpis felis, pulvinar a semper sed, adipiscing id dolor. Pellentesque auctor nisi id magna consequat sagittis. Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar at malesuada arcu rhoncus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In rutrum accumsan ultricies. Mauris vitae nisi at sem facilisis semper ac in est.
+
+
+Vivamus fermentum semper porta. Nunc diam velit, adipiscing ut tristique vitae, sagittis vel odio. Maecenas convallis ullamcorper ultricies. Curabitur ornare, ligula semper consectetur sagittis, nisi diam iaculis velit, id fringilla sem nunc vel mi. Nam dictum, odio nec pretium volutpat, arcu ante placerat erat, non tristique elit urna et turpis. Quisque mi metus, ornare sit amet fermentum et, tincidunt et orci. Fusce eget orci a orci congue vestibulum. Ut dolor diam, elementum et vestibulum eu, porttitor vel elit. Curabitur venenatis pulvinar tellus gravida ornare. Sed et erat faucibus nunc euismod ultricies ut id justo. Nullam cursus suscipit nisi, et ultrices justo sodales nec. Fusce venenatis facilisis lectus ac semper. Aliquam at massa ipsum. Quisque bibendum purus convallis nulla ultrices ultricies. Nullam aliquam, mi eu aliquam tincidunt, purus velit laoreet tortor, viverra pretium nisi quam vitae mi. Fusce vel volutpat elit. Nam sagittis nisi dui.
+
+
+Suspendisse lectus leo, consectetur in tempor sit amet, placerat quis neque. Etiam luctus porttitor lorem, sed suscipit est rutrum non. Curabitur lobortis nisl a enim congue semper. Aenean commodo ultrices imperdiet. Vestibulum ut justo vel sapien venenatis tincidunt. Phasellus eget dolor sit amet ipsum dapibus condimentum vitae quis lectus. Aliquam ut massa in turpis dapibus convallis. Praesent elit lacus, vestibulum at malesuada et, ornare et est. Ut augue nunc, sodales ut euismod non, adipiscing vitae orci. Mauris ut placerat justo. Mauris in ultricies enim. Quisque nec est eleifend nulla ultrices egestas quis ut quam. Donec sollicitudin lectus a mauris pulvinar id aliquam urna cursus. Cras quis ligula sem, vel elementum mi. Phasellus non ullamcorper urna.
+
+
+Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In euismod ultrices facilisis. Vestibulum porta sapien adipiscing augue congue id pretium lectus molestie. Proin quis dictum nisl. Morbi id quam sapien, sed vestibulum sem. Duis elementum rutrum mauris sed convallis. Proin vestibulum magna mi. Aenean tristique hendrerit magna, ac facilisis nulla hendrerit ut. Sed non tortor sodales quam auctor elementum. Donec hendrerit nunc eget elit pharetra pulvinar. Suspendisse id tempus tortor. Aenean luctus, elit commodo laoreet commodo, justo nisi consequat massa, sed vulputate quam urna quis eros. Donec vel. 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%\section*{R}
+<<package, eval = TRUE, echo = FALSE>>=
 library("trioClasses")
 data("cnv", package = "trioClasses")
 data("pedigrees", package="CleftCNVAssoc")
-@
-See vignette ``CNVMatrix'' method for description of cnv object.
-\subsection*{GRanges: SummarizedExperiment}
-<<data, echo = TRUE, eval = TRUE>>=
-(se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr ))
-@ 
-\subsection*{Pedigree}
-<<beaty-ped, eval = TRUE>>=
+se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr )
 beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
 beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
-@ 
-<<ped, eval = TRUE>>=
 ped <- PedClass(beaty.ped)
+fe <- FamilyExperiment(se, pedigree = ped )
 @ 
-\subsection*{FamilyExperiment}
-<<fe, eval = TRUE>>=
-(fe <- FamilyExperiment(se, pedigree = ped ))
+<<FamilyExperiment, echo = FALSE, eval = TRUE>>=
+fe.parents <- fe[,colnames(fe)%in%parents(fe)]
 @ 
-\subsection*{Trio-States}
-<<trioStates, eval = TRUE>>=
+<<freq-vec, echo = FALSE, eval = TRUE>>=
+freq.vec <- colSums(cnv(fe.parents))/nrow(cnv(fe.parents))
+@ 
+<<trioStates, eval = TRUE, echo = FALSE>>=
 trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
 trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
 dimnames(trioStates) <- dimnames(trioAssay$O)
 @ 
-<<table-list, eval = TRUE>>=
+<<table-list, eval = TRUE, echo = FALSE>>=
 table.list <- apply(trioStates, 2, "table")
-head(table.list)
 @ 
-<<transtab, eval = TRUE>>=
+<<transtab, eval = FALSE, echo = FALSE>>=
 trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
-head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
-reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/length(trans.vec))])
+#head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
 @ 
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\section*{Methods}
+\subsection*{Data Description}
+\begin{itemize}
+  \item \penn{} joint HMM
+  \item european, MAD $<0.3$, non-WGA, aux $\ne 1$
+  \item coverage $>10$
+  \item \Sexpr{length(cnv.obj$gr)} hemi/homozygous deletions identified in \Sexpr{nrow(completeTrios(fe))} trios
+  \item \Sexpr{ncol(cnv(fe))} CNV components
+  \subitem Common ($>0.01$): \Sexpr{sum(freq.vec > 0.01)}
+  \subitem Rare: \Sexpr{sum(freq.vec <= 0.01)}
+  \item Construct trio-states for all CNV components
+    \subitem recall that we use indicator variable for hemi/homozygous deletions
+  \item must be at least 5 informative mating pairs
+    \subitem 01x and 10x
+  \item count transmissions and perform binom.test (See ``trans.tab'')
+\end{itemize}
+\begin{figure}
+<<freq-hist, echo = FALSE, eval = TRUE, fig = TRUE>>=
+hist(freq.vec, breaks = seq(0,1,length.out=100), xlim = c(0,0.25), main = "Frequency of CNV Components", xlab = "frequency", ylab = "count")
+@ 
+\end{figure}
+<<summary-freq, eval = TRUE, echo = TRUE>>=
+summary(freq.vec)
+@ 
+<<trans.tab>>=
+trioClasses:::trans.tab
+@ 
+\begin{figure}
+<<manhattan, fig = TRUE, echo = FALSE, eval = TRUE>>=
+plot(-log10(trans.vec), pch = 20 )
+@ 
+\end{figure}
+<<n-tests, eval = TRUE, echo = FALSE>>=
+n.tests <- sum(!is.na(trans.vec))
+@ 
+<<reduce-locus, eval = TRUE, echo = TRUE>>=
+(locus <- reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)]))
+width(locus)/1e3
+@ 
+Performed \Sexpr{n.tests} tests.
+\clearpage
 \section*{Authors contributions}
 \section*{Acknowledgements}
 
