@@ -194,6 +194,48 @@ trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
   \item count transmissions and perform binom.test (See ``trans.tab'')
 \end{itemize}
 \begin{center}
+
+\begin{figure}
+  \begin{center}
+<<gviz, fig = TRUE, eval = TRUE, echo = FALSE, width = 5, height = 5>>=
+#layout(matrix(1:4, nrow = 2, ncol = 2, byrow = TRUE ))
+chr <- 8
+gr.cnp <- cnv.obj$cmp.gr
+gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+
+p.vec <- trans.vec
+p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+freq.vec.chr <- freq.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+
+#tr.rate.case.chr <- tr.rate.case[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+
+
+atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
+gtrack <- GenomeAxisTrack()
+dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "b", cex = 1, name = "-log10(p)", ylim = c(0,10) )
+dtrack2 <- DataTrack( range = gr.cnp.chr, data = freq.vec.chr, type = "b", col = "red", cex = 1, name = "freq", ylim = c(0,1) )
+#dtrack2 <- DataTrack( range = gr.cnp.chr, data = tr.rate.case.chr, type = "p", cex = 1, name = "Cleft Trans. Rate", col = "red", type = "p", ylim = c(0,1) )
+itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+#data(geneModels)
+#grtrack <- GeneRegionTrack(geneModels, genome="hg18", chromosome=chr, name="Gene Model")
+#plotTracks(list(itrack, gtrack, atrack, ))
+fud <- 1e5/2
+plotTracks(list(dtrack, dtrack2, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = 39356825 - fud, to = 39497557 + fud)
+@ 
+\end{center}
+\caption{$-\log p$-values for Fisher's exact test (blue) for an increase in transmission rate among cleft and control groups.  The transmission rate in the cleft group (red) is seen to increase around 20 MB with the $\log p$-value climbing to close to 3.}
+\end{figure}
+
+
+<<n-tests, eval = TRUE, echo = FALSE>>=
+n.tests <- sum(!is.na(trans.vec))
+@ 
+<<reduce-locus, eval = TRUE, echo = FALSE >>=
+locus <- reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
+wd <- width(locus)/1e3
+@ 
+Performed \Sexpr{n.tests} tests.  Bonferroni significant locus has width \Sexpr{wd} kB.
+\clearpage
 \begin{figure}
 <<freq-hist, echo = FALSE, eval = TRUE, fig = TRUE>>=
 hist(freq.vec, breaks = seq(0,1,length.out=100), xlim = c(0,0.25), main = "Frequency of CNV Components", xlab = "frequency", ylab = "count")
@@ -214,48 +256,6 @@ trioClasses:::trans.tab
 plot(-log10(trans.vec), pch = 20 )
 @ 
 \end{figure}
-
-
-\begin{figure}
-  \begin{center}
-<<gviz, fig = TRUE, eval = TRUE, echo = FALSE, width = 5, height = 5>>=
-#layout(matrix(1:4, nrow = 2, ncol = 2, byrow = TRUE ))
-chr <- 8
-gr.cnp <- cnv.obj$cmp.gr
-gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-
-p.vec <- trans.vec
-p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-freq.vec.chr <- freq.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-
-#tr.rate.case.chr <- tr.rate.case[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-
-
-atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
-gtrack <- GenomeAxisTrack()
-dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "p", cex = 1, name = "-log10(p)", ylim = c(0,10) )
-dtrack2 <- DataTrack( range = gr.cnp.chr, data = freq.vec.chr, type = "p", col = "red", cex = 1, name = "freq", ylim = c(0,1) )
-#dtrack2 <- DataTrack( range = gr.cnp.chr, data = tr.rate.case.chr, type = "p", cex = 1, name = "Cleft Trans. Rate", col = "red", type = "p", ylim = c(0,1) )
-itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-#data(geneModels)
-#grtrack <- GeneRegionTrack(geneModels, genome="hg18", chromosome=chr, name="Gene Model")
-#plotTracks(list(itrack, gtrack, atrack, ))
-fud <- 1e6/2
-plotTracks(list(dtrack, dtrack2, atrack,  gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = 0, to = 39497557 + fud)#from = 39356825 - fud, to = 39497557 + fud)
-@ 
-\end{center}
-\caption{$-\log p$-values for Fisher's exact test (blue) for an increase in transmission rate among cleft and control groups.  The transmission rate in the cleft group (red) is seen to increase around 20 MB with the $\log p$-value climbing to close to 3.}
-\end{figure}
-
-
-<<n-tests, eval = TRUE, echo = FALSE>>=
-n.tests <- sum(!is.na(trans.vec))
-@ 
-<<reduce-locus, eval = TRUE, echo = FALSE >>=
-locus <- reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
-wd <- width(locus)/1e3
-@ 
-Performed \Sexpr{n.tests} tests.  Bonferroni significant locus has width \Sexpr{wd} kB.
 \clearpage
 \section*{Authors contributions}
 \section*{Acknowledgements}
