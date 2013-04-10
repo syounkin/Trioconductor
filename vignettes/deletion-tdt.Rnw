@@ -1,7 +1,7 @@
 % Sweave(file = "./deletion-tdt.Rnw")
 \documentclass[10pt, final]{bmc_article}
 <<echo=FALSE>>=
-  options(width=35, continue = " ")
+  options(width=75, continue = " ")
 @
 \SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/deletion-tdt}
 \usepackage{fullpage}
@@ -142,6 +142,9 @@ micro-deletions.
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %\section*{R}
 <<package, eval = TRUE, echo = FALSE>>=
 library("Gviz")
@@ -173,31 +176,7 @@ trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
 #head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
 @ 
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-\section*{Methods}
-\subsection*{Data Description}
-\begin{itemize}
-  \item \penn{} joint HMM
-  \item european, MAD $<0.3$, non-WGA, aux $\ne 1$
-  \item coverage $>10$
-  \item \Sexpr{length(cnv.obj$gr)} hemi/homozygous deletions identified in \Sexpr{nrow(completeTrios(fe))} trios
-  \item \Sexpr{ncol(cnv(fe))} CNV components
-  \subitem Common ($>0.01$): \Sexpr{sum(freq.vec > 0.01)}
-  \subitem Rare: \Sexpr{sum(freq.vec <= 0.01)}
-  \item Construct trio-states for all CNV components
-    \subitem recall that we use indicator variable for hemi/homozygous deletions
-  \item must be at least 5 informative mating pairs
-    \subitem 01x and 10x
-  \item count transmissions and perform binom.test (See ``trans.tab'')
-\end{itemize}
-\begin{center}
-
-\begin{figure}
-  \begin{center}
-<<gviz, fig = TRUE, eval = TRUE, echo = FALSE, width = 5, height = 5>>=
+<<gviz, eval = TRUE, echo = FALSE>>=
 #layout(matrix(1:4, nrow = 2, ncol = 2, byrow = TRUE ))
 chr <- 8
 gr.cnp <- cnv.obj$cmp.gr
@@ -212,21 +191,15 @@ freq.vec.chr <- freq.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 
 atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
 gtrack <- GenomeAxisTrack()
-dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "b", cex = 1, name = "-log10(p)", ylim = c(0,10) )
-dtrack2 <- DataTrack( range = gr.cnp.chr, data = freq.vec.chr, type = "b", col = "red", cex = 1, name = "freq", ylim = c(0,1) )
+dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "p", cex = 1, name = "-log10(p)", ylim = c(0,10), col = "red" )
+dtrack2 <- DataTrack( range = gr.cnp.chr, data = freq.vec.chr, type = "s", col = "blue", cex = 1, name = "freq", ylim = c(0,1), lwd = 2 )
 #dtrack2 <- DataTrack( range = gr.cnp.chr, data = tr.rate.case.chr, type = "p", cex = 1, name = "Cleft Trans. Rate", col = "red", type = "p", ylim = c(0,1) )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
 #data(geneModels)
 #grtrack <- GeneRegionTrack(geneModels, genome="hg18", chromosome=chr, name="Gene Model")
 #plotTracks(list(itrack, gtrack, atrack, ))
 fud <- 1e5/2
-plotTracks(list(dtrack, dtrack2, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = 39356825 - fud, to = 39497557 + fud)
 @ 
-\end{center}
-\caption{$-\log p$-values for Fisher's exact test (blue) for an increase in transmission rate among cleft and control groups.  The transmission rate in the cleft group (red) is seen to increase around 20 MB with the $\log p$-value climbing to close to 3.}
-\end{figure}
-
-
 <<n-tests, eval = TRUE, echo = FALSE>>=
 n.tests <- sum(!is.na(trans.vec))
 @ 
@@ -234,29 +207,96 @@ n.tests <- sum(!is.na(trans.vec))
 locus <- reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
 wd <- width(locus)/1e3
 @ 
-Performed \Sexpr{n.tests} tests.  Bonferroni significant locus has width \Sexpr{wd} kB.
+<<trans.tab, eval = FALSE, echo = FALSE >>=
+trioClasses:::trans.tab
+@ 
 \clearpage
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section*{Methods}
+\subsection*{Data Description}
+\begin{itemize}
+  \item Performed \Sexpr{n.tests} tests.  Bonferroni significant locus has width \Sexpr{wd} kB.
+  \item \penn{} joint HMM
+  \item european, MAD $<0.3$, non-WGA, aux $\ne 1$
+  \item coverage $>10$
+  \item \Sexpr{length(cnv.obj$gr)} hemi/homozygous deletions identified in \Sexpr{nrow(completeTrios(fe))} trios
+  \item \Sexpr{ncol(cnv(fe))} CNV components
+  \subitem Common ($>0.01$): \Sexpr{sum(freq.vec > 0.01)}
+  \subitem Rare: \Sexpr{sum(freq.vec <= 0.01)}
+  \item Construct trio-states for all CNV components
+    \subitem recall that we use indicator variable for hemi/homozygous deletions
+  \item must be at least 5 informative mating pairs
+    \subitem 01x and 10x
+  \item count transmissions and perform binom.test (See ``trans.tab'')
+\end{itemize}
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In Figure \ref{gviz1} the \logp-values are displayed for the region on
+chromosome 8 that showed genome-wide significance after Bonferroni
+correction.  We see that the frequency of the CNV components
+responsible for this signal have a frequency in the parents of nearly
+0.5.
+
+<<sig.table>>=
+table.list[which(trans.vec <= 0.05/n.tests)][[1]]
+@ 
+
+\begin{figure}
+  \begin{center}
+<<gviz, fig = TRUE , echo = FALSE , eval = TRUE >>=
+plotTracks(list(dtrack, dtrack2, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = 39356825 - fud, to = 39497557 + fud)
+@ 
+\end{center}
+\caption{$-\log p$-values for Fisher's exact test (blue) for an
+  increase in transmission rate among cleft and control groups.  The
+  transmission rate in the cleft group (red) is seen to increase
+  around 20 MB with the $\log p$-value climbing to close to 3.}
+\label{gviz1}
+\end{figure}
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\begin{center} 
+\begin{figure}
+<<manhattan, fig = TRUE, echo = FALSE, eval = FALSE >>=
+plot(-log10(trans.vec), pch = 20 )
+@ 
+\end{figure}
+\end{center} 
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+\begin{center}
 \begin{figure}
 <<freq-hist, echo = FALSE, eval = TRUE, fig = TRUE>>=
-hist(freq.vec, breaks = seq(0,1,length.out=100), xlim = c(0,0.25), main = "Frequency of CNV Components", xlab = "frequency", ylab = "count")
+hist(freq.vec[freq.vec > 0.01], breaks = seq(0.01,1,by = 0.05), xlim = c(0.01,1), main = "Frequency of Common CNV Components", xlab = "frequency", ylab = "count")
 @ 
 \caption{histogram}
 \end{figure}
 \end{center}
-\begin{center}
-<<summary-freq, eval = TRUE, echo = TRUE>>=
-summary(freq.vec)
-@
-\end{center} 
-<<trans.tab, eval = FALSE, echo = FALSE >>=
-trioClasses:::trans.tab
-@ 
-\begin{figure}
-<<manhattan, fig = TRUE, echo = FALSE, eval = TRUE>>=
-plot(-log10(trans.vec), pch = 20 )
-@ 
-\end{figure}
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 \clearpage
+
 \section*{Authors contributions}
 \section*{Acknowledgements}
 
