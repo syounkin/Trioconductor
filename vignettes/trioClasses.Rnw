@@ -18,7 +18,7 @@
 \maketitle
 \section{Packages \& Data}
 <<package>>=
-Rprof(filename = "trioClasses.Rprof")
+#Rprof(filename = "trioClasses.Rprof")
 library("trioClasses")
 data("sample")
 data("8q24-european-all.sm")
@@ -60,7 +60,7 @@ table(paste0(F,M,O))
 (ste.rare <- ste[!(MAF(ste) >= 0.01 | is.na(MAF(ste)))])
 @ 
 <<window-by-snv, eval = TRUE, echo = FALSE>>=
-n.win <- 10
+n.win <- 100
 n.snp <- ceiling(length(rowData(ste.rare))/n.win)
 p <- length(rowData(ste.rare))
 i.vec <- seq(1,p,by = n.snp )
@@ -81,7 +81,7 @@ n.snp
 table(countOverlaps( window, rowData(ste.rare)))
 @ 
 <<scantrio>>=
-#window <- rowData(ste.rare)[1:10] + 1e3
+window <- rowData(ste.rare) + 250e3
 system.time( scan.trio <- ScanTrio( object = ste.rare, window = window, block = range(rowData(ste.rare))))
 scan.trio
 @ 
