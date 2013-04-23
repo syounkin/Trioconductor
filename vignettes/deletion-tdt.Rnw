@@ -15,42 +15,64 @@
   library("Gviz")
   library("trioClasses")
   library("TxDb.Hsapiens.UCSC.hg18.knownGene")
-  data("cnv", package = "trioClasses")
+
+
   data("pedigrees", package="CleftCNVAssoc")
   data("penncnvjoint", package = "CleftCNVAssoc")
 @ 
-<<se>>=
-  se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr )
+<<se-beaty, echo = FALSE, eval = TRUE>>=
+  data("cnv", package = "trioClasses")
+  cnv.beaty.obj <- cnv.obj
+  se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.beaty.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.beaty.obj$cnv.mat), row.names = rownames(cnv.beaty.obj$cnv.mat)), rowData = cnv.beaty.obj$cmp.gr )
   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
   ped <- PedClass(beaty.ped)
-  fe <- FamilyExperiment(se, pedigree = ped )
+  fe <- FamilyExperiment(se.beaty, pedigree = ped )
+@ 
+<<se-pitt, echo = FALSE, eval = TRUE>>=
+  data("cnv.pitt", package = "trioClasses")
+  cnv.pitt.obj <- cnv.obj
+  se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.pitt.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.pitt.obj$cnv.mat), row.names = rownames(cnv.pitt.obj$cnv.mat)), rowData = cnv.pitt.obj$cmp.gr )
+  pitt.trios <- MinimumDistance:::trios(pitt.pedigree)
+  
+pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
+
+  ped.pitt <- PedClass(pitt.ped)
+  fe.pitt <- FamilyExperiment(se.pitt, pedigree = ped.pitt )
 @ 
 
 <<FamilyExperiment, echo = FALSE, eval = TRUE>>=
   fe.parents <- fe[,colnames(fe)%in%parents(fe)]
+  fe.pitt.parents <- fe.pitt[,colnames(fe.pitt)%in%parents(fe.pitt)]
 @ 
 <<freq-vec, echo = FALSE, eval = TRUE>>=
     freq.vec <- colSums(cnv(fe.parents))/nrow(cnv(fe.parents))
+    freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 <<trioStates, eval = TRUE, echo = FALSE>>=
     trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
     trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates) <- dimnames(trioAssay$O)
+    trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt, type = "cnv")
+    trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+    dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
 <<table-list, eval = TRUE, echo = FALSE>>=
     table.list <- apply(trioStates, 2, "table")
+    table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
-The top 3 CNV components have the followinfg trio-states.  Where `1' indicates a deletion and order is F, M, O.
+The top CNV component has the followinfg trio-states.  Where `1' indicates a deletion and order is F, M, O.
 <<transtab, eval = TRUE, echo = FALSE>>=
     trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
-    head(table.list[which(trans.vec <= 0.05/length(trans.vec))],3)
+    table.list[which(trans.vec <= 0.05/sum(!is.na(trans.vec)))][[1]]
+    trans.vec.pitt <- as( lapply( table.list.pitt, trioClasses:::trans.tab ), "numeric")
 @ 
+
 \begin{center}
 \begin{figure}
 <<gviz, eval = TRUE, echo = FALSE, fig = TRUE, width = 8>>=
 chr <- 8
-gr.cnp <- cnv.obj$cmp.gr
+gr.cnp <- cnv.beaty.obj$cmp.gr
 gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
     
 p.vec <- trans.vec
@@ -69,7 +91,34 @@ fud <- 5e5/2
 plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
 @ 
 \label{chr8-locus}
-\caption{Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
+\caption{Cleft Trios --- Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
+\end{figure}
+\end{center}
+
+\begin{center}
+\begin{figure}
+<<gviz2, eval = TRUE, echo = FALSE, fig = TRUE, width = 8>>=
+chr <- 8
+gr.cnp <- cnv.pitt.obj$cmp.gr
+gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+    
+p.vec <- trans.vec.pitt
+p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+freq.vec.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+
+TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
+gtrack <- GenomeAxisTrack()
+dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "p", cex = 1, name = "-log10(p)", ylim = c(0,10), col = "red" )
+dtrack2 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
+itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
+
+fud <- 5e5/2
+plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
+@ 
+\label{chr8-locus-con}
+\caption{Control Trios --- Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
 \end{figure}
 \end{center}
 \begin{center}
@@ -83,7 +132,7 @@ plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = 
 @ 
 The CNV components with signiifcant $p$-values (Bonferroni) are given below.
 <<reduce-locus, eval = TRUE, echo = FALSE >>=
-    (locus <- cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
+    (locus <- cnv.beaty.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
     wd <- width(reduce(locus))/1e3
 @ 
 All CNV components are contiguous and the total width is \Sexpr{round(wd,1)} kB.
