@@ -10,12 +10,16 @@
 \usepackage{graphicx} %should be removed before submission!
 \input{/home/sgy/jhsph/latex/sgy}
 \begin{document}
-<<options, echo=FALSE, eval = TRUE, echo = TRUE>>=
+<<options, echo=FALSE, eval = TRUE, echo = FALSE>>=
   options(width=75, continue = " ")
   library("Gviz")
   library("trioClasses")
+  library("TxDb.Hsapiens.UCSC.hg18.knownGene")
   data("cnv", package = "trioClasses")
   data("pedigrees", package="CleftCNVAssoc")
+  data("penncnvjoint", package = "CleftCNVAssoc")
+@ 
+<<se>>=
   se <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj$cnv.mat), row.names = rownames(cnv.obj$cnv.mat)), rowData = cnv.obj$cmp.gr )
   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
@@ -23,29 +27,28 @@
   fe <- FamilyExperiment(se, pedigree = ped )
 @ 
 
-<<FamilyExperiment, echo = TRUE, eval = TRUE>>=
+<<FamilyExperiment, echo = FALSE, eval = TRUE>>=
   fe.parents <- fe[,colnames(fe)%in%parents(fe)]
 @ 
-<<freq-vec, echo = TRUE, eval = TRUE>>=
+<<freq-vec, echo = FALSE, eval = TRUE>>=
     freq.vec <- colSums(cnv(fe.parents))/nrow(cnv(fe.parents))
 @ 
-<<trioStates, eval = TRUE, echo = TRUE>>=
+<<trioStates, eval = TRUE, echo = FALSE>>=
     trioAssay <- trioClasses:::TrioAssay(fe, type = "cnv")
     trioStates <- with(trioAssay, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates) <- dimnames(trioAssay$O)
 @ 
-<<table-list, eval = TRUE, echo = TRUE>>=
+<<table-list, eval = TRUE, echo = FALSE>>=
     table.list <- apply(trioStates, 2, "table")
 @ 
-<<transtab, eval = TRUE, echo = TRUE>>=
+The top 3 CNV components have the followinfg trio-states.  Where `1' indicates a deletion and order is F, M, O.
+<<transtab, eval = TRUE, echo = FALSE>>=
     trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
-    head(table.list[which(trans.vec <= 0.05/length(trans.vec))])
+    head(table.list[which(trans.vec <= 0.05/length(trans.vec))],3)
 @ 
-\clearpage
 \begin{center}
 \begin{figure}
-<<gviz, eval = TRUE, echo = TRUE, fig = TRUE, width = 8>>=
-
+<<gviz, eval = TRUE, echo = FALSE, fig = TRUE, width = 8>>=
 chr <- 8
 gr.cnp <- cnv.obj$cmp.gr
 gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
@@ -53,8 +56,7 @@ gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 p.vec <- trans.vec
 p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 freq.vec.chr <- freq.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-    
-library("TxDb.Hsapiens.UCSC.hg18.knownGene")
+
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
 gtrack <- GenomeAxisTrack()
@@ -65,22 +67,31 @@ grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UC
 
 fud <- 5e5/2
 plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
-
 @ 
 \label{chr8-locus}
-\caption{Foo!}
+\caption{Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
 \end{figure}
 \end{center}
-\includegraphics{./figures/ucsc}
-%%     <<n-tests, eval = TRUE, echo = TRUE>>=
-%%     n.tests <- sum(!is.na(trans.vec))
-%% @ 
-%%     <<reduce-locus, eval = TRUE, echo = TRUE >>=
-%%     locus <- reduce(cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
-%%     wd <- width(locus)/1e3
-%% @ 
-%%     <<trans.tab, eval = TRUE, echo = TRUE >>=
-%%     trioClasses:::trans.tab
-%% @ 
-
+\begin{center}
+  \begin{figure}
+    \includegraphics[width = 4in]{./figures/ucsc}
+    \caption{UCSC Genome Browser at chromosome 8 locus.}
+  \end{figure}
+\end{center}
+<<n-tests, eval = TRUE, echo = FALSE>>=
+    n.tests <- sum(!is.na(trans.vec))
+@ 
+The CNV components with signiifcant $p$-values (Bonferroni) are given below.
+<<reduce-locus, eval = TRUE, echo = FALSE >>=
+    (locus <- cnv.obj$cmp.gr[which(trans.vec <= 0.05/n.tests)])
+    wd <- width(reduce(locus))/1e3
+@ 
+All CNV components are contiguous and the total width is \Sexpr{round(wd,1)} kB.
+<<trans.tab, eval = TRUE, echo = FALSE >>=
+    trioClasses:::trans.tab
+@ 
+<<pitt, eval = TRUE, echo = TRUE >>=
+gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
+sum(countOverlaps( gr.deletion.pitt, reduce(locus) ))
+@ 
 \end{document}
