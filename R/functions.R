@@ -30,3 +30,13 @@ trans.tab <- function( object ) {
     return(NA)
   }
 }
+
+trans.rate <- function( object ) {
+  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 5 ){
+    T <- sum(object[c("101","011")],na.rm=TRUE)
+    U <- sum(object[c("100","010")],na.rm=TRUE)
+    return(T/(T+U))
+  }else{
+    return(NA)
+  }
+}

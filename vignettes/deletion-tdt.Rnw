@@ -64,8 +64,10 @@ pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$
 The top CNV component has the followinfg trio-states.  Where `1' indicates a deletion and order is F, M, O.
 <<transtab, eval = TRUE, echo = FALSE>>=
     trans.vec <- as( lapply( table.list, trioClasses:::trans.tab ), "numeric")
+    trans.rate <- as( lapply( table.list, trioClasses:::trans.rate ), "numeric")
     table.list[which(trans.vec <= 0.05/sum(!is.na(trans.vec)))][[1]]
     trans.vec.pitt <- as( lapply( table.list.pitt, trioClasses:::trans.tab ), "numeric")
+    trans.rate.pitt <- as( lapply( table.list.pitt, trioClasses:::trans.rate ), "numeric")
 @ 
 
 \begin{center}
@@ -78,17 +80,19 @@ gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 p.vec <- trans.vec
 p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 freq.vec.chr <- freq.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+trans.rate.chr <- trans.rate[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
 gtrack <- GenomeAxisTrack()
 dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "p", cex = 1, name = "-log10(p)", ylim = c(0,10), col = "red" )
 dtrack2 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
+dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
 grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
 
 fud <- 5e5/2
-plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
+plotTracks(list(dtrack, dtrack2, dtrack3, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
 @ 
 \label{chr8-locus}
 \caption{Cleft Trios --- Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
@@ -105,17 +109,19 @@ gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 p.vec <- trans.vec.pitt
 p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 freq.vec.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+trans.rate.pitt.chr <- trans.rate.pitt[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
 gtrack <- GenomeAxisTrack()
 dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "p", cex = 1, name = "-log10(p)", ylim = c(0,10), col = "red" )
 dtrack2 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
+dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.pitt.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
 grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
 
 fud <- 5e5/2
-plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
+plotTracks(list(dtrack, dtrack2, dtrack3, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
 @ 
 \label{chr8-locus-con}
 \caption{Control Trios --- Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
@@ -143,4 +149,14 @@ All CNV components are contiguous and the total width is \Sexpr{round(wd,1)} kB.
 gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
 sum(countOverlaps( gr.deletion.pitt, reduce(locus) ))
 @ 
+\begin{center}
+\begin{figure}
+<<hist, fig = TRUE, echo = FALSE, eval = TRUE, width = 8>>=
+par(bg = '#FFFEDB')
+layout(matrix(1:2, nrow = 1, ncol = 2))
+hist(trans.rate, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Cleft Trios", xlab = "Transmission Rate", col='darkblue')
+hist(trans.rate.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Control Trios", xlab = "Transmission Rate", col='darkblue')
+@ 
+\end{figure}
+\end{center}
 \end{document}
