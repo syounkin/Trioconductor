@@ -16,7 +16,6 @@
   library("trioClasses")
   library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 
-
   data("pedigrees", package="CleftCNVAssoc")
   data("penncnvjoint", package = "CleftCNVAssoc")
 @ 
@@ -159,4 +158,33 @@ hist(trans.rate.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Contr
 @ 
 \end{figure}
 \end{center}
+\section*{Methods}
+\subsection*{Cleft Data Description}
+\begin{itemize}
+  \item Performed \Sexpr{n.tests} tests.  Bonferroni significant locus has width \Sexpr{wd} kB.
+  \item \penn{} joint HMM
+  \item european, MAD $<0.3$, non-WGA, aux $\ne 1$
+  \item coverage $>10$
+  \item \Sexpr{length(cnv.obj$gr)} hemi/homozygous deletions identified in \Sexpr{nrow(completeTrios(fe))} trios
+  \item \Sexpr{ncol(cnv(fe))} CNV components
+  \subitem Common ($>0.01$): \Sexpr{sum(freq.vec > 0.01)}
+  \subitem Rare: \Sexpr{sum(freq.vec <= 0.01)}
+  \item Construct trio-states for all CNV components
+    \subitem recall that we use indicator variable for hemi/homozygous deletions
+  \item must be at least 5 informative mating pairs
+    \subitem 01x and 10x
+  \item count transmissions and perform binom.test (See ``trans.tab'')
+\end{itemize}
+<<transmission-rate>>=
+mean(trans.rate[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))])
+mean(trans.rate.pitt[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))])
+@  
+<<tdt-p, echo = TRUE, eval = TRUE>>=
+mean(-log10(trans.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))]))
+mean(-log10(trans.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))]))
+@  
+<<frequencies, echo = TRUE, eval = TRUE>>=
+freq.pitt.vec[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))]
+freq.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))]
+@ 
 \end{document}
