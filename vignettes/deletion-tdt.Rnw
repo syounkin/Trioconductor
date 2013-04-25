@@ -215,31 +215,31 @@ All CNV components are contiguous and the total width is \Sexpr{round(wd,1)} kB.
 gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
 sum(countOverlaps( gr.deletion.pitt, reduce(locus) ))
 @ 
-%\end{figure}
-%\end{center}
 
 
-%% \begin{center}
-%% \begin{figure}
-%% <<hist, fig = TRUE, echo = FALSE, eval = TRUE, width = 8>>=
-%% par(bg = '#FFFEDB')
-%% layout(matrix(1:2, nrow = 1, ncol = 2))
-%% hist(trans.rate, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Cleft Trios", xlab = "Transmission Rate", col='darkblue')
-%% hist(trans.rate.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Control Trios", xlab = "Transmission Rate", col='darkblue')
-%% @ 
+\begin{center}
+\begin{figure}
+<<hist, fig = TRUE, echo = FALSE, eval = TRUE, width = 8>>=
+par(bg = '#FFFEDB')
+layout(matrix(1:2, nrow = 1, ncol = 2))
+hist(est.vec, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Cleft Trios", xlab = "Transmission Rate", col='darkblue')
+hist(est.vec.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Control Trios", xlab = "Transmission Rate", col='darkblue')
+@ 
+\end{figure}
+\end{center}
 
-%% <<transmission-rate>>=
-%% mean(trans.rate[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))])
-%% mean(trans.rate.pitt[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))])
-%% @  
-%% <<tdt-p, echo = TRUE, eval = TRUE>>=
-%% mean(-log10(trans.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))]))
-%% mean(-log10(trans.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))]))
-%% @  
-%% <<frequencies, echo = TRUE, eval = TRUE>>=
-%% freq.pitt.vec[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))]
-%% freq.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))]
-%% @ 
+<<transmission-rate>>=
+mean(est.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))])
+mean(est.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))])
+@  
+<<tdt-p, echo = TRUE, eval = TRUE>>=
+mean(-log10(trans.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))]))
+mean(-log10(trans.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))]))
+@  
+<<frequencies, echo = TRUE, eval = TRUE>>=
+freq.pitt.vec[subjectHits(findOverlaps(reduce(locus), cnv.pitt.obj$cmp.gr))]
+freq.vec[subjectHits(findOverlaps(reduce(locus), cnv.beaty.obj$cmp.gr))]
+@ 
 
 
 \end{document}
