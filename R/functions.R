@@ -22,7 +22,7 @@ aTDT.fn <- function(geno, correct=FALSE){
 }
 
 trans.tab <- function( object ) {
-  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 5 ){
+  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 60 ){
     T <- sum(object[c("101","011")],na.rm=TRUE)
     U <- sum(object[c("100","010")],na.rm=TRUE)
     return(binom.test(x = T,n = T+U,p = 0.5, alternative = "greater")$p.value)
@@ -32,10 +32,27 @@ trans.tab <- function( object ) {
 }
 
 trans.rate <- function( object ) {
-  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 5 ){
+  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 60 ){
     T <- sum(object[c("101","011")],na.rm=TRUE)
     U <- sum(object[c("100","010")],na.rm=TRUE)
-    return(T/(T+U))
+    return(binom.test(x = T,n = T+U,p = 0.5))
+#   return(binom.test(x = T,n = T+U,p = 0.5, alternative = "greater"))    
+  }else{
+    return(NA)
+  }
+}
+
+get.est <- function(obj){
+  if(!is.na(obj)){
+    return(obj$estimate)
+  }else{
+    return(NA)
+  }
+}
+
+get.ci <- function(obj){
+  if(!is.na(obj)){
+    return(obj$conf.int)
   }else{
     return(NA)
   }
