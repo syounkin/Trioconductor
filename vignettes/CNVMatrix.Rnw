@@ -1,9 +1,9 @@
-% Sweave(file = "./trioClasses.Rnw")
+% Sweave(file = "./CNVMatrix.Rnw")
 \documentclass[10pt]{article}
 <<echo=FALSE>>=
   options(width=70, continue = " ")
 @
-\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/trioClasses}
+\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/CNVMatrix}
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
@@ -21,21 +21,20 @@
 library("trioClasses")
 library("CleftCNVAssoc")
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
-gr.deletion <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
-length(gr.deletion)
-#data("sample")
-#data("8q24-european-all.sm")
-#data("penncnvjoint", package = "CleftCNVAssoc")
-#data("8q24-chinese-all.sm")
-#data("BMP4-european-all.sm")
-#data("BMP4-chinese-all.sm")
-@
-<<cnvmatrix>>=
-#system.time( cnv.obj <- CNVMatrix( gr.deletion ) )
-#system.time( cnv.obj <- CNVMatrix( gr.beaty[1:4e3] ) )
-system.time( cnv.obj <- CNVMatrix( gr.deletion ) )
+gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
+homos.beaty <- with(values(gr.deletion.beaty),cn==0)
+gr.deletion.beaty <- c(gr.deletion.beaty,gr.deletion.beaty[homos.beaty])
+gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
+homos.pitt <- with(values(gr.deletion.pitt),cn==0)
+gr.deletion.pitt <- c(gr.deletion.pitt,gr.deletion.pitt[homos.pitt])
 @ 
-<<savecnv>>=
-save( cnv.obj, file = "./../data/cnv.RData" )
+<<cnvmatrix-beaty>>=
+system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty ) )
+@ 
+<<cnvmatrix-pitt>>=
+system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt ) )
+@ 
+<<savecnv, echo = TRUE, eval = TRUE>>=
+save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 @ 
 \end{document}
