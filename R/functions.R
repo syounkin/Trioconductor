@@ -22,9 +22,9 @@ aTDT.fn <- function(geno, correct=FALSE){
 }
 
 trans.tab <- function( object ) {
-  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 60 ){
-    T <- sum(object[c("101","011")],na.rm=TRUE)
-    U <- sum(object[c("100","010")],na.rm=TRUE)
+  T <- sum(object[c("101","011","122","212","111","112","112")],na.rm=TRUE)
+  U <- sum(object[c("100","010","121","211","111","110","110")],na.rm=TRUE)
+  if( T+U >= 50 ){
     return(binom.test(x = T,n = T+U,p = 0.5, alternative = "greater")$p.value)
   }else{
     return(NA)
@@ -32,11 +32,10 @@ trans.tab <- function( object ) {
 }
 
 trans.rate <- function( object ) {
-  if( sum(object[c("101","011","100","010")],na.rm=TRUE) >= 60 ){
-    T <- sum(object[c("101","011")],na.rm=TRUE)
-    U <- sum(object[c("100","010")],na.rm=TRUE)
+  T <- sum(object[c("101","011","122","212","111","112","112")],na.rm=TRUE)
+  U <- sum(object[c("100","010","121","211","111","110","110")],na.rm=TRUE)
+  if( T+U >= 50 ){
     return(binom.test(x = T,n = T+U,p = 0.5))
-#   return(binom.test(x = T,n = T+U,p = 0.5, alternative = "greater"))    
   }else{
     return(NA)
   }

@@ -105,7 +105,7 @@ freq.pitt.vec <- freq.pitt.vec[testable.pitt]
 \begin{figure}
 <<trans-ci, fig = TRUE, echo = FALSE, eval = TRUE, height = 12>>=
 par(bg = '#FFFEDB')
-plot(1, type = "n", ylim = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), xlim = c(0,2), xlab = "Transmission Rate", ylab = "", main = "Transmission Rate 95 percent CI\n60 0/1 mating pairs required", axes = FALSE )
+plot(1, type = "n", ylim = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), xlim = c(0,2), xlab = "Transmission Rate", ylab = "", main = "Transmission Rate 95 percent CI\nT+U>50 ", axes = FALSE )
 polygon( y = c(1:length(est.vec.beaty), length(est.vec.beaty):1 ), x = c(ci.mat.beaty[,1],rev(ci.mat.beaty[,2])), col = "darkblue", border = NA)
 
 polygon( y = c(1:length(est.vec.pitt), length(est.vec.pitt):1 ), x = c(ci.mat.pitt[,1],rev(ci.mat.pitt[,2]))+1, col = "orange", border = NA)
@@ -166,8 +166,8 @@ sum(countOverlaps( gr.deletion.pitt, reduce(locus) ))
 <<hist, fig = TRUE, echo = FALSE, eval = TRUE, width = 8>>=
 par(bg = '#FFFEDB')
 layout(matrix(1:2, nrow = 1, ncol = 2))
-hist(est.vec.beaty, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Cleft Trios", xlab = "Transmission Rate", col='darkblue')
-hist(est.vec.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,200), main = "Control Trios", xlab = "Transmission Rate", col='darkblue')
+hist(est.vec.beaty, breaks = 20, xlim = c(0,1), ylim = c(0,100), main = "Cleft Trios", xlab = "Transmission Rate", col='darkblue')
+hist(est.vec.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,100), main = "Control Trios", xlab = "Transmission Rate", col='darkblue')
 @ 
 \end{figure}
 \end{center}
@@ -185,22 +185,29 @@ gr.cnp.pitt.chr <- gr.cnp.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr",
 #p.vec <- trans.vec
 est.vec.beaty.chr <- est.vec.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
 freq.vec.beaty.chr <- freq.beaty.vec[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+lower.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),1]
+upper.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),2]
+
 est.vec.pitt.chr <- est.vec.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
 freq.vec.pitt.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+lower.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),1]
+upper.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),2]
+
 #trans.rate.chr <- trans.rate[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 atrack <- AnnotationTrack(, name = "CNP comp.", fill = "darkgreen")
 gtrack <- GenomeAxisTrack()
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Genes", geneSymbols = TRUE, collapseTranscripts=TRUE, showId = TRUE)
+grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Genes", geneSymbols = TRUE, collapseTranscripts=TRUE, showId = FALSE)
 
-dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr, freq.vec.beaty.chr), type = "b", cex = 1, name = "Cleft Trios", ylim = c(0,1), col = c("red","darkblue"), pch = 20 )
-dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr, freq.vec.pitt.chr), type = "b", cex = 1, name = "Control Trios", ylim = c(0,1), col = c("red","darkblue"), pch = 20 )
+dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr,  lower.vec.beaty.chr, upper.vec.beaty.chr), type = "s", col = c("orange", "darkblue","orange"), lwd = 2, name = "Cleft Trios", ylim = c(0.25,0.75), pch = 20 )
+dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr,  lower.vec.pitt.chr, upper.vec.pitt.chr), type = "s", , col = c("orange", "darkblue","orange"), lwd = 2, name = "Control Trios", ylim = c(0.25,0.75), pch = 20 )
+#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr, freq.vec.pitt.chr), type = "s", cex = 1, name = "Control Trios", ylim = c(0,1), col = c("red","darkblue"), pch = 20 )
 fud <- 2e5/2
-plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","freq"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
+plotTracks( list(dtrack,  dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = mean(c(39356825,39497557)) - fud, to = mean(c(39356825,39497557)) + fud, legend = FALSE)
 
-#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "b", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
+#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "s", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
 #dtrack3 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
 #dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
 #itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
@@ -213,6 +220,111 @@ plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack ),  groups = c("trans"
 \caption{}
 \end{figure}
 \end{center}
+
+
+
+
+\begin{center}
+\begin{figure}
+<<gviz2, eval = TRUE, echo = FALSE, fig = TRUE, width = 6>>=
+chr <- 7
+#gr.cnp.beaty <- cnv.obj.beaty$cmp.gr
+gr.cnp.beaty.chr <- gr.cnp.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+
+#gr.cnp.pitt <- cnv.obj.pitt$cmp.gr
+gr.cnp.pitt.chr <- gr.cnp.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+
+#p.vec <- trans.vec
+est.vec.beaty.chr <- est.vec.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+freq.vec.beaty.chr <- freq.beaty.vec[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+lower.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),1]
+upper.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),2]
+
+est.vec.pitt.chr <- est.vec.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+freq.vec.pitt.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+lower.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),1]
+upper.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),2]
+
+#trans.rate.chr <- trans.rate[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+
+#TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+atrack <- AnnotationTrack(, name = "CNP comp.", fill = "darkgreen")
+gtrack <- GenomeAxisTrack()
+itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Genes", geneSymbols = TRUE, collapseTranscripts=TRUE, showId = FALSE)
+
+dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr,  lower.vec.beaty.chr, upper.vec.beaty.chr), type = "s", col = c("orange", "darkblue","orange"), lwd = 2, name = "Cleft Trios", ylim = c(0,1), pch = 20 )
+dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr,  lower.vec.pitt.chr, upper.vec.pitt.chr), type = "s", , col = c("orange", "darkblue","orange"), lwd = 2, name = "Control Trios", ylim = c(0,1), pch = 20 )
+#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr, freq.vec.pitt.chr), type = "s", cex = 1, name = "Control Trios", ylim = c(0,1), col = c("red","darkblue"), pch = 20 )
+fud <- 2e5/2
+#plotTracks( list(dtrack,  dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud, legend = FALSE)
+plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack  ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 141.43e6 - fud, to = 141.43e6 + fud, legend = FALSE)
+
+#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "s", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
+#dtrack3 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
+#dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
+#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+#grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
+
+#fud <- 5e5/2
+#plotTracks(list(dtrack,  grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
+@ 
+\label{chr8-locus}
+\caption{}
+\end{figure}
+\end{center}
+
+
+\begin{center}
+\begin{figure}
+<<gviz3, eval = TRUE, echo = FALSE, fig = TRUE, width = 6>>=
+chr <- 11
+#gr.cnp.beaty <- cnv.obj.beaty$cmp.gr
+gr.cnp.beaty.chr <- gr.cnp.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+
+#gr.cnp.pitt <- cnv.obj.pitt$cmp.gr
+gr.cnp.pitt.chr <- gr.cnp.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+
+#p.vec <- trans.vec
+est.vec.beaty.chr <- est.vec.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+freq.vec.beaty.chr <- freq.beaty.vec[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
+lower.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),1]
+upper.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),2]
+
+est.vec.pitt.chr <- est.vec.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+freq.vec.pitt.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
+lower.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),1]
+upper.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),2]
+
+#trans.rate.chr <- trans.rate[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
+
+#TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+atrack <- AnnotationTrack(, name = "CNP comp.", fill = "darkgreen")
+gtrack <- GenomeAxisTrack()
+itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Genes", geneSymbols = TRUE, collapseTranscripts=TRUE, showId = FALSE)
+
+dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr,  lower.vec.beaty.chr, upper.vec.beaty.chr), type = "s", col = c("orange", "darkblue","orange"), lwd = 2, name = "Cleft Trios", ylim = c(0,1), pch = 20 )
+dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr,  lower.vec.pitt.chr, upper.vec.pitt.chr), type = "s", , col = c("orange", "darkblue","orange"), lwd = 2, name = "Control Trios", ylim = c(0,1), pch = 20 )
+#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr, freq.vec.pitt.chr), type = "s", cex = 1, name = "Control Trios", ylim = c(0,1), col = c("red","darkblue"), pch = 20 )
+fud <- 2e5/2
+#plotTracks( list(dtrack,  dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud, legend = FALSE)
+plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack  ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 55.20e6 - fud, to = 55.20e6 + fud, legend = FALSE)
+
+#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "s", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
+#dtrack3 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
+#dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
+#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+#grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
+
+#fud <- 5e5/2
+#plotTracks(list(dtrack,  grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
+@ 
+\label{chr8-locus}
+\caption{}
+\end{figure}
+\end{center}
+
 
 %% \begin{center}
 %% \begin{figure}
@@ -255,7 +367,7 @@ mean(-log10(trans.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.obj.pitt$
 @  
 <<frequencies, echo = TRUE, eval = TRUE>>=
 freq.pitt.vec[subjectHits(findOverlaps(reduce(locus), cnv.obj.pitt$cmp.gr))]
-freq.vec[subjectHits(findOverlaps(reduce(locus), cnv.obj.beaty$cmp.gr))]
+freq.beaty.vec[subjectHits(findOverlaps(reduce(locus), cnv.obj.beaty$cmp.gr))]
 @ 
 
 
