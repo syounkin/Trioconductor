@@ -14,3 +14,4 @@ extdata
 *.bbl
 *.blg
 log
+foo*

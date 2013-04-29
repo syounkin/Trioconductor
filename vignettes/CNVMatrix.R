@@ -1,23 +1,14 @@
-% Sweave(file = "./CNVMatrix.Rnw")
-\documentclass[10pt]{article}
-<<echo=FALSE>>=
+### R code from vignette source 'CNVMatrix.Rnw'
+
+###################################################
+### code chunk number 1: CNVMatrix.Rnw:3-4
+###################################################
   options(width=70, continue = " ")
-@
-\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/CNVMatrix}
-\usepackage{fullpage}
-\usepackage{times}
-\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-\title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
-\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
-\date{\today}
-%\input{/home/bst/student/syounkin/jhsph/latex/sgy}
-%\input{/home/sgy/jhsph/latex/sgy}
-\begin{document}
-\setlength{\parskip}{0.2\baselineskip}
-\setlength{\parindent}{0pt}
-\maketitle
-\section{Packages \& Data}
-<<package>>=
+
+
+###################################################
+### code chunk number 2: package
+###################################################
 library("trioClasses")
 library("CleftCNVAssoc")
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
@@ -34,14 +25,23 @@ gr.deletion.beaty <- c(gr.deletion.beaty,gr.deletion.beaty[homos.beaty])
 gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
 homos.pitt <- with(values(gr.deletion.pitt),cn==0)
 gr.deletion.pitt <- c(gr.deletion.pitt,gr.deletion.pitt[homos.pitt])
-@ 
-<<cnvmatrix-beaty>>=
+
+
+###################################################
+### code chunk number 3: cnvmatrix-beaty
+###################################################
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty ) )
-@ 
-<<cnvmatrix-pitt>>=
+
+
+###################################################
+### code chunk number 4: cnvmatrix-pitt
+###################################################
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt ) )
-@ 
-<<savecnv, echo = TRUE, eval = TRUE>>=
+
+
+###################################################
+### code chunk number 5: savecnv
+###################################################
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
-@ 
-\end{document}
+
+

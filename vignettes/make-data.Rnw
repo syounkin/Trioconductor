@@ -14,12 +14,12 @@
   options(width=75, continue = " ")
   library("trioClasses")
   data("pedigrees", package="CleftCNVAssoc")
-  data("penncnvjoint", package = "CleftCNVAssoc")
+#  data("penncnvjoint", package = "CleftCNVAssoc")
 @ 
 <<se-beaty, echo = TRUE, eval = TRUE>>=
   data("cnv", package = "trioClasses")
-#  cnv.beaty.obj <- cnv.obj
-  se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.beaty.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.beaty.obj$cnv.mat), row.names = rownames(cnv.beaty.obj$cnv.mat)), rowData = cnv.beaty.obj$cmp.gr )
+#  cnv.obj.beaty <- cnv.obj
+  se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.beaty$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.beaty$cnv.mat), row.names = rownames(cnv.obj.beaty$cnv.mat)), rowData = cnv.obj.beaty$cmp.gr )
   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
   ped <- PedClass(beaty.ped)
@@ -27,8 +27,8 @@
 @ 
 <<se-pitt, echo = TRUE, eval = TRUE>>=
 #  data("cnv.pitt", package = "trioClasses")
-#  cnv.pitt.obj <- cnv.obj
-  se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.pitt.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.pitt.obj$cnv.mat), row.names = rownames(cnv.pitt.obj$cnv.mat)), rowData = cnv.pitt.obj$cmp.gr )
+#  cnv.obj.pitt <- cnv.obj
+  se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.pitt$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.pitt$cnv.mat), row.names = rownames(cnv.obj.pitt$cnv.mat)), rowData = cnv.obj.pitt$cmp.gr )
   pitt.trios <- MinimumDistance:::trios(pitt.pedigree)
   
 pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
