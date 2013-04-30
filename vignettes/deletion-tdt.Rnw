@@ -150,7 +150,44 @@ index.2.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[2]))
 index.4.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[4]))
 index.3.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[3]))
 
+index.1.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[1]))
+index.1.full.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus.full[1]))
+index.2.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[2]))
+index.3.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[3]))
+index.2.full.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus.full[2]))
+index.4.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[4]))
+index.3.full.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus.full[3]))
+index.1.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[1]))
+index.1.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[1]))
+index.2.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[2]))
+index.3.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[3]))
+index.2.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[2]))
+index.4.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[4]))
+index.3.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[3]))
+
 @ 
+
+\begin{center}
+\begin{figure}
+<<trans-plot, fig = TRUE, echo = FALSE, eval = TRUE, width = 8>>=
+par(bg = '#FFFEDB')
+plot( 1, type = "n", xlim = xlim <- c(39.3,39.5)*1e6, ylim = c(0,1), axes = FALSE, xlab = "Chromsome 8", ylab = "Transmission Rate" )
+xvec.beaty <- start(gr.cnp.beaty[index.2.full.beaty.testable])
+polygon( x = c(xvec.beaty, rev(xvec.beaty)), y = c(ci.mat.beaty[index.2.full.beaty.testable,1],ci.mat.beaty[index.2.full.beaty.testable,2]), col = rgb(1,0,0,0.5), border  = NA )
+xvec.pitt <- start(gr.cnp.pitt[index.2.full.pitt.testable])
+polygon( x = c(xvec.pitt, rev(xvec.pitt)), y = c(ci.mat.pitt[index.2.full.pitt.testable,1],ci.mat.pitt[index.2.full.pitt.testable,2]), col = rgb(0,0,1,0.5), border  = NA )
+lines( range(xlim), rep(0.5,2), lty = 3 )
+axis(2, at = c(0,0.25,0.5,0.75,1) )
+axis(1, at = at <- seq( xlim[1], xlim[2], by = 25e3 ), labels = paste0(round(at/1e6,2), " MB") )
+legend( x = 39.3e6, y = 1, legend = c("Cleft", "Control"), col = c(rgb(1,0,0,0.5),rgb(0,0,1,0.5)), pch = 15)
+#lines( start(gr.cnp.beaty[index.2.full.beaty.testable]), ci.mat.beaty[index.2.full.beaty.testable,2], lty = 2, col = "orange" )
+#lines( start(gr.cnp.beaty[index.2.full.beaty.testable]), est.vec.beaty[index.2.full.beaty.testable], col = "orange" )
+#lines( start(gr.cnp.pitt[index.2.full.pitt.testable]), ci.mat.pitt[index.2.full.pitt.testable,1], lty = 2 )
+#lines( start(gr.cnp.pitt[index.2.full.pitt.testable]), ci.mat.pitt[index.2.full.pitt.testable,2], lty = 2 )
+#lines( start(gr.cnp.pitt[index.2.full.pitt.testable]), est.vec.pitt[index.2.full.pitt.testable] )
+@ 
+\end{figure}
+\end{center}
 
 <<freq, echo = TRUE>>=
 freq.beaty <- colSums(cnv(fe.beaty))/2/nrow(cnv(fe.beaty))
