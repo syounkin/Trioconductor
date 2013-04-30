@@ -19,34 +19,7 @@
   data("pedigrees", package="CleftCNVAssoc")
   data("penncnvjoint", package = "CleftCNVAssoc")
   data("cnv", package = "trioClasses")
-#  cnv.obj.beaty <- cnv.obj
-#  data("cnv.pitt", package = "trioClasses")
-#  cnv.pitt.obj <- cnv.obj
-#  rm(cnv.obj)
 @ 
-%% <<se-beaty, echo = FALSE, eval = TRUE>>=
-%%   data("cnv", package = "trioClasses")
-%%   cnv.obj.beaty <- cnv.obj
-%%   se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.beaty$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.beaty$cnv.mat), row.names = rownames(cnv.obj.beaty$cnv.mat)), rowData = cnv.obj.beaty$cmp.gr )
-%%   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
-%%   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
-%%   ped <- PedClass(beaty.ped)
-%%   fe <- FamilyExperiment(se.beaty, pedigree = ped )
-%% @ 
-%% <<se-pitt, echo = FALSE, eval = TRUE>>=
-%%   data("cnv.pitt", package = "trioClasses")
-%%   cnv.pitt.obj <- cnv.obj
-%%   se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.pitt.obj$cnv.mat)), colData = DataFrame(id=rownames(cnv.pitt.obj$cnv.mat), row.names = rownames(cnv.pitt.obj$cnv.mat)), rowData = cnv.pitt.obj$cmp.gr )
-%%   pitt.trios <- MinimumDistance:::trios(pitt.pedigree)
-  
-%% pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
-
-%%   ped.pitt <- PedClass(pitt.ped)
-%%   fe.pitt <- FamilyExperiment(se.pitt, pedigree = ped.pitt )
-%% @ 
-
-
-
 
 <<FamilyExperiment, echo = FALSE, eval = TRUE>>=
   fe.beaty.parents <- fe.beaty[,colnames(fe.beaty)%in%parents(fe.beaty)]
@@ -72,16 +45,13 @@ The top CNV component has the followinfg trio-states.  Where `1' indicates a del
 <<transtab, eval = TRUE, echo = FALSE>>=
     trans.vec <- as( lapply( table.list.beaty, trioClasses:::trans.tab ), "numeric")
     trans.vec.pitt <- as( lapply( table.list.pitt, trioClasses:::trans.tab ), "numeric")
-#    table.list.beaty[which(trans.vec <= 0.05/sum(!is.na(trans.vec)))][[1]]
-    
+
     binom.list.beaty <- lapply( table.list.beaty, trioClasses:::trans.rate )
     binom.list.pitt <- lapply( table.list.pitt, trioClasses:::trans.rate )
 
-#    trans.rate <- trans.vec #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#    trans.rate.pitt <- trans.vec.pitt #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @ 
 
-<<ci-beaty>>=
+<<ci-beaty, echo = FALSE>>=
 est.list.beaty <- lapply(binom.list.beaty, FUN = trioClasses:::get.est)
 ci.list.beaty <- lapply(binom.list.beaty, FUN = trioClasses:::get.ci)
 testable.beaty <- !is.na(ci.list.beaty)
@@ -91,7 +61,7 @@ gr.cnp.beaty <- cnv.obj.beaty$cmp.gr[testable.beaty]
 freq.beaty.vec <- freq.beaty.vec[testable.beaty]
 @ 
 
-<<ci-pitt>>=
+<<ci-pitt, echo = FALSE>>=
 est.list.pitt <- lapply(binom.list.pitt, FUN = trioClasses:::get.est)
 ci.list.pitt <- lapply(binom.list.pitt, FUN = trioClasses:::get.ci)
 testable.pitt <- !is.na(ci.list.pitt)
@@ -109,7 +79,6 @@ plot(1, type = "n", ylim = c(0,max(length(est.vec.beaty),length(est.vec.pitt))),
 polygon( y = c(1:length(est.vec.beaty), length(est.vec.beaty):1 ), x = c(ci.mat.beaty[,1],rev(ci.mat.beaty[,2])), col = "darkblue", border = NA)
 
 polygon( y = c(1:length(est.vec.pitt), length(est.vec.pitt):1 ), x = c(ci.mat.pitt[,1],rev(ci.mat.pitt[,2]))+1, col = "orange", border = NA)
-#lines( x = rep(0.5,2), y = c(0,length(est.vec.beaty)), lty = 2, lwd = 2)
 lines( x = rep(0.5,2), y = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), lty = 2, lwd = 2)
 lines( x = rep(0.5,2)+1, y = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), lty = 2, lwd = 2)
 lines( x = rep(1,2), y = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), lty = 3, lwd = 2)
@@ -134,29 +103,78 @@ The CNV components with signiifcant $p$-values (Bonferroni) are given below.
     (locus <- cnv.obj.beaty$cmp.gr[which(trans.vec <= 0.05/n.tests)])
     wd <- width(reduce(locus))/1e3
 @ 
-All CNV components are contiguous and the total width is \Sexpr{round(wd,1)} kB.
-<<trans.tab, eval = TRUE, echo = FALSE >>=
+
+<<locus-full, echo = FALSE>>=
+(locus.full <- reduce(reduce(cnv.obj.beaty$cmp.gr)[queryHits(findOverlaps(reduce(cnv.obj.beaty$cmp.gr), locus)) ]))
+
+index.1.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[1]))
+index.1.full.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus.full[1]))
+index.2.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[2]))
+index.3.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[3]))
+index.2.full.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus.full[2]))
+index.4.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[4]))
+index.3.full.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus.full[3]))
+index.1.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[1]))
+index.1.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[1]))
+index.2.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[2]))
+index.3.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[3]))
+index.2.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[2]))
+index.4.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[4]))
+index.3.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[3]))
+
+@ 
+
+<<freq, echo = TRUE>>=
+freq.beaty <- colSums(cnv(fe.beaty))/2/nrow(cnv(fe.beaty))
+freq.pitt <- colSums(cnv(fe.pitt))/2/nrow(cnv(fe.pitt))
+
+freq.beaty[index.1.beaty]
+freq.pitt[index.1.pitt]
+
+freq.beaty[index.2.beaty]
+freq.pitt[index.2.pitt]
+
+freq.beaty[index.3.beaty]
+freq.pitt[index.3.pitt]
+
+freq.beaty[index.4.beaty]
+freq.pitt[index.4.pitt]
+
+summary(freq.beaty[index.1.full.beaty])
+summary(freq.pitt[index.1.full.pitt])
+
+summary(freq.beaty[index.2.full.beaty])
+summary(freq.pitt[index.2.full.pitt])
+
+summary(freq.beaty[index.3.full.beaty])
+summary(freq.pitt[index.3.full.pitt])
+@ 
+
+%All CNV components are contiguous and the total width is \Sexpr{round(wd,1)} kB.
+<<trans.tab, eval = TRUE, echo = TRUE >>=
     trioClasses:::trans.tab
 @ 
-<<pitt, eval = TRUE, echo = TRUE >>=
-gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
-sum(countOverlaps( gr.deletion.pitt, reduce(locus) ))
+<<trans.rate, eval = TRUE, echo = TRUE >>=
+    trioClasses:::trans.rate
 @ 
+%% <<pitt, eval = TRUE, echo = FALSE >>=
+%% gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
+%% sum(countOverlaps( gr.deletion.pitt, reduce(locus) ))
+%% @ 
 \section*{Methods}
 \subsection*{Cleft Data Description}
 \begin{itemize}
-  \item Performed \Sexpr{n.tests} tests.  Bonferroni significant locus has width \Sexpr{wd} kB.
+  \item Performed \Sexpr{n.tests} tests.  %Bonferroni significant locus has width \Sexpr{wd} kB.
   \item \penn{} joint HMM
   \item european, MAD $<0.3$, non-WGA, aux $\ne 1$
   \item coverage $>10$
   \item \Sexpr{length(cnv.obj.beaty$gr)} hemi/homozygous deletions identified in \Sexpr{nrow(completeTrios(fe.beaty))} trios
   \item \Sexpr{ncol(cnv(fe.beaty))} CNV components
-  \subitem Common ($>0.01$): \Sexpr{sum(freq.beaty.vec > 0.01)}
-  \subitem Rare: \Sexpr{sum(freq.beaty.vec <= 0.01)}
+  \subitem Common ($>0.01$): \Sexpr{sum(freq.beaty > 0.01)}
+  \subitem Rare: \Sexpr{sum(freq.beaty <= 0.01)}
   \item Construct trio-states for all CNV components
-    \subitem recall that we use indicator variable for hemi/homozygous deletions
-  \item must be at least 5 informative mating pairs
-    \subitem 01x and 10x
+    \subitem 0,1,2 variable for normal, hemizygous and homozygous, respectively
+  \item $T + U > 50$
   \item count transmissions and perform binom.test (See ``trans.tab'')
 \end{itemize}
 
@@ -176,13 +194,10 @@ hist(est.vec.pitt, breaks = 20, xlim = c(0,1), ylim = c(0,100), main = "Control 
 \begin{figure}
 <<gviz, eval = TRUE, echo = FALSE, fig = TRUE, width = 6>>=
 chr <- 8
-#gr.cnp.beaty <- cnv.obj.beaty$cmp.gr
 gr.cnp.beaty.chr <- gr.cnp.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
 
-#gr.cnp.pitt <- cnv.obj.pitt$cmp.gr
 gr.cnp.pitt.chr <- gr.cnp.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr))]
 
-#p.vec <- trans.vec
 est.vec.beaty.chr <- est.vec.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
 freq.vec.beaty.chr <- freq.beaty.vec[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr))]
 lower.vec.beaty.chr <- ci.mat.beaty[as.logical(seqnames(gr.cnp.beaty) == paste0("chr", chr)),1]
@@ -193,7 +208,6 @@ freq.vec.pitt.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp.pitt) == paste0("c
 lower.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),1]
 upper.vec.pitt.chr <- ci.mat.pitt[as.logical(seqnames(gr.cnp.pitt) == paste0("chr", chr)),2]
 
-#trans.rate.chr <- trans.rate[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
 
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 atrack <- AnnotationTrack(, name = "CNP comp.", fill = "darkgreen")
@@ -203,18 +217,9 @@ grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UC
 
 dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr,  lower.vec.beaty.chr, upper.vec.beaty.chr), type = "s", col = c("orange", "darkblue","orange"), lwd = 2, name = "Cleft Trios", ylim = c(0.25,0.75), pch = 20 )
 dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr,  lower.vec.pitt.chr, upper.vec.pitt.chr), type = "s", , col = c("orange", "darkblue","orange"), lwd = 2, name = "Control Trios", ylim = c(0.25,0.75), pch = 20 )
-#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr, freq.vec.pitt.chr), type = "s", cex = 1, name = "Control Trios", ylim = c(0,1), col = c("red","darkblue"), pch = 20 )
 fud <- 2e5/2
 plotTracks( list(dtrack,  dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = mean(c(39356825,39497557)) - fud, to = mean(c(39356825,39497557)) + fud, legend = FALSE)
 
-#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "s", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
-#dtrack3 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
-#dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
-#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-#grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
-
-#fud <- 5e5/2
-#plotTracks(list(dtrack,  grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
 @ 
 \label{chr8-locus}
 \caption{}
@@ -260,14 +265,6 @@ fud <- 2e5/2
 #plotTracks( list(dtrack,  dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud, legend = FALSE)
 plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack  ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 141.43e6 - fud, to = 141.43e6 + fud, legend = FALSE)
 
-#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "s", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
-#dtrack3 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
-#dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
-#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-#grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
-
-#fud <- 5e5/2
-#plotTracks(list(dtrack,  grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
 @ 
 \label{chr8-locus}
 \caption{}
@@ -311,64 +308,10 @@ fud <- 2e5/2
 #plotTracks( list(dtrack,  dtrack2, grtrack, gtrack, itrack ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud, legend = FALSE)
 plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack  ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 55.20e6 - fud, to = 55.20e6 + fud, legend = FALSE)
 
-#dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = est.vec.pitt.chr, type = "s", cex = 1, name = "Trans (Controls)", ylim = c(0,1), col = "darkblue", pch = 20 )
-#dtrack3 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
-#dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
-#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-#grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
-
-#fud <- 5e5/2
-#plotTracks(list(dtrack,  grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
 @ 
 \label{chr8-locus}
 \caption{}
 \end{figure}
 \end{center}
-
-
-%% \begin{center}
-%% \begin{figure}
-%% <<gviz2, eval = TRUE, echo = FALSE, fig = TRUE, width = 8>>=
-%% chr <- 8
-%% gr.cnp <- cnv.obj.pitt$cmp.gr
-%% gr.cnp.chr <- gr.cnp[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-    
-%% p.vec <- trans.vec.pitt
-%% p.vec.chr <- p.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-%% freq.vec.chr <- freq.pitt.vec[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-%% #trans.rate.pitt <- est.vec.pitt
-%% #trans.rate.pitt.chr <- trans.rate.pitt[as.logical(seqnames(gr.cnp) == paste0("chr", chr))]
-
-%% TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
-%% atrack <- AnnotationTrack(reduce(gr.cnp.chr), name = "CNP comp.", fill = "darkgreen")
-%% gtrack <- GenomeAxisTrack()
-%% dtrack <- DataTrack( range = gr.cnp.chr, data = -log10(p.vec.chr), type = "p", cex = 1, name = "-log10(p)", ylim = c(0,10), col = "red" )
-%% dtrack2 <- DataTrack( range = gr.cnp.chr, data = ifelse(freq.vec.chr > 0.01, freq.vec.chr, NA ), type = "s", col = "blue", cex = 1, name = "Frequency", ylim = c(0,1), lwd = 2 )
-%% #dtrack3 <- DataTrack( range = gr.cnp.chr, data = trans.rate.pitt.chr, type = "s", col = "blue", cex = 1, name = "Transmission Rate", ylim = c(0,1), lwd = 2 )
-%% itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-%% grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UCSC Known Transcripts", showId = TRUE)
-
-%% fud <- 5e5/2
-%% plotTracks(list(dtrack, dtrack2, grtrack, gtrack, itrack ),  background.panel = '#FFFEDB', background.title = 'darkblue', from = 39356825 - fud, to = 39497557 + fud)
-%% @ 
-%% \label{chr8-locus-con}
-%% \caption{Control Trios --- Red: $-\log_{10}p$-values for each CNV component that has at least \textbf{five} ``0/1'' mating pairs.  Null hypothesis is transmission rate of $\frac{1}{2}$, and alternative hypothesis is ``one-sided.''  Blue: The frequency of CNV component in the parents.  Yellow: Gene tracks, labeled by transcript.} 
-%% \end{figure}
-%% \end{center}
-
-
-<<transmission-rate>>=
-mean(est.vec.beaty[subjectHits(findOverlaps(reduce(locus), cnv.obj.beaty$cmp.gr))])
-mean(est.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.obj.pitt$cmp.gr))])
-@  
-<<tdt-p, echo = TRUE, eval = TRUE>>=
-mean(-log10(trans.vec[subjectHits(findOverlaps(reduce(locus), cnv.obj.beaty$cmp.gr))]))
-mean(-log10(trans.vec.pitt[subjectHits(findOverlaps(reduce(locus), cnv.obj.pitt$cmp.gr))]))
-@  
-<<frequencies, echo = TRUE, eval = TRUE>>=
-freq.pitt.vec[subjectHits(findOverlaps(reduce(locus), cnv.obj.pitt$cmp.gr))]
-freq.beaty.vec[subjectHits(findOverlaps(reduce(locus), cnv.obj.beaty$cmp.gr))]
-@ 
-
 
 \end{document}
