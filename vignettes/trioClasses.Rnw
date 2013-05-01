@@ -60,7 +60,7 @@ table(paste0(F,M,O))
 (ste.rare <- ste[!(MAF(ste) >= 0.01 | is.na(MAF(ste)))])
 @ 
 <<window-by-snv, eval = TRUE, echo = FALSE>>=
-n.win <- 10
+n.win <- 100 + 1
 n.snp <- ceiling(length(rowData(ste.rare))/n.win)
 p <- length(rowData(ste.rare))
 i.vec <- seq(1,p,by = n.snp )
@@ -73,13 +73,11 @@ end <- end(range(rowData(ste.rare)))
 #wd <- 100e3
 #start.vec <- seq(start,end+wd,by = wd)
 window <- GRanges( seqnames = levels(seqnames(rowData(ste.rare))), ranges = IRanges( start = start(rowData(ste.rare))[i.vec], end = start(rowData(ste.rare))[j.vec] ), strand = "*" )
-window <- window[-length(window)]
+#window <- window[-length(window)]
+window
+countOverlaps(window, rowData(ste.rare))
 @ 
 %Create a GRanges object such that each range contain \Sexpr{n.snp} rare variants.
-<<window, echo = FALSE, eval = FALSE>>=
-n.snp
-table(countOverlaps( window, rowData(ste.rare)))
-@ 
 <<scantrio>>=
 #window <- rowData(ste.rare) + 250e3
 system.time( scan.trio <- ScanTrio( object = ste.rare, window = window, block = range(rowData(ste.rare))))
@@ -100,9 +98,9 @@ save(scan.trio, file = "./../data/scan-trio.RData")
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\appendix
 \clearpage
-\subsection{Holger-style Genotype Matrix}
+\appendix
+\section{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
 <<trio, eval = FALSE>>=
 geno <- as(ste, "matrix")
