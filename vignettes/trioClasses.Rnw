@@ -60,7 +60,7 @@ table(paste0(F,M,O))
 (ste.rare <- ste[!(MAF(ste) >= 0.01 | is.na(MAF(ste)))])
 @ 
 <<window-by-snv, eval = TRUE, echo = FALSE>>=
-n.win <- 100
+n.win <- 10
 n.snp <- ceiling(length(rowData(ste.rare))/n.win)
 p <- length(rowData(ste.rare))
 i.vec <- seq(1,p,by = n.snp )
@@ -81,7 +81,7 @@ n.snp
 table(countOverlaps( window, rowData(ste.rare)))
 @ 
 <<scantrio>>=
-window <- rowData(ste.rare) + 250e3
+#window <- rowData(ste.rare) + 250e3
 system.time( scan.trio <- ScanTrio( object = ste.rare, window = window, block = range(rowData(ste.rare))))
 scan.trio
 @ 
@@ -97,6 +97,10 @@ axis(1, at = at <- seq(start,end,length.out=4), labels = round(at/1e6,1) )
 <<save>>=
 save(scan.trio, file = "./../data/scan-trio.RData")
 @ 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\appendix
 \clearpage
 \subsection{Holger-style Genotype Matrix}
 Coercion to matrix for \emph{trio}
@@ -109,10 +113,6 @@ Or apply the aTDT method to the FamilyExperiment directly.
 aTDT(ste[1:5])
 @ 
 \clearpage
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\appendix
 \section{Count of Transmission of Variants (\emph{TransCount()})}
 \subsection{Window}
 <<windows, eval = FALSE>>=
