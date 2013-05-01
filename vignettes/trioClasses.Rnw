@@ -74,7 +74,10 @@ end <- end(range(rowData(ste.rare)))
 #start.vec <- seq(start,end+wd,by = wd)
 window <- GRanges( seqnames = levels(seqnames(rowData(ste.rare))), ranges = IRanges( start = start(rowData(ste.rare))[i.vec], end = start(rowData(ste.rare))[j.vec] ), strand = "*" )
 #window <- window[-length(window)]
+@ 
+<<window-show>>=
 window
+range(rowData(ste.rare))
 countOverlaps(window, rowData(ste.rare))
 @ 
 %Create a GRanges object such that each range contain \Sexpr{n.snp} rare variants.
