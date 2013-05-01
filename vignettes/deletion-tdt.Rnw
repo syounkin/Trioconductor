@@ -2,11 +2,6 @@
 \documentclass[10pt, final]{article}
 \usepackage{Sweave}
 \SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/deletion-tdt}
-%\usepackage{fullpage}
-%\usepackage{times}
-%\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
-%\usepackage{ifthen}  % Conditional 
-%\usepackage{multicol}   %Columns
 \usepackage{graphicx} %should be removed before submission!
 \input{/home/sgy/jhsph/latex/sgy}
 \begin{document}
@@ -99,22 +94,7 @@ axis(2)
 @ 
 \end{figure}
 \end{center}
-%% \begin{center}
-%% \begin{figure}
-%% <<trans-ci, fig = TRUE, echo = FALSE, eval = TRUE, height = 12>>=
-%% par(bg = '#FFFEDB')
-%% plot(1, type = "n", ylim = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), xlim = c(0,2), xlab = "Transmission Rate", ylab = "", main = "Transmission Rate 95 percent CI\nT+U>50 ", axes = FALSE )
-%% polygon( y = c(1:length(est.vec.beaty), length(est.vec.beaty):1 ), x = c(ci.mat.beaty[,1],rev(ci.mat.beaty[,2])), col = "darkblue", border = NA)
 
-%% polygon( y = c(1:length(est.vec.pitt), length(est.vec.pitt):1 ), x = c(ci.mat.pitt[,1],rev(ci.mat.pitt[,2]))+1, col = "orange", border = NA)
-%% lines( x = rep(0.5,2), y = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), lty = 2, lwd = 2)
-%% lines( x = rep(0.5,2)+1, y = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), lty = 2, lwd = 2)
-%% lines( x = rep(1,2), y = c(0,max(length(est.vec.beaty),length(est.vec.pitt))), lty = 3, lwd = 2)
-%% axis(1, at = c(0.5,1.5), labels = c(0.5,0.5) )
-%% axis(2)
-%% @ 
-%% \end{figure}
-%% \end{center}
 
 
 \begin{center}
@@ -180,11 +160,6 @@ lines( range(xlim), rep(0.5,2), lty = 3 )
 axis(2, at = c(0,0.25,0.5,0.75,1) )
 axis(1, at = at <- seq( xlim[1], xlim[2], by = 25e3 ), labels = paste0(round(at/1e6,2), " MB") )
 legend( x = 39.3e6, y = 1, legend = c("Cleft", "Control"), col = c(rgb(1,0,0,0.5),rgb(0,0,1,0.5)), pch = 15)
-#lines( start(gr.cnp.beaty[index.2.full.beaty.testable]), ci.mat.beaty[index.2.full.beaty.testable,2], lty = 2, col = "orange" )
-#lines( start(gr.cnp.beaty[index.2.full.beaty.testable]), est.vec.beaty[index.2.full.beaty.testable], col = "orange" )
-#lines( start(gr.cnp.pitt[index.2.full.pitt.testable]), ci.mat.pitt[index.2.full.pitt.testable,1], lty = 2 )
-#lines( start(gr.cnp.pitt[index.2.full.pitt.testable]), ci.mat.pitt[index.2.full.pitt.testable,2], lty = 2 )
-#lines( start(gr.cnp.pitt[index.2.full.pitt.testable]), est.vec.pitt[index.2.full.pitt.testable] )
 @ 
 \end{figure}
 \end{center}
@@ -319,7 +294,6 @@ grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UC
 dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr,  lower.vec.beaty.chr, upper.vec.beaty.chr), type = "S", col = c("orange", "darkblue","orange"), lwd = 2, name = "Cleft Trios", ylim = c(0,1), pch = 20 )
 dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr,  lower.vec.pitt.chr, upper.vec.pitt.chr), type = "S", , col = c("orange", "darkblue","orange"), lwd = 2, name = "Control Trios", ylim = c(0,1), pch = 20 )
 
-#fud <- 3e5/2
 
 plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack  ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 141.43e6 - fud, to = 141.43e6 + fud, legend = FALSE)
 
@@ -360,7 +334,6 @@ grtrack <- GeneRegionTrack(TranscriptDb, genome="hg18", chromosome=chr, name="UC
 dtrack <- DataTrack( range = gr.cnp.beaty.chr, data = rbind(est.vec.beaty.chr,  lower.vec.beaty.chr, upper.vec.beaty.chr), type = "S", col = c("orange", "darkblue","orange"), lwd = 2, name = "Cleft Trios", ylim = c(0,1), pch = 20 )
 dtrack2 <- DataTrack( range = gr.cnp.pitt.chr, data = rbind(est.vec.pitt.chr,  lower.vec.pitt.chr, upper.vec.pitt.chr), type = "S", , col = c("orange", "darkblue","orange"), lwd = 2, name = "Control Trios", ylim = c(0,1), pch = 20 )
 
-#fud <- 3e5
 
 plotTracks( list(dtrack, dtrack2, grtrack, gtrack, itrack  ),  groups = c("trans","lower","upper"), background.panel = '#FFFEDB', background.title = 'darkblue', from = 55.20e6 - fud, to = 55.20e6 + fud, legend = FALSE)
 
