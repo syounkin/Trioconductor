@@ -39,12 +39,12 @@ gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.del
 
 @ 
 <<cnvmatrix-beaty>>=
-system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean ) )
+system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean[1:10] ) )
 @ 
-<<cnvmatrix-pitt>>=
-system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean ) )
+<<cnvmatrix-pitt, eval = FALSE, echo = FALSE>>=
+system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 @ 
-<<savecnv, echo = TRUE, eval = TRUE>>=
+<<savecnv, echo = FALSE, eval = FALSE>>=
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 @ 
 \end{document}
