@@ -10,10 +10,10 @@
   library("Gviz")
   library("trioClasses")
   library("TxDb.Hsapiens.UCSC.hg18.knownGene")
-  data("fe", package = "trioClasses")
+  data("fe-25", package = "trioClasses")
   data("pedigrees", package="CleftCNVAssoc")
   data("penncnvjoint", package = "CleftCNVAssoc")
-  data("cnv", package = "trioClasses")
+  data("cnv-25", package = "trioClasses")
 @ 
 
 <<FamilyExperiment, echo = FALSE, eval = TRUE>>=
