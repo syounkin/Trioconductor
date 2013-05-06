@@ -1,6 +1,7 @@
-setMethod("CNVMatrix",  signature(object="GRanges"), function(object){
+setMethod("CNVMatrix",  signature(object="GRanges", gr="GRanges"), function(object, gr){ # sgy
   id.vec <- as.character(unique(names(object)))
-  cmp <- disjoin(object)
+  cmp0 <- disjoin(object)
+  cmp <- disjoin(cmp0, gr)
   cnv <- matrix(NA, nrow = length(id.vec), ncol = length(cmp) )
   for ( i in 1:length(id.vec) ){
     cnv[i,] <- countOverlaps( cmp, object[names(object) == id.vec[i]] )
