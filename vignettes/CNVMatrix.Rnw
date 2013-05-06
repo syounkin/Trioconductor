@@ -28,10 +28,12 @@ source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 #gr.beaty <- gr.beaty[-compound.beaty]
 #gr.pitt <- gr.pitt[-compound.pitt]
 
-gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
+num.snp <- 25
+
+gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= num.snp & values(gr.beaty)$cn %in% 0:1 ]
 homos.beaty <- with(values(gr.deletion.beaty),cn==0)
 #gr.deletion.beaty <- c(gr.deletion.beaty,gr.deletion.beaty[homos.beaty])
-gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
+gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= num.snp & values(gr.pitt)$cn %in% 0:1 ]
 homos.pitt <- with(values(gr.deletion.pitt),cn==0)
 #gr.deletion.pitt <- c(gr.deletion.pitt,gr.deletion.pitt[homos.pitt])
 gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.deletion.beaty)$id))), unlist(reduce(split(gr.deletion.beaty[homos.beaty], values(gr.deletion.beaty[homos.beaty])$id))))
@@ -41,10 +43,10 @@ gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.del
 <<cnvmatrix-beaty>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 @ 
-<<cnvmatrix-pitt, eval = FALSE, echo = FALSE>>=
+<<cnvmatrix-pitt, eval = TRUE, echo = TRUE>>=
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 @ 
-<<savecnv, echo = FALSE, eval = FALSE>>=
-save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
+<<savecnv, echo = TRUE, eval = TRUE>>=
+save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv-25.RData" )
 @ 
 \end{document}
