@@ -39,7 +39,7 @@ gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.del
 
 @ 
 <<cnvmatrix-beaty>>=
-system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean[1:10] ) )
+system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 @ 
 <<cnvmatrix-pitt, eval = FALSE, echo = FALSE>>=
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
