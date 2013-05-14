@@ -168,6 +168,6 @@ setMethod("ScanTrio", signature(object="FamilyExperiment", window = "GRanges", b
     p.in <- (minor.in+1)/(n.in +2)
     p.out <- (minor.out+1)/(n.out +2)
     lr <- (p.in/n)^y.in*(p.out/n)^y.out*((1-p.in)/(1-n))^(n.in-y.in)*((1-p.out)/(1-n))^(n.out-y.out)
-    DataFrame(lr = lr, minor.in = as.integer(minor.in), major.in = as.integer(major.in), minor.out = as.integer(minor.out), major.out = as.integer(major.out), mendel.in = as.integer(mendel.in), mendel.out = as.integer(mendel.out) )
+    DataFrame(lr = lr, minor.in = as.integer(minor.in), major.in = as.integer(major.in), minor.out = as.integer(minor.out), major.out = as.integer(major.out), mendel.in = as.integer(mendel.in), mendel.out = as.integer(mendel.out), window = window )
   })
 })
