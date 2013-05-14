@@ -1,0 +1,150 @@
+% Sweave(file = './deletion-tdt.Rnw')
+\documentclass[10pt, final]{article}
+\usepackage{Sweave}
+\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/deletion-tdt}
+\usepackage{graphicx} %should be removed before submission!
+\input{/home/sgy/jhsph/latex/sgy}
+\begin{document}
+<<options, echo=FALSE, eval = TRUE, echo = FALSE>>=
+  options(width=75, continue = " ")
+  library("Gviz")
+  library("trioClasses")
+  library("TxDb.Hsapiens.UCSC.hg18.knownGene")
+  data("fe-25", package = "trioClasses")
+  data("pedigrees", package="CleftCNVAssoc")
+  data("penncnvjoint", package = "CleftCNVAssoc")
+  data("cnv-25", package = "trioClasses")
+@ 
+
+<<FamilyExperiment, echo = FALSE, eval = TRUE>>=
+  fe.beaty.parents <- fe.beaty[,colnames(fe.beaty)%in%parents(fe.beaty)]
+  fe.pitt.parents <- fe.pitt[,colnames(fe.pitt)%in%parents(fe.pitt)]
+@ 
+<<freq-vec, echo = FALSE, eval = TRUE>>=
+    freq.beaty.vec <- colSums(cnv(fe.beaty.parents))/nrow(cnv(fe.beaty.parents))
+    freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
+@ 
+<<trioStates, eval = TRUE, echo = FALSE>>=
+    trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
+    trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+    dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+    trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt, type = "cnv")
+    trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+    dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+@ 
+<<table-list, eval = TRUE, echo = FALSE>>=
+    table.list.beaty <- apply(trioStates.beaty, 2, "table")
+    table.list.pitt <- apply(trioStates.pitt, 2, "table")
+@ 
+The top CNV component has the followinfg trio-states.  Where `1' indicates a deletion and order is F, M, O.
+<<transtab, eval = TRUE, echo = FALSE>>=
+    trans.vec <- as( lapply( table.list.beaty, trioClasses:::trans.tab ), "numeric")
+    trans.vec.pitt <- as( lapply( table.list.pitt, trioClasses:::trans.tab ), "numeric")
+
+    binom.list.beaty <- lapply( table.list.beaty, trioClasses:::trans.rate )
+    binom.list.pitt <- lapply( table.list.pitt, trioClasses:::trans.rate )
+
+@ 
+
+<<ci-beaty, echo = FALSE>>=
+est.list.beaty <- lapply(binom.list.beaty, FUN = trioClasses:::get.est)
+ci.list.beaty <- lapply(binom.list.beaty, FUN = trioClasses:::get.ci)
+testable.beaty <- !is.na(ci.list.beaty)
+ci.mat.beaty <- matrix(unlist(ci.list.beaty[testable.beaty]), nrow = sum(testable.beaty), ncol = 2, byrow = TRUE)
+est.vec.beaty <- as(est.list.beaty, "numeric")[testable.beaty]
+gr.cnp.beaty <- cnv.obj.beaty$cmp.gr[testable.beaty]
+freq.beaty.vec <- freq.beaty.vec[testable.beaty]
+@ 
+
+<<ci-pitt, echo = FALSE>>=
+est.list.pitt <- lapply(binom.list.pitt, FUN = trioClasses:::get.est)
+ci.list.pitt <- lapply(binom.list.pitt, FUN = trioClasses:::get.ci)
+testable.pitt <- !is.na(ci.list.pitt)
+ci.mat.pitt <- matrix(unlist(ci.list.pitt[testable.pitt]), nrow = sum(testable.pitt), ncol = 2, byrow = TRUE)
+est.vec.pitt <- as(est.list.pitt, "numeric")[testable.pitt]
+gr.cnp.pitt <- cnv.obj.pitt$cmp.gr[testable.pitt]
+freq.pitt.vec <- freq.pitt.vec[testable.pitt]
+@ 
+
+\begin{center}
+\begin{figure}
+<<trans-ci, fig = TRUE, echo = FALSE, eval = TRUE, width = 6>>=
+par(bg = '#FFFEDB')
+pch <- substr(as.character(seqnames(cnv.obj.beaty$cmp.gr[testable.beaty])),4,999)
+col <- as(pch,"integer")
+plot( est.vec.beaty, pch = 20,col = col, axes = FALSE, ylim = c(0,1) )
+lines(c(1,length(est.vec.beaty)), rep(0.5,2), lty = 3)
+legend(x = 1, y = 1, legend = 1:22, col = 1:22, pch = 20)
+axis(2)
+axis(2)
+@ 
+\end{figure}
+\end{center}
+\begin{center}
+\begin{figure}
+<<trans-ci-pitt, fig = TRUE, echo = FALSE, eval = TRUE, width = 6>>=
+par(bg = '#FFFEDB')
+pch <- substr(as.character(seqnames(cnv.obj.pitt$cmp.gr[testable.pitt])),4,999)
+col <- as(pch,"integer")
+plot( est.vec.pitt, pch = 20,col = col, axes = FALSE, ylim = c(0,1) )
+lines(c(1,length(est.vec.pitt)), rep(0.5,2), lty = 3)
+legend(x = 1, y = 1, legend = 1:22, col = 1:22, pch = 20)
+axis(2)
+axis(2)
+@ 
+\end{figure}
+\end{center}
+
+
+
+\begin{center}
+  \begin{figure}
+    \includegraphics[width = 4in]{./figures/ucsc}
+    \caption{UCSC Genome Browser at chromosome 8 locus.}
+  \end{figure}
+\end{center}
+<<n-tests, eval = TRUE, echo = FALSE>>=
+    n.tests <- sum(!is.na(trans.vec))
+@ 
+The CNV components with signiifcant $p$-values (Bonferroni) are given below.
+<<reduce-locus, eval = TRUE, echo = FALSE >>=
+    (locus <- cnv.obj.beaty$cmp.gr[which(trans.vec <= 0.05/n.tests)])
+    wd <- width(reduce(locus))/1e3
+@ 
+
+<<locus-full, echo = FALSE>>=
+(locus.full <- reduce(reduce(cnv.obj.beaty$cmp.gr)[queryHits(findOverlaps(reduce(cnv.obj.beaty$cmp.gr), locus)) ]))
+
+index.1.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[1]))
+index.1.full.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus.full[1]))
+#index.2.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[2]))
+#index.3.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[3]))
+## index.2.full.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus.full[2]))
+## index.4.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus[4]))
+## index.3.full.beaty <- queryHits(findOverlaps(cnv.obj.beaty$cmp.gr, locus.full[3]))
+## index.1.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[1]))
+## index.1.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[1]))
+## index.2.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[2]))
+## index.3.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[3]))
+## index.2.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[2]))
+## index.4.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus[4]))
+## index.3.full.pitt <- queryHits(findOverlaps(cnv.obj.pitt$cmp.gr, locus.full[3]))
+
+index.1.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[1]))
+index.1.full.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus.full[1]))
+## index.2.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[2]))
+## index.3.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[3]))
+## index.2.full.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus.full[2]))
+## index.4.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus[4]))
+## index.3.full.beaty.testable <-  queryHits(findOverlaps(cnv.obj.beaty$cmp.gr[testable.beaty], locus.full[3]))
+## index.1.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[1]))
+## index.1.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[1]))
+## index.2.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[2]))
+## index.3.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[3]))
+## index.2.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[2]))
+## index.4.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus[4]))
+## index.3.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[3]))
+
+@ 
+
+\end{document}
