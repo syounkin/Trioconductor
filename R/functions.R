@@ -56,3 +56,15 @@ get.ci <- function(obj){
     return(NA)
   }
 }
+
+make.files.for.cpp <- function(obj, fileroot){
+  ped.df <- as(pedigree(obj), "data.frame")
+  geno.mat <- as(as(geno(obj),"numeric"), "matrix")
+  rownames(ped.df) <- ped.df$id
+  pedfile <- cbind(ped.df[rownames(geno.mat),], geno.mat)[c(t(as.matrix(completeTrios(ste.small)))),]
+  write.table(pedfile, file = paste0(fileroot,".ped"), quote = FALSE, col.names = FALSE, row.names = FALSE)
+    write.table(start(rowData(obj)), file = paste0(fileroot,".map"), quote = FALSE, col.names = FALSE, row.names = FALSE)
+  nsnps <- length(rowData(obj))
+  write.table(rep(1,nsnps), file = paste0(fileroot,".weights"), quote = FALSE, col.names = FALSE, row.names = FALSE)
+  write.table(data.frame(name="pseudoblock", start=1, end=nsnps), file = paste0(fileroot,".blocks"), quote = FALSE, col.names = FALSE, row.names = FALSE)
+  }

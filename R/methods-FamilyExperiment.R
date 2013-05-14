@@ -168,11 +168,7 @@ setMethod("ScanTrio", signature(object="FamilyExperiment", window = "GRanges", b
     p.in <- (minor.in+1)/(n.in +2)
     p.out <- (minor.out+1)/(n.out +2)
     ## lr <- (p.in/n)^y.in*(p.out/n)^y.out*((1-p.in)/(1-n))^(n.in-y.in)*((1-p.out)/(1-n))^(n.out-y.out)
-    if( p.in > p.out ){
-      loglr <- y.in*log(p.in/n) + y.out*log(p.out/n) + (n.in-y.in)*log((1-p.in)/(1-n)) + (n.out-y.out)*log((1-p.out)/(1-n))
-    }else{
-      loglr <- 0
-    }
+    loglr <- ifelse( p.in > p.out, y.in*log(p.in/n) + y.out*log(p.out/n) + (n.in-y.in)*log((1-p.in)/(1-n)) + (n.out-y.out)*log((1-p.out)/(1-n)), 0)
     lr <- exp(loglr)
     DataFrame(lr = lr, minor.in = as.integer(minor.in), major.in = as.integer(major.in), minor.out = as.integer(minor.out), major.out = as.integer(major.out), mendel.in = as.integer(mendel.in), mendel.out = as.integer(mendel.out), window = window )
   })

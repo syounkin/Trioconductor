@@ -82,7 +82,7 @@ countOverlaps(window, rowData(ste.rare))
 @ 
 %Create a GRanges object such that each range contain \Sexpr{n.snp} rare variants.
 <<scantrio>>=
-#window <- rowData(ste.rare) + 250e3
+window <- rowData(ste)
 system.time( scan.trio <- ScanTrio( object = ste.rare, window = window, block = range(rowData(ste.rare))))
 scan.trio
 @ 

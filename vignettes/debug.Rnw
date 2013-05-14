@@ -1,0 +1,67 @@
+% Sweave(file = "./trioClasses.Rnw")
+\documentclass[10pt]{article}
+<<echo=FALSE>>=
+  options(width=70, continue = " ")
+@
+\SweaveOpts{eps=FALSE,echo=TRUE,figs.only=TRUE,keep.source=FALSE, prefix.string=figures/trioClasses}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue]{hyperref}
+\title{The R package \emph{trioClasses} for definition of the class \emph{FamilyExperiment}, an extension of \emph{SummarizedExperiment}, for use in trio based analyses of genetic data.}
+\author{Samuel G. Younkin}%, Robert Scharpf, Holger Schwender, Ingo Ruczinski}
+\date{\today}
+%\input{/home/bst/student/syounkin/jhsph/latex/sgy}
+%\input{/home/sgy/jhsph/latex/sgy}
+\begin{document}
+\setlength{\parskip}{0.2\baselineskip}
+\setlength{\parindent}{0pt}
+\maketitle
+\section{Packages \& Data}
+<<package>>=
+#Rprof(filename = "trioClasses.Rprof")
+library("trioClasses")
+data("sample")
+data("8q24-european-all.sm")
+#data("8q24-chinese-all.sm")
+#data("BMP4-european-all.sm")
+#data("BMP4-chinese-all.sm")
+@
+<<prelim, echo = FALSE, eval = TRUE>>=
+pos <- as(do.call("rbind", strsplit(colnames(sm),split = ":") )[,2], "integer" )
+chr <- do.call("rbind", strsplit(colnames(sm),split = ":") )[,1]
+gr <- GRanges( seqnames = chr, ranges = IRanges(start = pos, width = 1), strand = "*" )
+names(gr) <- colnames(sm)
+col.DF <- DataFrame( id = rownames(sm) )
+rownames(col.DF) <- rownames(sm)
+@ 
+\section{SummarizedExperiment}
+<<data, echo = TRUE>>=
+se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
+@ 
+\section{Pedigree}
+<<ped>>=
+ped <- PedClass(ped.DF)
+@ 
+\section{FamilyExperiment}
+<<ste>>=
+(ste <- FamilyExperiment(se, pedigree = ped ))
+@ 
+<<gtrio, echo = FALSE, eval = FALSE>>=
+gtrio <- trioClasses:::TrioAssay(ste)
+index <- with(gtrio, !( is.na(F) | is.na(M) | is.na(O) ) )
+F <- as(with(gtrio,F), "numeric")[index]
+M <- as(with(gtrio,M), "numeric")[index]
+O <- as(with(gtrio,O), "numeric")[index]
+table(paste0(F,M,O))
+@ 
+\section{debug}
+<<small>>=
+ste.small <- ste[1:10,]
+window <- rowData(ste.small)[1]+50e3
+system.time( scan.trio <- ScanTrio( object = ste.small[MAF(ste.small)<=0.01], window = window, block = range(rowData(ste.small))))
+scan.trio
+@ 
+<<make-files-for-cpp>>=
+trioClasses:::make.files.for.cpp(ste.small, fileroot = "small")
+@ 
+\end{document}
