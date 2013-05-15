@@ -56,13 +56,16 @@ table(paste0(F,M,O))
 @ 
 \section{debug}
 <<small>>=
-ste.small <- ste[1:5,1:9]
-window <- rowData(ste.small)
-system.time( scan.trio <- ScanTrio( object = ste.small, window = window, block = range(rowData(ste.small))))
+ste.small <- ste[1:50]
+bad.markers <- which(colSums(is.na(geno(ste.small)))>0)
+ste.small <- ste.small[-bad.markers]
+wd <- 100
+window <- GRanges( seqnames = seqnames(ste.small), ranges = IRanges(start = start(rowData(ste.small)), width = wd ) )
+system.time( scan.trio <- ScanTrio( object = ste.small[MAF(ste.small)<=0.01], window = window, block = range(rowData(ste.small))))
 #system.time( scan.trio <- ScanTrio( object = ste.small[MAF(ste.small)<=0.01], window = window, block = range(rowData(ste.small))))
 scan.trio
 @ 
 <<make-files-for-cpp>>=
-trioClasses:::make.files.for.cpp(ste.small, fileroot = "~/misc/small")
+trioClasses:::make.files.for.cpp(ste.small, fileroot = "./small")
 @ 
 \end{document}

@@ -17,3 +17,5 @@ log
 foo*
 *-script.R
 small.*
+script
+compile
