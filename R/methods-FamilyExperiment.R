@@ -170,6 +170,10 @@ setMethod("ScanTrio", signature(object="FamilyExperiment", window = "GRanges", b
     ## lr <- (p.in/n)^y.in*(p.out/n)^y.out*((1-p.in)/(1-n))^(n.in-y.in)*((1-p.out)/(1-n))^(n.out-y.out)
     loglr <- ifelse( p.in > p.out, y.in*log(p.in/n) + y.out*log(p.out/n) + (n.in-y.in)*log((1-p.in)/(1-n)) + (n.out-y.out)*log((1-p.out)/(1-n)), 0)
     lr <- exp(loglr)
-    DataFrame(lr = lr, minor.in = as.integer(minor.in), major.in = as.integer(major.in), minor.out = as.integer(minor.out), major.out = as.integer(major.out), mendel.in = as.integer(mendel.in), mendel.out = as.integer(mendel.out), window = window )
+    meta <- values(window)
+    meta2 <- DataFrame( meta, lr = lr, minor.in = as.integer(minor.in), major.in = as.integer(major.in), minor.out = as.integer(minor.out), major.out = as.integer(major.out), mendel.in = as.integer(mendel.in), mendel.out = as.integer(mendel.out) )
+    values(window) <- meta2
+    return(window)
+    ## DataFrame(lr = lr, minor.in = as.integer(minor.in), major.in = as.integer(major.in), minor.out = as.integer(minor.out), major.out = as.integer(major.out), mendel.in = as.integer(mendel.in), mendel.out = as.integer(mendel.out))
   })
 })
