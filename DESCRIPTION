@@ -7,7 +7,7 @@ Author: Samuel G. Younkin, Ingo Ruczinski, Margaret Taub, Holger Schwender, Robe
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
 Description: The package trioClasses presents the class FamilyExperiment, an extension of SummarizedExperiment.  This class is useful for analyzing genetic sequence data in parent-offspring study designs.  The package trioClasses takes advantage of the vcf file format through the SummarizedExperiment class and the VCFTools package.
 License: THE BEER-WARE LICENSE
-Depends: R (>= 2.15), methods, GenomicRanges, snpStats
+Depends: R (>= 3.0.0), methods, GenomicRanges, snpStats
 Imports:
 Suggests:
 Enhances:
