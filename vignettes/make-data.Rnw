@@ -17,7 +17,7 @@
 #  data("penncnvjoint", package = "CleftCNVAssoc")
 @ 
 <<se-beaty, echo = TRUE, eval = TRUE>>=
-  data("cnv-25", package = "trioClasses")
+  data("cnv", package = "trioClasses")
 #  data("cnv", package = "trioClasses")
 #  cnv.obj.beaty <- cnv.obj
   se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.beaty$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.beaty$cnv.mat), row.names = rownames(cnv.obj.beaty$cnv.mat)), rowData = cnv.obj.beaty$cmp.gr )
@@ -38,7 +38,7 @@ pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$
   fe.pitt <- FamilyExperiment(se.pitt, pedigree = ped.pitt )
 @ 
 <<save>>=
-#save(fe.beaty, fe.pitt, file = "./../data/fe.RData" ) 
-save(fe.beaty, fe.pitt, file = "./../data/fe-25.RData" )
+save(fe.beaty, fe.pitt, file = "./../data/fe.RData" ) 
+#save(fe.beaty, fe.pitt, file = "./../data/fe-25.RData" )
 @ 
 \end{document}

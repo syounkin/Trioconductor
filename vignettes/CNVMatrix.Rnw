@@ -28,7 +28,7 @@ source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 #gr.beaty <- gr.beaty[-compound.beaty]
 #gr.pitt <- gr.pitt[-compound.pitt]
 
-num.snp <- 25
+num.snp <- 10
 
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= num.snp & values(gr.beaty)$cn %in% 0:1 ]
 homos.beaty <- with(values(gr.deletion.beaty),cn==0)
@@ -47,6 +47,6 @@ system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deleti
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 @ 
 <<savecnv, echo = TRUE, eval = TRUE>>=
-save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv-25.RData" )
+save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 @ 
 \end{document}
