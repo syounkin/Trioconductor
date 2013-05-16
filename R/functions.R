@@ -61,7 +61,7 @@ make.files.for.cpp <- function(obj, fileroot){
   ped.df <- as(pedigree(obj), "data.frame")
   geno.mat <- as(as(geno(obj),"numeric"), "matrix")
   rownames(ped.df) <- ped.df$id
-  pedfile <- cbind(ped.df[rownames(geno.mat),], geno.mat)[c(t(as.matrix(completeTrios(ste.small)))),]
+  pedfile <- cbind(ped.df[rownames(geno.mat),], geno.mat)[c(t(as.matrix(completeTrios(obj)))),]
   write.table(pedfile, file = paste0(fileroot,".ped"), quote = FALSE, col.names = FALSE, row.names = FALSE)
     write.table(start(rowData(obj)), file = paste0(fileroot,".map"), quote = FALSE, col.names = FALSE, row.names = FALSE)
   nsnps <- length(rowData(obj))
