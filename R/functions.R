@@ -68,3 +68,10 @@ make.files.for.cpp <- function(obj, fileroot){
   write.table(rep(1,nsnps), file = paste0(fileroot,".weights"), quote = FALSE, col.names = FALSE, row.names = FALSE)
   write.table(data.frame(name="pseudoblock", start=1, end=nsnps), file = paste0(fileroot,".blocks"), quote = FALSE, col.names = FALSE, row.names = FALSE)
   }
+
+CountTU <- function( x ){
+  T <- sum(c(x["011"],x["101"],x["111"],x["112"],x["112"],x["122"],x["212"]), na.rm = TRUE )
+  U <- sum(c(x["010"],x["100"],x["111"],x["110"],x["110"],x["121"],x["211"]), na.rm = TRUE )
+  return(c(T,U))
+}
+
