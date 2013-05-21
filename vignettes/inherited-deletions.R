@@ -59,6 +59,62 @@ rownames(TU.mat) <- names(table.list.beaty)[testable]
 colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 DF <- DataFrame(TU.mat, rowData(fe.beaty)[testable])
 colnames(DF) <- c(colnames(TU.mat),"grange")
-DF
+
+
+###################################################
+### code chunk number 7: hist
+###################################################
+hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
+
+
+###################################################
+### code chunk number 8: fish
+###################################################
+fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
+p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
+DF <- DataFrame(DF,p.vec)
+
+
+###################################################
+### code chunk number 9: length1
+###################################################
+c(length(DF$grange),length(reduce(DF$grange)))
+
+
+###################################################
+### code chunk number 10: qqplot
+###################################################
+n <- nrow(DF)
+plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
+lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
+
+
+###################################################
+### code chunk number 11: badlocus
+###################################################
+badloci.gr <- reduce(rowData(fe.beaty[testable]))[which(countOverlaps(reduce(rowData(fe.beaty[testable])),rowData(fe.beaty[testable]))>10)]
+bad <- subjectHits(findOverlaps( badloci.gr,DF$grange))
+DF <- DF[-bad,]
+TU.mat <- TU.mat[-bad,]
+
+
+###################################################
+### code chunk number 12: length2
+###################################################
+c(length(DF$grange),length(reduce(DF$grange)))
+
+
+###################################################
+### code chunk number 13: hist2
+###################################################
+hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 10)
+
+
+###################################################
+### code chunk number 14: qqplot2
+###################################################
+n <- nrow(DF)
+plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
+lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 
 
