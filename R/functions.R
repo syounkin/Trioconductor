@@ -75,3 +75,10 @@ CountTU <- function( x ){
   return(c(T,U))
 }
 
+TU.fish <- function( TU.vec ){
+  if(!identical(c("T.case", "U.case", "T.con", "U.con"),names(TU.vec))) return( "TU vector must have the correct names.")
+  fish <- fisher.test(matrix(TU.vec, nrow = 2, ncol = 2, byrow = TRUE), alternative = "greater")
+  return(fish)
+}
+
+
