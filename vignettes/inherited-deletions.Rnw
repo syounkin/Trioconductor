@@ -39,7 +39,7 @@
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
 
-<<TU>>=
+<<TU, eval = TRUE, echo = FALSE>>=
 TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
@@ -55,10 +55,10 @@ colnames(DF) <- c(colnames(TU.mat),"grange")
 hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
 @ 
 \end{figure}
-<<fish>>=
+<<fish, eval = TRUE, echo = FALSE>>=
 fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
-DF <- DataFrame(DF,p.vec)
+DF <- DataFrame(DF,p.vec, trans.vec)
 @ 
 <<length1>>=
 c(length(DF$grange),length(reduce(DF$grange)))
@@ -71,6 +71,69 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
 \end{figure}
 
+%% \begin{figure}
+%% <<manhat, fig = TRUE, echo = FALSE, eval = TRUE>>=
+%% plot(-log10(DF$p.vec), pch = 20, main = "", axes = FALSE, xlab = "", ylab = "", type ="S")
+%% @ 
+%%\end{figure}
+
+<<pmin, echo = TRUE, eval = TRUE>>=
+regions.gr <- reduce(DF$grange)
+index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
+DF.list <- split(DF, index.vec)
+p.min.vec <- as(unlist(lapply( DF.list, function( obj ) min(obj$p.vec, na.rm = TRUE) )),"numeric")
+n.vec <- as(unlist(lapply( DF.list, function( obj ) nrow(obj))),"numeric")
+p.median.vec <- as(unlist(lapply( DF.list, function( obj ) median(obj$p.vec, na.rm = TRUE))),"numeric")
+trans.median.vec <- as(unlist(lapply( DF.list, function( obj ) median(obj$trans.vec, na.rm = TRUE))),"numeric")
+@ 
+<<meta, eval = TRUE, echo = FALSE>>=
+meta <- values(regions.gr)
+meta <- DataFrame(meta, p.min = p.min.vec, p.median = p.median.vec, trans.median = trans.median.vec, n.cmp = n.vec)
+values(regions.gr) <- meta
+@
+<<tophits, eval = TRUE, echo = FALSE>>=
+head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),25)
+@ 
+\begin{figure}
+<<transvp, fig = TRUE, eval = TRUE, echo = FALSE>>=
+layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
+with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(width(regions.gr)/1e3, n.cmp, pch = 20))
+@ 
+\end{figure}
+<<chr16, eval = TRUE, echo = FALSE>>=
+(bad.region.gr <- regions.gr[which(values(regions.gr)$n.cmp >= 120)])
+@ 
+The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  If we remove the outlying region on chromsome 16 we see the following.
+
+\begin{figure}
+<<transvp2, fig = TRUE, eval = TRUE, echo = FALSE>>=
+regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
+layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
+with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(width(regions.gr), n.cmp, pch = 20))
+@ 
+\end{figure}
+<<cumsum, fig = TRUE, width = 8, eval = TRUE, echo = FALSE>>=
+TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
+names(chrlength) <- c(names(chrlength[-1]),"foo")
+chrlength <- rev(rev(chrlength)[-1])
+chrstart <- cumsum(chrlength)
+
+plot(1, type = "n", xlim = c(1,3e9), ylim = c(0,6 ), axes = FALSE, xlab = "", ylab = "" )
+for( i in 1:length(regions.gr) ){
+  points( chrstart[as(seqnames(regions.gr[i]),"character")] + start(DF.list[[i]]$grange), -log10(DF.list[[i]]$p.vec), pch = 20, col = i)
+}
+axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
+axis(2)
+@ 
+\end{document}
+
 %% <<TU2>>=
 %% TU.mat <- TU.mat[trans.vec >= 0.4,]
 %% DF <- DF[trans.vec >= 0.4,]
@@ -82,30 +145,29 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 %% @ 
 %% <<reduce2>>=
 %% length(reduce(DF$grange))
+%% <<badlocus, echo = FALSE, eval = FALSE>>=
+%% badloci.gr <- reduce(rowData(fe.beaty[testable]))[which(countOverlaps(reduce(rowData(fe.beaty[testable])),rowData(fe.beaty[testable]))>10)]
+%% bad <- subjectHits(findOverlaps( badloci.gr,DF$grange))
+%% DF <- DF[-bad,]
+%% TU.mat <- TU.mat[-bad,]
+%% @ 
+%% <<length2, echo = FALSE, eval = FALSE>>=
+%% c(length(DF$grange),length(reduce(DF$grange)))
+%% @ 
+%% \begin{figure}
+%% <<hist2, fig = TRUE, echo = FALSE, eval = FALSE>>=
+%% hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 10)
+%% @ 
+%% \end{figure}
+%% @ 
+%% \begin{figure}
+%% <<qqplot2, fig = TRUE, echo = FALSE, eval = FALSE>>=
+%% n <- nrow(DF)
+%% plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
+%% lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
+%% @ 
+%% \end{figure}
 
-<<badlocus>>=
-badloci.gr <- reduce(rowData(fe.beaty[testable]))[which(countOverlaps(reduce(rowData(fe.beaty[testable])),rowData(fe.beaty[testable]))>10)]
-bad <- subjectHits(findOverlaps( badloci.gr,DF$grange))
-DF <- DF[-bad,]
-TU.mat <- TU.mat[-bad,]
-@ 
-<<length2>>=
-c(length(DF$grange),length(reduce(DF$grange)))
-@ 
-\begin{figure}
-<<hist2, fig = TRUE, eval = TRUE, echo = FALSE>>=
-hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 10)
-@ 
-\end{figure}
-@ 
-\begin{figure}
-<<qqplot2, fig = TRUE, eval = TRUE, echo = FALSE>>=
-n <- nrow(DF)
-plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
-lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
-@ 
-
-\end{figure}
 %% The top CNV component has the followinfg trio-states.  Where `1' indicates a deletion and order is F, M, O.
 %% <<transtab, eval = TRUE, echo = FALSE>>=
 %%     trans.vec <- as( lapply( table.list.beaty, trioClasses:::trans.tab ), "numeric")
@@ -216,5 +278,3 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 %% ## index.3.full.pitt.testable <-  queryHits(findOverlaps(cnv.obj.pitt$cmp.gr[testable.pitt], locus.full[3]))
 
 %% @ 
-
-\end{document}
