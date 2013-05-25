@@ -77,7 +77,7 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 %% @ 
 %%\end{figure}
 
-<<pmin, echo = TRUE, eval = TRUE>>=
+<<pmin, eval = TRUE, echo = FALSE>>=
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
@@ -118,6 +118,7 @@ with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(width(regions.gr), n.cmp, pch = 20))
 @ 
 \end{figure}
+\begin{figure}
 <<cumsum, fig = TRUE, width = 8, eval = TRUE, echo = FALSE>>=
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
@@ -132,6 +133,58 @@ for( i in 1:length(regions.gr) ){
 axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
 axis(2)
 @ 
+\end{figure}
+<<transmedianhist, fig = TRUE, eval = TRUE, echo = FALSE>>=
+with(as(values(regions.gr),"data.frame"),hist(trans.median))
+@ 
+<<thresh>>=
+thresh <- with(as(values(regions.gr),"data.frame"),median(trans.median))
+regions.gr.clean <- regions.gr[which(values(regions.gr)$trans.median >= thresh)]
+DF.clean <- DF[queryHits(findOverlaps(DF$grange, regions.gr.clean)),]
+
+@ 
+\begin{figure}
+<<qqplot-clean, fig = TRUE, eval = TRUE, echo = FALSE>>=
+n <- nrow(DF.clean)
+plot( -log10((1:n)/n), -log10(DF.clean$p.vec[order(DF.clean$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
+lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
+@ 
+\end{figure}
+\begin{figure}
+<<cumsum2, fig = TRUE, width = 8, eval = TRUE, echo = FALSE>>=
+#TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+#chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
+#names(chrlength) <- c(names(chrlength[-1]),"foo")
+#chrlength <- rev(rev(chrlength)[-1])
+#chrstart <- cumsum(chrlength)
+index.vec <- subjectHits(findOverlaps(DF.clean$grange,regions.gr.clean))
+DF.clean.list <- split(DF.clean, index.vec)
+
+plot(1, type = "n", xlim = c(1,3e9), ylim = c(0,6 ), axes = FALSE, xlab = "", ylab = "" )
+for( i in 1:length(regions.gr.clean) ){
+  points( chrstart[as(seqnames(regions.gr.clean[i]),"character")] + start(DF.clean.list[[i]]$grange), -log10(DF.clean.list[[i]]$p.vec), pch = 20, col = i)
+}
+lines( c(1,(chrstart+chrlength)[22]), rep(-log10(0.05/n),2), lty = 3)
+axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
+axis(2)
+@ 
+\end{figure}
+\begin{figure}
+<<phist, fig = TRUE,  eval = TRUE, echo = FALSE>>=
+with(as(values(regions.gr.clean),"data.frame"),hist(p.min, breaks = 10))
+@ 
+\end{figure}
+\begin{figure}
+<<transvp3, fig = TRUE, eval = TRUE, echo = FALSE>>=
+#regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
+layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
+with(as(values(regions.gr.clean),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
+with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
+with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, trans.median, pch = 20))
+with(as(values(regions.gr.clean),"data.frame"),plot(width(regions.gr.clean), n.cmp, pch = 20))
+@ 
+\end{figure}
+
 \end{document}
 
 %% <<TU2>>=
