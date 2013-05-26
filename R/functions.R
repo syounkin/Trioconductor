@@ -81,4 +81,16 @@ TU.fish <- function( TU.vec ){
   return(fish)
 }
 
+## This function finds the minimum component-wise p-value for each region
+## and returns a DataFrame of regions.  It requires that the GRanges
+## object in the input DataFrame have name "grange".  Any obvious
+## improvement is to make ingeneral to both the set function, e.g.,
+## minimum, and the name of the Granges object, "grange".
 
+p.min <- function(obj){
+  gr <- reduce(obj$grange)
+  index.vec <- subjectHits(findOverlaps(obj$grange,gr))
+  obj.list <- split(obj, index.vec)
+  p.min <- as(unlist(lapply( obj.list, function( obj ) min(obj$p.vec, na.rm = TRUE))),"numeric")
+  return( DataFrame( gr, p.min ) )
+}
