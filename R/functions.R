@@ -91,8 +91,8 @@ TU.fish <- function( TU.vec ){
 p.min <- function(obj){
   gr <- reduce(obj$grange)
   index.vec <- subjectHits(findOverlaps(obj$grange,gr))
-  obj.list <- split(obj, index.vec)
-  p.min.vec <- as(unlist(lapply( obj.list, function(obj2) min(obj2$p.vec, na.rm = TRUE))),"numeric")
-  gr2 <- DataFrame( gr, p.min.vec ) 
-  return(gr2) 
+# obj.list <- split(obj, index.vec)     # I would prefer to split the DataFrame, but something seems weird with the split method for DataFrames
+  p.vec.list <- split(obj$p.vec, index.vec)
+  p.min.vec <- as(unlist(lapply( p.vec.list, "min", na.rm = TRUE)),"numeric")
+  return(DataFrame( gr, p.min.vec ) ) 
 }
