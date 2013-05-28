@@ -82,11 +82,11 @@ TU.fish <- function( TU.vec ){
 }
 
 # GRanges object must be in column 1 
-f.cmp <- function(obj, colname, FUN){
+f.cmp <- function(obj, colname, FUN, ...){
   col <- which(names(obj) == colname)
   gr <- reduce(obj[,1])
   index.vec <- subjectHits(findOverlaps(obj[,1],gr))
   x.list <- split(obj[,col], index.vec)
-  val.vec <- as(unlist(lapply( x.list, FUN, na.rm = TRUE)),"numeric")
+  val.vec <- as(unlist(lapply( x.list, FUN, ...)),"numeric")
   return(DataFrame( gr, value = val.vec ) ) 
 }
