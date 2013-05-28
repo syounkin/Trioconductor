@@ -1,0 +1,72 @@
+<pre class="sourceCode r"><code class="sourceCode r">opts_chunk$<span class="kw">set</span>(<span class="dt">fig.width =</span> <span class="dv">5</span>, <span class="dt">fig.height =</span> <span class="dv">5</span>, <span class="dt">width =</span> <span class="dv">200</span>, <span class="dt">continue =</span> <span class="st">&quot; &quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;trioClasses&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;Gviz&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;TxDb.Hsapiens.UCSC.hg18.knownGene&quot;</span>)
+<span class="kw">data</span>(<span class="st">&quot;fe&quot;</span>, <span class="dt">package =</span> <span class="st">&quot;trioClasses&quot;</span>)</code></pre>
+<p>Create trio-states</p>
+<pre class="sourceCode r"><code class="sourceCode r">trioAssay.beaty &lt;- trioClasses:::<span class="kw">TrioAssay</span>(fe.beaty, <span class="dt">type =</span> <span class="st">&quot;cnv&quot;</span>)
+trioStates.beaty &lt;- <span class="kw">with</span>(trioAssay.beaty, <span class="kw">matrix</span>(<span class="kw">paste0</span>(F, M, O), <span class="dt">nrow =</span> <span class="kw">nrow</span>(O), 
+    <span class="dt">ncol =</span> <span class="kw">ncol</span>(O)))
+<span class="kw">dimnames</span>(trioStates.beaty) &lt;- <span class="kw">dimnames</span>(trioAssay.beaty$O)
+trioAssay.pitt &lt;- trioClasses:::<span class="kw">TrioAssay</span>(fe.pitt, <span class="dt">type =</span> <span class="st">&quot;cnv&quot;</span>)
+trioStates.pitt &lt;- <span class="kw">with</span>(trioAssay.pitt, <span class="kw">matrix</span>(<span class="kw">paste0</span>(F, M, O), <span class="dt">nrow =</span> <span class="kw">nrow</span>(O), 
+    <span class="dt">ncol =</span> <span class="kw">ncol</span>(O)))
+<span class="kw">dimnames</span>(trioStates.pitt) &lt;- <span class="kw">dimnames</span>(trioAssay.pitt$O)</code></pre>
+<p>Tabulate trio-states component-wise.</p>
+<pre class="sourceCode r"><code class="sourceCode r">table.list.beaty &lt;- <span class="kw">apply</span>(trioStates.beaty, <span class="dv">2</span>, <span class="st">&quot;table&quot;</span>)
+table.list.pitt &lt;- <span class="kw">apply</span>(trioStates.pitt, <span class="dv">2</span>, <span class="st">&quot;table&quot;</span>)</code></pre>
+<p>Count transmission events and compute p-values component-wise.</p>
+<pre class="sourceCode r"><code class="sourceCode r">TU.mat.beaty &lt;- <span class="kw">matrix</span>(<span class="kw">unlist</span>(<span class="kw">lapply</span>(table.list.beaty, trioClasses:::CountTU)), 
+    <span class="dt">nrow =</span> <span class="kw">length</span>(table.list.beaty), <span class="dt">ncol =</span> <span class="dv">2</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)
+TU.mat.pitt &lt;- <span class="kw">matrix</span>(<span class="kw">unlist</span>(<span class="kw">lapply</span>(table.list.pitt, trioClasses:::CountTU)), 
+    <span class="dt">nrow =</span> <span class="kw">length</span>(table.list.pitt), <span class="dt">ncol =</span> <span class="dv">2</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)
+TU.mat &lt;- <span class="kw">cbind</span>(TU.mat.beaty, TU.mat.pitt)
+testable &lt;- <span class="kw">which</span>((<span class="kw">rowSums</span>(TU.mat[, <span class="dv">1</span>:<span class="dv">2</span>]) &gt;= <span class="dv">25</span>) &amp; (<span class="kw">rowSums</span>(TU.mat[, <span class="dv">3</span>:<span class="dv">4</span>]) &gt;= 
+    <span class="dv">25</span>))
+TU.mat &lt;- TU.mat[testable, ]
+<span class="kw">rownames</span>(TU.mat) &lt;- <span class="kw">names</span>(table.list.beaty)[testable]
+<span class="kw">colnames</span>(TU.mat) &lt;- <span class="kw">c</span>(<span class="st">&quot;T.case&quot;</span>, <span class="st">&quot;U.case&quot;</span>, <span class="st">&quot;T.con&quot;</span>, <span class="st">&quot;U.con&quot;</span>)
+DF &lt;- <span class="kw">DataFrame</span>(<span class="kw">rowData</span>(fe.beaty)[testable], TU.mat)
+<span class="kw">colnames</span>(DF) &lt;- <span class="kw">c</span>(<span class="st">&quot;grange&quot;</span>, <span class="kw">colnames</span>(TU.mat))</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(trans.vec &lt;- <span class="kw">rowSums</span>(TU.mat[, <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)])/<span class="kw">rowSums</span>(TU.mat), <span class="dt">breaks =</span> <span class="dv">20</span>)</code></pre>
+<div class="figure">
+<img src="figure/hist.png" alt="plot of chunk hist" /><p class="caption">plot of chunk hist</p>
+</div>
+<pre class="sourceCode r"><code class="sourceCode r">fish.list &lt;- <span class="kw">apply</span>(TU.mat, <span class="dv">1</span>, trioClasses:::TU.fish)
+p.vec &lt;- <span class="kw">unlist</span>(<span class="kw">lapply</span>(fish.list, function(obj) <span class="kw">return</span>(obj$p.value)))
+DF &lt;- <span class="kw">DataFrame</span>(DF, p.vec, trans.vec)</code></pre>
+<p>Now we look at regions.</p>
+<pre class="sourceCode r"><code class="sourceCode r">regions.gr &lt;- <span class="kw">reduce</span>(DF$grange)
+p.min.DF &lt;- trioClasses:::<span class="kw">f.cmp</span>(DF, <span class="st">&quot;p.vec&quot;</span>, min, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+n.DF &lt;- trioClasses:::<span class="kw">f.cmp</span>(DF, <span class="st">&quot;p.vec&quot;</span>, function(vec) {
+    <span class="kw">sum</span>(!<span class="kw">is.na</span>(vec), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+})
+p.median.DF &lt;- trioClasses:::<span class="kw">f.cmp</span>(DF, <span class="st">&quot;p.vec&quot;</span>, median, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+trans.median.DF &lt;- trioClasses:::<span class="kw">f.cmp</span>(DF, <span class="st">&quot;trans.vec&quot;</span>, median, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+meta &lt;- <span class="kw">values</span>(regions.gr)
+meta &lt;- <span class="kw">DataFrame</span>(meta, <span class="dt">p.min =</span> p.min.DF$value, <span class="dt">p.median =</span> p.median.DF$value, 
+    <span class="dt">trans.median =</span> trans.median.DF$value, <span class="dt">n.cmp =</span> n.DF$value)
+<span class="kw">values</span>(regions.gr) &lt;- meta</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">as</span>(regions.gr[<span class="kw">order</span>(<span class="kw">values</span>(regions.gr)$p.min)], <span class="st">&quot;data.frame&quot;</span>), <span class="dv">10</span>)</code></pre>
+<pre><code>##    seqnames     start       end  width strand     p.min  p.median
+## 1     chr15  19768826  19982036 213211      * 3.073e-05 0.0013693
+## 2      chr7 141419097 141441259  22163      * 9.834e-05 0.0006589
+## 3     chr15  19341464  19545168 203705      * 1.407e-04 0.0012757
+## 4      chr8  39356825  39497557 140733      * 2.204e-03 0.0123764
+## 5      chr6  32611466  32643872  32407      * 2.220e-03 0.0150875
+## 6      chr6  32059186  32065343   6158      * 2.560e-03 0.0068370
+## 7     chr15  19095051  19205581 110531      * 4.307e-03 0.0150366
+## 8     chr17  41785962  41914286 128325      * 6.286e-03 0.0109697
+## 9      chr6  32094298  32107594  13297      * 3.235e-02 0.0462510
+## 10     chr6  32066939  32093133  26195      * 3.594e-02 0.3073202
+##    trans.median n.cmp
+## 1        0.3304    21
+## 2        0.5411     8
+## 3        0.3333    30
+## 4        0.5363    17
+## 5        0.3614    43
+## 6        0.4493     5
+## 7        0.3563    13
+## 8        0.4537    22
+## 9        0.2576    11
+## 10       0.2727    15</code></pre>
