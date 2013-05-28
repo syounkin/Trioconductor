@@ -7,8 +7,9 @@
 \begin{document}
 <<options, echo=FALSE, eval = TRUE, echo = FALSE>>=
   options(width=75, continue = " ")
-  library("Gviz")
+  
   library("trioClasses")
+#library("Gviz")
   library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 ##  data("fe-25", package = "trioClasses")
   data("fe", package = "trioClasses")
@@ -47,8 +48,8 @@ testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 TU.mat <- TU.mat[testable,]
 rownames(TU.mat) <- names(table.list.beaty)[testable]
 colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
-DF <- DataFrame(TU.mat, rowData(fe.beaty)[testable])
-colnames(DF) <- c(colnames(TU.mat),"grange")
+DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
+colnames(DF) <- c("grange", colnames(TU.mat))
 @ 
 \begin{figure}
 <<hist, fig = TRUE, eval = TRUE, echo = FALSE>>=
@@ -81,14 +82,15 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
-p.min.vec <- as(unlist(lapply( DF.list, function( obj ) min(obj$p.vec, na.rm = TRUE) )),"numeric")
-n.vec <- as(unlist(lapply( DF.list, function( obj ) nrow(obj))),"numeric")
-p.median.vec <- as(unlist(lapply( DF.list, function( obj ) median(obj$p.vec, na.rm = TRUE))),"numeric")
-trans.median.vec <- as(unlist(lapply( DF.list, function( obj ) median(obj$trans.vec, na.rm = TRUE))),"numeric")
-@ 
+p.min.DF <- trioClasses:::f.cmp( DF, "p.vec", min, na.rm = TRUE )
+n.DF <- trioClasses:::f.cmp( DF, "p.vec", function(vec){sum(!is.na(vec), na.rm = TRUE)})
+p.median.DF <- trioClasses:::f.cmp( DF, "p.vec", median, na.rm = TRUE )
+trans.median.DF <- trioClasses:::f.cmp( DF, "trans.vec", median, na.rm = TRUE )
+@
+
 <<meta, eval = TRUE, echo = FALSE>>=
 meta <- values(regions.gr)
-meta <- DataFrame(meta, p.min = p.min.vec, p.median = p.median.vec, trans.median = trans.median.vec, n.cmp = n.vec)
+meta <- DataFrame(meta, p.min = p.min.DF$value, p.median = p.median.DF$value, trans.median = trans.median.DF$value, n.cmp = n.DF$value)
 values(regions.gr) <- meta
 @
 <<tophits, eval = TRUE, echo = FALSE>>=
