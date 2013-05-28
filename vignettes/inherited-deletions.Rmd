@@ -1,13 +1,12 @@
-
-```{r setup}
-  opts_chunk$set(fig.width=5, fig.height=5, width =200, continue = " ")
+```{r setup, echo=TRUE}
+  opts_chunk$set(fig.width=10, fig.height=10, comment = "", fig.path = "figures/", highlight = TRUE, background = "red")
   library("trioClasses")
   library("Gviz")
   library("TxDb.Hsapiens.UCSC.hg18.knownGene")
   data("fe", package = "trioClasses")
 ```
 Create trio-states
-```{r trioStates}
+```{r trioStates, cache = TRUE, echo=FALSE}
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -16,12 +15,12 @@ Create trio-states
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 ```
 Tabulate trio-states component-wise.
-```{r tables}
+```{r tables, cache = TRUE, echo=FALSE}
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 ```
 Count transmission events and  compute p-values component-wise.
-```{r DF}
+```{r DF, echo=FALSE}
 TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
@@ -32,17 +31,17 @@ colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
 colnames(DF) <- c("grange", colnames(TU.mat))
 ```
-```{r hist}
+```{r hist, echo=FALSE}
 hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
 ```
-```{r fish}
+```{r fish, echo=FALSE}
 fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 DF <- DataFrame(DF,p.vec, trans.vec)
 
 ```
 Now we look at regions.
-```{r regions}
+```{r regions, echo=FALSE}
 regions.gr <- reduce(DF$grange)
 p.min.DF <- trioClasses:::f.cmp( DF, "p.vec", min, na.rm = TRUE )
 n.DF <- trioClasses:::f.cmp( DF, "p.vec", function(vec){sum(!is.na(vec), na.rm = TRUE)})
@@ -52,6 +51,7 @@ meta <- values(regions.gr)
 meta <- DataFrame(meta, p.min = p.min.DF$value, p.median = p.median.DF$value, trans.median = trans.median.DF$value, n.cmp = n.DF$value)
 values(regions.gr) <- meta
 ```
-```{r tophits}
-head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),10)
+```{r tophits, results='asis', echo=FALSE}
+foo <- xtable(head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),10))
+print(foo, type = "html")
 ```
