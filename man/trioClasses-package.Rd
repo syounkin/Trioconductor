@@ -2,37 +2,21 @@
 \alias{trioClasses-package}
 \alias{trioClasses}
 \docType{package}
-\title{
-  What the package does (short line)
-  ~~ package title ~~
-}
-\description{
-  More about what it does (maybe more than one line)
-  ~~ A concise (1-5 lines) description of the package ~~
-}
+\title{Classes and methods for Family data}
+\description{Classes and methods for Family data}
 \details{
   \tabular{ll}{
     Package: \tab trioClasses\cr
     Type: \tab Package\cr
-    Version: \tab 0.0.1\cr
-    Date: \tab 2012-12-05\cr
-    License: \tab What license is it under?\cr
+    Version: \tab 1.0.6\cr
+    Date: \tab Thu 30 May 2013 01:44:20 PM EDT\cr
+    License: \tab THE BEER-WARE LICENSE\cr
   }
-  ~~ An overview of how to use the package, including the most important
-~~
-~~ functions ~~
 }
 \author{
-  Who wrote it
-
-  Maintainer: Who to complain to <yourfault@somewhere.net>
-  ~~ The author and/or maintainer of the package ~~
+  Samuel G. Younkin <syounkin@jhsph.edu>
 }
 \references{
   ~~ Literature or other references for background information ~~
 }
-\keyword{ package }
-\seealso{
-  ~~ Optional links to other man pages, e.g. ~~
-  ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
+\keyword{ trioClasses }
