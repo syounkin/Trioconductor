@@ -1,7 +1,7 @@
 Package: trioClasses
 Type: Package
 Title: trioClasses
-Version: 1.0.4
+Version: 1.0.5
 Date: Wed May 15 13:30:09 EDT 2013
 Author: Samuel G. Younkin, Ingo Ruczinski, Margaret Taub, Holger Schwender, Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
