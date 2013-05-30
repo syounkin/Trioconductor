@@ -1,6 +1,14 @@
-test_FamilyExperiment <- function(){
-  checkTrue(validObject(FamilyExperiment))
+test_PedClass <- function(){
+	checkTrue(validObject(PedClass()))
+	data(sample)
+	checkTrue(validObject(PedClass(ped.DF)))
+	## must have all the required columns
+	checkException(validObject(PedClass(DataFrame(mid="a"))))
 }
+
+##test_FamilyExperiment <- function(){
+##	checkTrue(validObject(FamilyExperiment))
+##}
 
 ## make_test_Pedigree <- function(){
 ## 	pedTest <- new("Pedigree", trios=data.frame(F=c("NA06993", "NA11881"),
