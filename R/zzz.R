@@ -1,6 +1,6 @@
 THISPKG <- "trioClasses"
 .onAttach <- function(libname, pkgname) {
-	version <- packageDescription("trioClasses", field="Version")
+	version <- packageDescription("trioClasses", fields="Version")
 	packageStartupMessage(paste("
 Welcome to trioClasses version ", version, "\n",
 "~~~~~~~~~~~~~~~~~", "\n",

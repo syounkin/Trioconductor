@@ -2,67 +2,64 @@
 \docType{class}
 
 % Class:
-\alias{class:GenomicRanges}
-\alias{GenomicRanges-class}
-\alias{GenomicRanges}
 \alias{class:FamilyExperiment}
 \alias{FamilyExperiment-class}
 \alias{FamilyExperiment}
-\alias{GenomicRangesORFamilyExperimentList-class}
-\alias{GenomicRangesORmissing-class}
+%\alias{FamilyExperimentORFamilyExperimentList-class}
+%\alias{FamilyExperimentORmissing-class}
 
 % Constructors:
-\alias{FamilyExperiment}
-\alias{updateObject,FamilyExperiment-method}
+%\alias{FamilyExperiment}
+%\alias{updateObject,FamilyExperiment-method}
 
 % Coercion:
-\alias{splitAsListReturnedClass,GRange}
-\alias{coerce,RangedData,FamilyExperiment-method}
-\alias{coerce,GenomicRanges,RangedData-method}
-\alias{coerce,RangesList,FamilyExperiment-method}
-\alias{coerce,GenomicRanges,RangesList-method}
-\alias{coerce,GenomicRanges,GappedAlignments-method}
-\alias{coerce,RleList,FamilyExperiment-method}
-\alias{coerce,RleViewsList,FamilyExperiment-method}
-\alias{as.data.frame,GenomicRanges-method}
+%% \alias{splitAsListReturnedClass,GRange}
+%% \alias{coerce,RangedData,FamilyExperiment-method}
+%% \alias{coerce,FamilyExperiment,RangedData-method}
+%% \alias{coerce,RangesList,FamilyExperiment-method}
+%% \alias{coerce,FamilyExperiment,RangesList-method}
+%% \alias{coerce,FamilyExperiment,GappedAlignments-method}
+%% \alias{coerce,RleList,FamilyExperiment-method}
+%% \alias{coerce,RleViewsList,FamilyExperiment-method}
+%% \alias{as.data.frame,FamilyExperiment-method}
 
 % Accessors:
 \alias{seqnames,FamilyExperiment-method}
-\alias{seqnames<-,GenomicRanges-method}
+\alias{seqnames<-,FamilyExperiment-method}
 \alias{ranges,FamilyExperiment-method}
-\alias{ranges<-,GenomicRanges-method}
+\alias{ranges<-,FamilyExperiment-method}
 \alias{strand,FamilyExperiment-method}
-\alias{strand<-,GenomicRanges-method}
-\alias{elementMetadata<-,GenomicRanges-method}
-\alias{names,GenomicRanges-method}
-\alias{names<-,GenomicRanges-method}
+\alias{strand<-,FamilyExperiment-method}
+\alias{elementMetadata<-,FamilyExperiment-method}
+\alias{names,FamilyExperiment-method}
+\alias{names<-,FamilyExperiment-method}
 \alias{seqinfo,FamilyExperiment-method}
-\alias{seqinfo<-,GenomicRanges-method}
-\alias{score,GenomicRanges-method}
+\alias{seqinfo<-,FamilyExperiment-method}
+\alias{score,FamilyExperiment-method}
 
 % Ranges methods:
-\alias{start,GenomicRanges-method}
-\alias{start<-,GenomicRanges-method}
-\alias{end,GenomicRanges-method}
-\alias{end<-,GenomicRanges-method}
-\alias{width,GenomicRanges-method}
-\alias{width<-,GenomicRanges-method}
+\alias{start,FamilyExperiment-method}
+\alias{start<-,FamilyExperiment-method}
+\alias{end,FamilyExperiment-method}
+\alias{end<-,FamilyExperiment-method}
+\alias{width,FamilyExperiment-method}
+\alias{width<-,FamilyExperiment-method}
 
 % Vector methods:
-\alias{length,GenomicRanges-method}
-\alias{[,GenomicRanges-method}
-\alias{[<-,GenomicRanges,ANY,ANY,ANY-method}
-\alias{c,GenomicRanges-method}
-\alias{seqselect,GenomicRanges-method}
-\alias{seqselect<-,GenomicRanges-method}
-\alias{window,GenomicRanges-method}
+\alias{length,FamilyExperiment-method}
+\alias{[,FamilyExperiment-method}
+\alias{[<-,FamilyExperiment,ANY,ANY,ANY-method}
+\alias{c,FamilyExperiment-method}
+\alias{seqselect,FamilyExperiment-method}
+\alias{seqselect<-,FamilyExperiment-method}
+\alias{window,FamilyExperiment-method}
 
 % $ and $<- methods:
-\alias{$,GenomicRanges-method}
-\alias{$<-,GenomicRanges-method}
+\alias{$,FamilyExperiment-method}
+\alias{$<-,FamilyExperiment-method}
 
 % "show" method:
-\alias{show,GenomicRanges-method}
+\alias{show,FamilyExperiment-method}
 
 % other methods:
 \alias{splitAsListReturnedClass,FamilyExperiment-method}
@@ -422,7 +419,7 @@
       respectively. Provided as a convenience, for FamilyExperiment objects *only*,
       and as the result of strong popular demand.
       Note that those methods are not consistent with the other \code{$}
-      and \code{$<-} methods in the IRanges/GenomicRanges infrastructure,
+      and \code{$<-} methods in the IRanges/FamilyExperiment infrastructure,
       and might confuse some users by making them believe that a FamilyExperiment
       object can be manipulated as a data.frame-like object.
       Therefore we recommend using them only interactively, and we discourage
@@ -457,12 +454,12 @@
   \link[IRanges]{Ranges-class},
   \link[IRanges]{Rle-class},
   \link[IRanges]{DataFrame-class},
-  \link[GenomicRanges]{intra-range-methods},
-  \link[GenomicRanges]{inter-range-methods},
-  \link[GenomicRanges]{setops-methods},
-  \link[GenomicRanges]{findOverlaps-methods},
-  \link[GenomicRanges]{nearest-methods},
-  \link[GenomicRanges]{coverage-methods}
+  \link[FamilyExperiment]{intra-range-methods},
+  \link[FamilyExperiment]{inter-range-methods},
+  \link[FamilyExperiment]{setops-methods},
+  \link[FamilyExperiment]{findOverlaps-methods},
+  \link[FamilyExperiment]{nearest-methods},
+  \link[FamilyExperiment]{coverage-methods}
 }
 
 \examples{
