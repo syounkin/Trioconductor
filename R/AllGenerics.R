@@ -6,11 +6,7 @@ setGeneric("pedigree", function(object) standardGeneric("pedigree"))
 setGeneric("completeTrios", function(object) standardGeneric("completeTrios"))
 setGeneric("ids", function(object) standardGeneric("ids"))
 setGeneric("FamilyExperiment", function(se, pedigree) standardGeneric("FamilyExperiment"))
-<<<<<<< HEAD
 #setGeneric("PedClass", function(object) standardGeneric("PedClass"))
-=======
-##setGeneric("PedClass", function(object) standardGeneric("PedClass"))
->>>>>>> mdDepends
 setGeneric("trios", function(object) standardGeneric("trios"))
 setGeneric("TrioAssay", function(object, type) standardGeneric("TrioAssay"))
 setGeneric("ctcbind", function(object) standardGeneric("ctcbind"))
