@@ -1,7 +1,7 @@
 Package: trioClasses
 Type: Package
 Title: trioClasses
-Version: 1.0.3
+Version: 1.0.4
 Date: Wed May 15 13:30:09 EDT 2013
 Author: Samuel G. Younkin, Ingo Ruczinski, Margaret Taub, Holger Schwender, Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
@@ -9,7 +9,7 @@ Description: The package trioClasses presents the class FamilyExperiment, an ext
 License: THE BEER-WARE LICENSE
 Depends: R (>= 3.0.0), methods, GenomicRanges, snpStats
 Imports:
-Suggests:
+Suggests: BiocGenerics, RUnit
 Enhances:
 Collate: AllClasses.R
 	 AllGenerics.R
