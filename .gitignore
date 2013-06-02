@@ -24,3 +24,4 @@ scan-trios-cpp*
 *.R
 cache
 trioClasses.Rcheck
+trioClasses.pdf

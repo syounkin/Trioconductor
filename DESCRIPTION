@@ -2,7 +2,7 @@ Package: trioClasses
 Type: Package
 Title: trioClasses
 Version: 1.0.6
-Date: Thu May 30 15:20:28 EDT 2013
+Date: Sun Jun  2 18:08:30 EDT 2013
 Author: Samuel G. Younkin, Ingo Ruczinski, Margaret Taub, Holger Schwender, Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
 Description: The package trioClasses presents the class FamilyExperiment, an extension of SummarizedExperiment.  This class is useful for analyzing genetic sequence data in parent-offspring study designs.  The package trioClasses takes advantage of the vcf file format through the SummarizedExperiment class and the VCFTools package.
