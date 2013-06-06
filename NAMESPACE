@@ -1,4 +1,4 @@
 exportClasses( FamilyExperiment, PedClass )
-exportMethods(  pedigree, completeTrios, ids, geno, cnv, logR, baf, FamilyExperiment, trios, "[", parents, offspring, MAF, aTDT, ScanTrio, CNVMatrix, allSubjects )
+exportMethods(  pedigree, completeTrios, geno, cnv, logR, baf, FamilyExperiment, trios, "[", parents, offspring, MAF, aTDT, ScanTrio, CNVMatrix, allSubjects )
 export(aTDT, PedClass)
 importMethodsFrom(GenomicRanges, "[")
