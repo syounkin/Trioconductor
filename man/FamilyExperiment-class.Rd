@@ -96,6 +96,9 @@
 \item{}{
 \code{cnv(fe)}:
   }
+\item{}{
+\code{fe[i,j]}: subset operator
+  }
 }
 }
 \author{Samuel G. Younkin <syounkin@jhsph.edu>}
