@@ -1,0 +1,8 @@
+aTDT                    aTDT method
+CNVMatrix               CNVMatrix method
+FamilyExperiment-class
+                        FamilyExperiment Class
+PedClass-class          PedClass Class
+ScanTrio                ScanTrio method
+trioClasses-package     Classes and methods for Family data
+inherited-deletions	Vignette of inherited deletion analysis
