@@ -6,17 +6,24 @@
 
 \title{ScanTrio method}
 
-\description{Foo}
+\description{This method implements a trio-based version of the Scan
+  Statistic approach of Ionita-Laza et al.}
 
-%% \usage{
+\usage{
+\S4method{ScanTrio}{FamilyExperiment,GRanges,GRanges}(object, window, block)
+}
 
-%% ## Constructors
-
-%% FamilyExperiment(se, pedigree)
-%% \S4method{FamilyExperiment}{SummarizedExperiment}(se, pedigree)
-%% %\S4method{SummarizedExperiment}{missing}(assays, ...)
-%% %\S4method{SummarizedExperiment}{list}(assays, ...)
-%% %\S4method{SummarizedExperiment}{matrix}(assays, ...)
-
-%% }
+\arguments{
+  \item{object}{
+    A \link{FamilyExperiment} object. 
+  }
+  \item{window}{
+    A GRanges object. 
+  }
+  \item{block}{
+    A GRanges object. 
+  }
+}
+\details{Foo.}
+\value{A GRanges object.}
 \author{Samuel G. Younkin <syounkin@jhsph.edu>}
