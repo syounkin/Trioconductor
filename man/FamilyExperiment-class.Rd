@@ -6,6 +6,9 @@
 \alias{FamilyExperiment-class}
 \alias{FamilyExperiment}
 
+% Constructor
+\alias{FamilyExperiment,SummarizedExperiment,PedClass-method}
+
 % Accessors:
 \alias{pedigree,FamilyExperiment-method}
 \alias{pedigree}
@@ -14,7 +17,22 @@
 \alias{completeTrios,FamilyExperiment-method}
 \alias{completeTrios}
 \alias{parents,FamilyExperiment-method}
-\alias{parents}
+%\alias{parents}
+\alias{baf}
+\alias{baf,FamilyExperiment-method}
+\alias{cnv}
+\alias{cnv,FamilyExperiment-method}
+\alias{geno}
+\alias{geno,FamilyExperiment-method}
+\alias{logR}
+\alias{logR,FamilyExperiment-method}
+%\alias{ids}
+%\alias{ids,
+
+% Methods
+\alias{[,FamilyExperiment-method]}
+%\alias{[,FamilyExperiment-method,ANY,ANY,ANY]}
+\alias{[,FamilyExperiment,ANY,ANY,ANY]}
 
 \title{FamilyExperiment Class}
 
@@ -25,6 +43,17 @@
   'geno' must appear in the assayData list.  Similarly with cnv data the
   assayData list must contain a matrix named 'cnv'.}
 
+%% \usage{
+
+%% ## Constructors
+
+%% FamilyExperiment(se, pedigree)
+%% \S4method{FamilyExperiment}{SummarizedExperiment}(se, pedigree)
+%% %\S4method{SummarizedExperiment}{missing}(assays, ...)
+%% %\S4method{SummarizedExperiment}{list}(assays, ...)
+%% %\S4method{SummarizedExperiment}{matrix}(assays, ...)
+
+%% }
   \section{Accessors}{
   In the following code snippets, \code{fe} is a FamilyExperiment
   object.
@@ -51,6 +80,18 @@
 \code{parents(fe)}: Returns the parents IDs.  Note that this is
   intended to be used with parent-offspring trios.  It will return any
   subject that has both parents in the pedigree data.
+  }
+\item{}{
+\code{baf(fe)}: Retrieve matrix of B allele frequencies.  Not yet implemented. 
+  }
+\item{}{
+\code{logr(fe)}: Retrieve matrix of log R ratio values.  Not yet implemented. 
+  }
+\item{}{
+\code{geno(fe)}: Retrieve a matrix of genotypes.
+  }
+\item{}{
+\code{cnv(fe)}:
   }
 }
 }
