@@ -31,11 +31,11 @@
 
 % Methods
 %\alias{[,FamilyExperiment-method]}
-\alias{[,FamilyExperiment,ANY,ANY,ANY-method]}
-\alias{[,FamilyExperiment,ANY,ANY,ANY]}
-\alias{[,FamilyExperiment,ANY,ANY-method]}
-\alias{[,FamilyExperiment,ANY,ANY]}
-\alias{[,FamilyExperiment-method]}
+\alias{[,FamilyExperiment,ANY,ANY,ANY-method}
+%\alias{[,FamilyExperiment,ANY,ANY,ANY]}
+%\alias{[,FamilyExperiment,ANY,ANY-method]}
+%\alias{[,FamilyExperiment,ANY,ANY]}
+%\alias{[,FamilyExperiment-method]}
 
 \title{FamilyExperiment Class}
 
