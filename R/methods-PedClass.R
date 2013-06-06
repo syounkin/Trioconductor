@@ -40,7 +40,8 @@ PedClass <- function(object){
 }
 
 setMethod("trios",  signature(object="PedClass"), function(object) {
-  trio.df <- subset( as(object, "data.frame" ), !is.na(fid) & !is.na(mid) & !is.na(id) )
+  index <- which( with(as(object, "data.frame" ), !is.na(fid) & !is.na(mid) & !is.na(id)))
+  trio.df <- as(object,"data.frame")[index,]
 #  id.char <- as.character(trio.df$id)#,
   trio.df.2 <- data.frame( id = as.character(trio.df$id),
                           fid = as.character(trio.df$fid),

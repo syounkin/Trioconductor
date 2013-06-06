@@ -52,7 +52,7 @@ setMethod("ctcbind", signature( object = "list"), function( object ){
   holger
 })
 
-setMethod("[", "FamilyExperiment", function( x, i, j, ..., drop = TRUE ){
+setMethod("[", c("FamilyExperiment","ANY","ANY"), function( x, i, j, ..., drop = TRUE ){
   se <- as( x, "SummarizedExperiment" )
   if( !missing(i) & !missing(j)){
     se <- se[i,j]
