@@ -1,0 +1,61 @@
+```{r setup}
+opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = TRUE, highlight = TRUE, fig.path = 'figures/', dev = 'png', background = 'red')
+library("trioClasses")
+library("GWASTools")
+library("CleftCNVAssoc")
+```
+```{r data, cache = TRUE}
+data("beaty.scanAnnot")
+data("beaty.snpAnnot")
+data("fe")
+intensfile <- NcdfIntensityReader("/media/sgy/lockdown/GWASTools/beaty.intensity.nc")
+genofile <- NcdfGenotypeReader("/media/sgy/lockdown/GWASTools/beaty.geno.nc")
+xyfile <- NcdfIntensityReader("/media/sgy/lockdown/GWASTools/beaty.intensity.xy.nc")
+scan.ids <- as.character( getScanID( beaty_scanAnnot ) )
+scan.names <- as.character( getVariable( beaty_scanAnnot, "scanName" ) )
+names(scan.names) <- scan.ids
+names(scan.ids) <- as.character(scan.names)
+```
+
+```{r ids}
+fa.id <- as.character(completeTrios(fe.beaty)$fid)
+ma.id <- as.character(completeTrios(fe.beaty)$mid)
+names(fa.id) <- as.character(completeTrios(fe.beaty)$id)
+names(ma.id) <- as.character(completeTrios(fe.beaty)$id)
+```
+```{r foo}
+offspring.vec <- as.character(completeTrios(fe.beaty)$id)
+```
+```{r grange}
+gr <- GRanges( seqnames = rep('chr16',length(offspring.vec)), ranges = IRanges( start = 32404517, end = 32530051), id = offspring.vec )
+```
+```{r raw, cache = TRUE}
+raw.df.list <- getRaw( gr, intensfile = intensfile, snpAnnot = beaty_snpAnnot, scan.id = scan.ids, fa.id = fa.id, ma.id = ma.id, genofile = genofile, xyfile = xyfile )
+```
+```{r head}
+head(raw.df.list[[1]])
+head(raw.df.list[[2]])
+```
+
+```{r pos}
+pos.vec <- raw.df.list[[1]]$pos
+logr.list <- lapply(raw.df.list, function(df) df$logr )
+logr.fa.list <- lapply(raw.df.list, function(df) df$logr.fa )
+logr.ma.list <- lapply(raw.df.list, function(df) df$logr.ma )
+```
+```{r logrplot, fig.width = 24}
+par(bg="lightyellow")
+plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
+for( i in 1:length(logr.list) ){
+  points(jitter(pos.vec,amount = 1e3), logr.list[[i]], pch = 20, col = "orange")
+  }
+plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
+for( i in 1:length(logr.fa.list) ){
+  points(jitter(pos.vec,amount = 1e3), logr.fa.list[[i]], pch = 20, col = "red")
+  }
+plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
+for( i in 1:length(logr.ma.list) ){
+  points(jitter(pos.vec,amount = 1e3), logr.ma.list[[i]], pch = 20, col = "blue")
+  }
+```
+Now plot only offspring with an untransmitted deletion.

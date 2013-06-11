@@ -1,0 +1,81 @@
+<pre class="sourceCode r"><code class="sourceCode r">opts_chunk$<span class="kw">set</span>(<span class="dt">fig.width =</span> <span class="dv">7</span>, <span class="dt">fig.height =</span> <span class="dv">5</span>, <span class="dt">comment =</span> <span class="st">&quot;&quot;</span>, <span class="dt">warning =</span> <span class="ot">FALSE</span>, 
+    <span class="dt">tidy =</span> <span class="ot">TRUE</span>, <span class="dt">highlight =</span> <span class="ot">TRUE</span>, <span class="dt">fig.path =</span> <span class="st">&quot;figures/&quot;</span>, <span class="dt">dev =</span> <span class="st">&quot;png&quot;</span>, <span class="dt">background =</span> <span class="st">&quot;red&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;trioClasses&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;GWASTools&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;CleftCNVAssoc&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;beaty.scanAnnot&quot;</span>)
+<span class="kw">data</span>(<span class="st">&quot;beaty.snpAnnot&quot;</span>)
+<span class="kw">data</span>(<span class="st">&quot;fe&quot;</span>)
+intensfile &lt;- <span class="kw">NcdfIntensityReader</span>(<span class="st">&quot;/media/sgy/lockdown/GWASTools/beaty.intensity.nc&quot;</span>)
+genofile &lt;- <span class="kw">NcdfGenotypeReader</span>(<span class="st">&quot;/media/sgy/lockdown/GWASTools/beaty.geno.nc&quot;</span>)
+xyfile &lt;- <span class="kw">NcdfIntensityReader</span>(<span class="st">&quot;/media/sgy/lockdown/GWASTools/beaty.intensity.xy.nc&quot;</span>)
+scan.ids &lt;- <span class="kw">as.character</span>(<span class="kw">getScanID</span>(beaty_scanAnnot))
+scan.names &lt;- <span class="kw">as.character</span>(<span class="kw">getVariable</span>(beaty_scanAnnot, <span class="st">&quot;scanName&quot;</span>))
+<span class="kw">names</span>(scan.names) &lt;- scan.ids
+<span class="kw">names</span>(scan.ids) &lt;- <span class="kw">as.character</span>(scan.names)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">fa.id &lt;- <span class="kw">as.character</span>(<span class="kw">completeTrios</span>(fe.beaty)$fid)
+ma.id &lt;- <span class="kw">as.character</span>(<span class="kw">completeTrios</span>(fe.beaty)$mid)
+<span class="kw">names</span>(fa.id) &lt;- <span class="kw">as.character</span>(<span class="kw">completeTrios</span>(fe.beaty)$id)
+<span class="kw">names</span>(ma.id) &lt;- <span class="kw">as.character</span>(<span class="kw">completeTrios</span>(fe.beaty)$id)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">offspring.vec &lt;- <span class="kw">as.character</span>(<span class="kw">completeTrios</span>(fe.beaty)$id)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">gr &lt;- <span class="kw">GRanges</span>(<span class="dt">seqnames =</span> <span class="kw">rep</span>(<span class="st">&quot;chr16&quot;</span>, <span class="kw">length</span>(offspring.vec)), <span class="dt">ranges =</span> <span class="kw">IRanges</span>(<span class="dt">start =</span> <span class="dv">32404517</span>, 
+    <span class="dt">end =</span> <span class="dv">32530051</span>), <span class="dt">id =</span> offspring.vec)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">raw.df.list &lt;- <span class="kw">getRaw</span>(gr, <span class="dt">intensfile =</span> intensfile, <span class="dt">snpAnnot =</span> beaty_snpAnnot, 
+    <span class="dt">scan.id =</span> scan.ids, <span class="dt">fa.id =</span> fa.id, <span class="dt">ma.id =</span> ma.id, <span class="dt">genofile =</span> genofile, <span class="dt">xyfile =</span> xyfile)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(raw.df.list[[<span class="dv">1</span>]])</code></pre>
+<pre><code>     logr    baf      pos logr.fa logr.ma baf.fa baf.ma geno geno.fa
+1 -0.0034 0.0021 32404517  0.3408  0.0461 0.0041 0.0000   NA      NA
+2 -0.0105 0.0044 32404959  0.2262 -0.0421 0.0155 0.0261   NA      NA
+3  0.1060 0.0000 32405177  0.2159 -0.1033 0.0038 0.0082   NA      NA
+4  0.1355 1.0000 32405464  0.1135  0.0823 0.9981 1.0000   NA      NA
+5  0.4216 0.0000 32405894  0.3769  0.4550 0.0000 0.0000   NA      NA
+6  0.2457 0.0007 32406646  0.1938  0.1694 0.0227 0.0221   NA      NA
+  geno.ma     x     y  x.fa  y.fa  x.ma  y.ma     snpname
+1      NA 1.181 0.028 1.495 0.039 1.229 0.022 cnvi0022821
+2      NA 1.194 0.106 1.387 0.143 1.137 0.134 cnvi0022826
+3      NA 1.539 0.134 1.633 0.172 1.302 0.144 cnvi0020617
+4      NA 0.035 1.039 0.040 1.018 0.034 1.001 cnvi0022830
+5      NA 0.933 0.028 0.911 0.021 0.953 0.032 cnvi0020621
+6      NA 1.801 0.076 1.688 0.123 1.661 0.120 cnvi0022831</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(raw.df.list[[<span class="dv">2</span>]])</code></pre>
+<pre><code>    logr    baf      pos logr.fa logr.ma baf.fa baf.ma geno geno.fa
+1 0.1870 0.0009 32404517  0.3145  0.0147 0.0041 0.0000   NA      NA
+2 0.1410 0.0000 32404959  0.3573 -0.0979 0.0000 0.0089   NA      NA
+3 0.2580 0.0116 32405177  0.3956  0.2541 0.0000 0.0000   NA      NA
+4 0.1061 1.0000 32405464  0.2630 -0.0574 1.0000 1.0000   NA      NA
+5 0.1743 0.0000 32405894  0.3977  0.0065 0.0000 0.0000   NA      NA
+6 0.0612 0.0056 32406646  0.3595  0.1363 0.0130 0.0097   NA      NA
+  geno.ma     x     y  x.fa  y.fa  x.ma  y.ma     snpname
+1      NA 1.350 0.029 1.468 0.039 1.200 0.024 cnvi0022821
+2      NA 1.338 0.105 1.553 0.124 1.117 0.106 cnvi0022826
+3      NA 1.666 0.192 1.883 0.162 1.701 0.152 cnvi0020617
+4      NA 0.024 1.029 0.023 1.151 0.020 0.920 cnvi0022830
+5      NA 0.787 0.023 0.926 0.020 0.701 0.020 cnvi0020621
+6      NA 1.575 0.077 1.918 0.114 1.650 0.090 cnvi0022831</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">pos.vec &lt;- raw.df.list[[<span class="dv">1</span>]]$pos
+logr.list &lt;- <span class="kw">lapply</span>(raw.df.list, function(df) df$logr)
+logr.fa.list &lt;- <span class="kw">lapply</span>(raw.df.list, function(df) df$logr.fa)
+logr.ma.list &lt;- <span class="kw">lapply</span>(raw.df.list, function(df) df$logr.ma)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">bg =</span> <span class="st">&quot;lightyellow&quot;</span>)
+<span class="kw">plot</span>(<span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xlim =</span> <span class="kw">range</span>(pos.vec), <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>))
+for (i in <span class="dv">1</span>:<span class="kw">length</span>(logr.list)) {
+    <span class="kw">points</span>(<span class="kw">jitter</span>(pos.vec, <span class="dt">amount =</span> <span class="dv">1000</span>), logr.list[[i]], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>)
+}</code></pre>
+<div class="figure">
+<img src="figures/logrplot1.png" alt="plot of chunk logrplot" /><p class="caption">plot of chunk logrplot</p>
+</div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xlim =</span> <span class="kw">range</span>(pos.vec), <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>))
+for (i in <span class="dv">1</span>:<span class="kw">length</span>(logr.fa.list)) {
+    <span class="kw">points</span>(<span class="kw">jitter</span>(pos.vec, <span class="dt">amount =</span> <span class="dv">1000</span>), logr.fa.list[[i]], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
+}</code></pre>
+<div class="figure">
+<img src="figures/logrplot2.png" alt="plot of chunk logrplot" /><p class="caption">plot of chunk logrplot</p>
+</div>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xlim =</span> <span class="kw">range</span>(pos.vec), <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>))
+for (i in <span class="dv">1</span>:<span class="kw">length</span>(logr.ma.list)) {
+    <span class="kw">points</span>(<span class="kw">jitter</span>(pos.vec, <span class="dt">amount =</span> <span class="dv">1000</span>), logr.ma.list[[i]], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)
+}</code></pre>
+<div class="figure">
+<img src="figures/logrplot3.png" alt="plot of chunk logrplot" /><p class="caption">plot of chunk logrplot</p>
+</div>
+<p>Now plot only offspring with an untransmitted deletion.</p>
