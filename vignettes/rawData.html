@@ -61,21 +61,21 @@ logr.ma.list &lt;- <span class="kw">lapply</span>(raw.df.list, function(df) df$l
 for (i in <span class="dv">1</span>:<span class="kw">length</span>(logr.list)) {
     <span class="kw">points</span>(<span class="kw">jitter</span>(pos.vec, <span class="dt">amount =</span> <span class="dv">1000</span>), logr.list[[i]], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>)
 }</code></pre>
-<figure>
-<img src="figures/logrplot1.png" alt="plot of chunk logrplot" /><figcaption>plot of chunk logrplot</figcaption>
-</figure>
+<div class="figure">
+<img src="figures/logrplot1.png" alt="plot of chunk logrplot" /><p class="caption">plot of chunk logrplot</p>
+</div>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xlim =</span> <span class="kw">range</span>(pos.vec), <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>))
 for (i in <span class="dv">1</span>:<span class="kw">length</span>(logr.fa.list)) {
     <span class="kw">points</span>(<span class="kw">jitter</span>(pos.vec, <span class="dt">amount =</span> <span class="dv">1000</span>), logr.fa.list[[i]], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
 }</code></pre>
-<figure>
-<img src="figures/logrplot2.png" alt="plot of chunk logrplot" /><figcaption>plot of chunk logrplot</figcaption>
-</figure>
+<div class="figure">
+<img src="figures/logrplot2.png" alt="plot of chunk logrplot" /><p class="caption">plot of chunk logrplot</p>
+</div>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;n&quot;</span>, <span class="dt">xlim =</span> <span class="kw">range</span>(pos.vec), <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>))
 for (i in <span class="dv">1</span>:<span class="kw">length</span>(logr.ma.list)) {
     <span class="kw">points</span>(<span class="kw">jitter</span>(pos.vec, <span class="dt">amount =</span> <span class="dv">1000</span>), logr.ma.list[[i]], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)
 }</code></pre>
-<figure>
-<img src="figures/logrplot3.png" alt="plot of chunk logrplot" /><figcaption>plot of chunk logrplot</figcaption>
-</figure>
+<div class="figure">
+<img src="figures/logrplot3.png" alt="plot of chunk logrplot" /><p class="caption">plot of chunk logrplot</p>
+</div>
 <p>Now plot only offspring with an untransmitted deletion.</p>
