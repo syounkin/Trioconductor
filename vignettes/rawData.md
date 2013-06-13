@@ -1,3 +1,5 @@
+    cd ~/trioClasses/vignettes/ && pandoc -o rawData.html rawData.md && cd ~/jhsph/sgy-website/ && ./build-website.sh
+
 
 
 
@@ -56,7 +58,7 @@ head(raw.df.list[[1]], 5)
 
 
 
-Plot the logR values for everyone stratified by F,M,O.  Orange is offspring, red is father, and blue is mother.
+Plot the logR values for everyone stratified by F,M,O.  Purple is offspring, red is father, and blue is mother.
 ![plot of chunk logrplot](figures/logrplot1.png) ![plot of chunk logrplot](figures/logrplot2.png) ![plot of chunk logrplot](figures/logrplot3.png) 
 
 Not very informative so we turn to individual trios with an untransmitted deletion. First, we need to find a vector offspring IDs with an untransmitted deletion.  This is a property of the CNVMatrix within the FamilyExperiment object and can be manipulated with the non-exported method TrioAssay.  To begin we first subset the CNVMatrix on the chr16 region.

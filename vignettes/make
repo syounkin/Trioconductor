@@ -1,0 +1,7 @@
+$!/bin/bash
+cd ~/trioClasses/vignettes/
+Rscript knitme.R rawData.Rmd rawData.md
+pandoc -o rawData.html rawData.md
+cp -v rawData.html ~/jhsph/sgy-website/vignettes/
+cd ~/jhsph/sgy-website/
+./build-website.sh

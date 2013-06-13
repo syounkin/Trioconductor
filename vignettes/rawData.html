@@ -1,3 +1,4 @@
+<pre><code>cd ~/trioClasses/vignettes/ &amp;&amp; pandoc -o rawData.html rawData.md &amp;&amp; cd ~/jhsph/sgy-website/ &amp;&amp; ./build-website.sh</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;trioClasses&quot;</span>)
 <span class="kw">library</span>(<span class="st">&quot;GWASTools&quot;</span>)
 <span class="kw">library</span>(<span class="st">&quot;CleftCNVAssoc&quot;</span>)</code></pre>
@@ -23,7 +24,7 @@
 3       0 0.194 1.769 1.349 1.270 0.194 1.647 rs4536493
 4       0 0.020 0.875 0.005 0.837 0.013 0.836 rs4889545
 5       1 1.246 0.058 1.116 0.055 0.763 1.003 rs4477723</code></pre>
-<p>Plot the logR values for everyone stratified by F,M,O. Orange is offspring, red is father, and blue is mother. <img src="figures/logrplot1.png" alt="plot of chunk logrplot" /> <img src="figures/logrplot2.png" alt="plot of chunk logrplot" /> <img src="figures/logrplot3.png" alt="plot of chunk logrplot" /></p>
+<p>Plot the logR values for everyone stratified by F,M,O. Purple is offspring, red is father, and blue is mother. <img src="figures/logrplot1.png" alt="plot of chunk logrplot" /> <img src="figures/logrplot2.png" alt="plot of chunk logrplot" /> <img src="figures/logrplot3.png" alt="plot of chunk logrplot" /></p>
 <p>Not very informative so we turn to individual trios with an untransmitted deletion. First, we need to find a vector offspring IDs with an untransmitted deletion. This is a property of the CNVMatrix within the FamilyExperiment object and can be manipulated with the non-exported method TrioAssay. To begin we first subset the CNVMatrix on the chr16 region.</p>
 <pre class="sourceCode r"><code class="sourceCode r">chr16.gr &lt;- <span class="kw">GRanges</span>(<span class="dt">seqnames =</span> <span class="st">&quot;chr16&quot;</span>, <span class="dt">ranges =</span> <span class="kw">IRanges</span>(<span class="dt">start =</span> <span class="dv">32404517</span>, <span class="dt">end =</span> <span class="dv">32530051</span>))
 (fe.beaty.chr16 &lt;- fe.beaty[<span class="kw">queryHits</span>(<span class="kw">findOverlaps</span>(<span class="kw">rowData</span>(fe.beaty), chr16.gr))])</code></pre>

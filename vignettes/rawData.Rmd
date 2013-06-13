@@ -1,3 +1,5 @@
+    cd ~/trioClasses/vignettes/ && pandoc -o rawData.html rawData.md && cd ~/jhsph/sgy-website/ && ./build-website.sh
+
 ```{r setup, echo = FALSE}
 opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = TRUE, highlight = TRUE, fig.path = 'figures/', dev = 'png', background = 'red', width = 100)
 ```
@@ -48,12 +50,12 @@ logr.list <- lapply(raw.df.list, function(df) df$logr )
 logr.fa.list <- lapply(raw.df.list, function(df) df$logr.fa )
 logr.ma.list <- lapply(raw.df.list, function(df) df$logr.ma )
 ```
-Plot the logR values for everyone stratified by F,M,O.  Orange is offspring, red is father, and blue is mother.
-```{r logrplot, fig.width = 24, echo = FALSE}
+Plot the logR values for everyone stratified by F,M,O.  Purple is offspring, red is father, and blue is mother.
+```{r logrplot, fig.width = 24, echo = FALSE, cache = TRUE}
 par(bg="lightyellow")
 plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
 for( i in 1:length(logr.list) ){
-  points(jitter(pos.vec,amount = 1e3), logr.list[[i]], pch = 20, col = "orange")
+  points(jitter(pos.vec,amount = 1e3), logr.list[[i]], pch = 20, col = "purple")
   }
 plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
 for( i in 1:length(logr.fa.list) ){
@@ -88,15 +90,15 @@ length(offspring.chr16)
 head(offspring.chr16)
 ```
 Now we have what we need to dig deeper into the cause of the under-transmission.
-```{r logrplot2, fig.width = 24, echo = FALSE}
+```{r logrplot2, fig.width = 24, echo = FALSE, cache = TRUE}
 par(bg="lightyellow")
 for( i in which(names(logr.list) %in% offspring.chr16) ){
   plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,6) )
-  points(pos.vec, logr.list[[i]], pch = 20, col = "orange")
+  points(pos.vec, logr.list[[i]], pch = 20, col = "purple")
   points(pos.vec, 4+logr.fa.list[[i]], pch = 20, col = "red")
   points(pos.vec, 4+logr.ma.list[[i]], pch = 20, col = "blue")
   foo <- reduce(rowData(fe.beaty.chr16)[untrans.mat[names(logr.list)[i],]])
-  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2))
+  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2), lwd = 2, col = "red")
   }
 ```
 Now for the transmitted deletions in the chr16 region.
@@ -108,14 +110,14 @@ offspring.chr16 <- rownames(trans.mat)[which(rowSums(trans.mat)>0)]
 length(offspring.chr16)
 head(offspring.chr16)
 ```
-```{r logrplot3, fig.width = 24, echo = FALSE}
+```{r logrplot3, fig.width = 24, echo = FALSE, cache = TRUE}
 par(bg="lightyellow")
 for( i in which(names(logr.list) %in% offspring.chr16) ){
   plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,6) )
-  points(pos.vec, logr.list[[i]], pch = 20, col = "orange")
+  points(pos.vec, logr.list[[i]], pch = 20, col = "purple")
   points(pos.vec, 4+logr.fa.list[[i]], pch = 20, col = "red")
   points(pos.vec, 4+logr.ma.list[[i]], pch = 20, col = "blue")
   foo <- reduce(rowData(fe.beaty.chr16)[trans.mat[names(logr.list)[i],]])
-  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2))
+  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2), lwd = 2, col = "purple")
   }
 ```
