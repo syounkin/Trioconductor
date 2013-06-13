@@ -1,10 +1,12 @@
-```{r setup}
-opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = TRUE, highlight = TRUE, fig.path = 'figures/', dev = 'png', background = 'red')
+```{r setup, echo = FALSE}
+opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = TRUE, highlight = TRUE, fig.path = 'figures/', dev = 'png', background = 'red', width = 100)
+```
+```{r libs}
 library("trioClasses")
 library("GWASTools")
 library("CleftCNVAssoc")
 ```
-```{r data, cache = TRUE}
+```{r data, cache = TRUE, echo = FALSE}
 data("beaty.scanAnnot")
 data("beaty.snpAnnot")
 data("fe")
@@ -17,33 +19,37 @@ names(scan.names) <- scan.ids
 names(scan.ids) <- as.character(scan.names)
 ```
 
-```{r ids}
+```{r ids, echo = FALSE}
 fa.id <- as.character(completeTrios(fe.beaty)$fid)
 ma.id <- as.character(completeTrios(fe.beaty)$mid)
 names(fa.id) <- as.character(completeTrios(fe.beaty)$id)
 names(ma.id) <- as.character(completeTrios(fe.beaty)$id)
 ```
-```{r foo}
+First we create a vector of offspring IDs that we want plotted.
+```{r foo, echo = TRUE}
 offspring.vec <- as.character(completeTrios(fe.beaty)$id)
 ```
+Now we incorporate it into a GRange object with the ranges in this case being the chr16 region for each of the offspring.
 ```{r grange}
 gr <- GRanges( seqnames = rep('chr16',length(offspring.vec)), ranges = IRanges( start = 32404517, end = 32530051), id = offspring.vec )
 ```
+Now we apply a function from CleftCNVAssoc to retrieve data from GWASTools objects.  These data exist only on an encrypted hard drive and enigma.
 ```{r raw, cache = TRUE}
-raw.df.list <- getRaw( gr, intensfile = intensfile, snpAnnot = beaty_snpAnnot, scan.id = scan.ids, fa.id = fa.id, ma.id = ma.id, genofile = genofile, xyfile = xyfile )
+raw.df.list <- getRaw( gr+1e6, intensfile = intensfile, snpAnnot = beaty_snpAnnot, scan.id = scan.ids, fa.id = fa.id, ma.id = ma.id, genofile = genofile, xyfile = xyfile )
 ```
+Here are the data for the first offspring's first 5 markers.
 ```{r head}
-head(raw.df.list[[1]])
-head(raw.df.list[[2]])
+head(raw.df.list[[1]],5)
 ```
 
-```{r pos}
+```{r pos, echo = FALSE}
 pos.vec <- raw.df.list[[1]]$pos
 logr.list <- lapply(raw.df.list, function(df) df$logr )
 logr.fa.list <- lapply(raw.df.list, function(df) df$logr.fa )
 logr.ma.list <- lapply(raw.df.list, function(df) df$logr.ma )
 ```
-```{r logrplot, fig.width = 24}
+Plot the logR values for everyone stratified by F,M,O.  Orange is offspring, red is father, and blue is mother.
+```{r logrplot, fig.width = 24, echo = FALSE}
 par(bg="lightyellow")
 plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
 for( i in 1:length(logr.list) ){
@@ -58,4 +64,58 @@ for( i in 1:length(logr.ma.list) ){
   points(jitter(pos.vec,amount = 1e3), logr.ma.list[[i]], pch = 20, col = "blue")
   }
 ```
-Now plot only offspring with an untransmitted deletion.
+Not very informative so we turn to individual trios with an untransmitted deletion. First, we need to find a vector offspring IDs with an untransmitted deletion.  This is a property of the CNVMatrix within the FamilyExperiment object and can be manipulated with the non-exported method TrioAssay.  To begin we first subset the CNVMatrix on the chr16 region.
+```{r subset}
+chr16.gr <- GRanges( seqnames = 'chr16', ranges = IRanges( start = 32404517, end = 32530051))
+(fe.beaty.chr16 <- fe.beaty[queryHits(findOverlaps(rowData(fe.beaty),chr16.gr))])
+```
+Now with the smaller FE object we can easily construct the trio-states.
+```{r trios}
+trioAssay.chr16 <- trioClasses:::TrioAssay(fe.beaty.chr16, type = "cnv")
+trioStates.chr16 <- with(trioAssay.chr16, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+dimnames(trioStates.chr16) <- dimnames(trioAssay.chr16$O)
+head(trioStates.chr16[,1:5],10)
+```
+Now we identify trio-cnv pairs with an untransmitted deletion, i.e., trio-states 100, 010, or 110.  (This is not a complete list of trio-states with a non-transmission.)
+```{r untrans}
+untrans.mat <- matrix(trioStates.chr16 %in% c("100","010","110"),nrow=nrow(trioStates.chr16),ncol=ncol(trioStates.chr16),byrow=FALSE,dimnames=dimnames(trioStates.chr16))
+head(untrans.mat[,1:10],10)
+```
+And finally we find the IDs of those with more than zero untransmitted deletions.
+```{r offspring}
+offspring.chr16 <- rownames(untrans.mat)[which(rowSums(untrans.mat)>0)]
+length(offspring.chr16)
+head(offspring.chr16)
+```
+Now we have what we need to dig deeper into the cause of the under-transmission.
+```{r logrplot2, fig.width = 24, echo = FALSE}
+par(bg="lightyellow")
+for( i in which(names(logr.list) %in% offspring.chr16) ){
+  plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,6) )
+  points(pos.vec, logr.list[[i]], pch = 20, col = "orange")
+  points(pos.vec, 4+logr.fa.list[[i]], pch = 20, col = "red")
+  points(pos.vec, 4+logr.ma.list[[i]], pch = 20, col = "blue")
+  foo <- reduce(rowData(fe.beaty.chr16)[untrans.mat[names(logr.list)[i],]])
+  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2))
+  }
+```
+Now for the transmitted deletions in the chr16 region.
+```{r trans}
+trans.mat <- matrix(trioStates.chr16 %in% c("101","011","112"),nrow=nrow(trioStates.chr16),ncol=ncol(trioStates.chr16),byrow=FALSE,dimnames=dimnames(trioStates.chr16))
+```
+```{r offspring2}
+offspring.chr16 <- rownames(trans.mat)[which(rowSums(trans.mat)>0)]
+length(offspring.chr16)
+head(offspring.chr16)
+```
+```{r logrplot3, fig.width = 24, echo = FALSE}
+par(bg="lightyellow")
+for( i in which(names(logr.list) %in% offspring.chr16) ){
+  plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,6) )
+  points(pos.vec, logr.list[[i]], pch = 20, col = "orange")
+  points(pos.vec, 4+logr.fa.list[[i]], pch = 20, col = "red")
+  points(pos.vec, 4+logr.ma.list[[i]], pch = 20, col = "blue")
+  foo <- reduce(rowData(fe.beaty.chr16)[trans.mat[names(logr.list)[i],]])
+  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2))
+  }
+```
