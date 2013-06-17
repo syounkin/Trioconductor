@@ -1,5 +1,3 @@
-    cd ~/trioClasses/vignettes/ && pandoc -o rawData.html rawData.md && cd ~/jhsph/sgy-website/ && ./build-website.sh
-
 
 
 

@@ -151,3 +151,6 @@ DF.clean <- DF[queryHits(findOverlaps(DF$grange, regions.gr.clean)), ]
 
 ![plot of chunk transvp3](figures/transvp3.png) 
 
+
+![plot of chunk density](figures/density1.png) ![plot of chunk density](figures/density2.png) ![plot of chunk density](figures/density3.png) ![plot of chunk density](figures/density4.png) 
+

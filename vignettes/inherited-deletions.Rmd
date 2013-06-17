@@ -23,7 +23,7 @@ opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = 
     freq.beaty.vec <- colSums(cnv(fe.beaty.parents))/nrow(cnv(fe.beaty.parents))
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 ``` 
-```{r trioStates, eval = TRUE, echo = FALSE}
+```{r trioStates, eval = TRUE, echo = FALSE, cache = TRUE}
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -31,7 +31,7 @@ opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = 
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 ``` 
-```{r table-list, eval = TRUE, echo = FALSE}
+```{r table-list, eval = TRUE, echo = FALSE, cache = TRUE}
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 ``` 
@@ -67,7 +67,7 @@ plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5),
 lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 ``` 
 
-```{r pmin, eval = TRUE, echo = FALSE}
+```{r pmin, eval = TRUE, echo = FALSE, cache = TRUE}
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
@@ -110,7 +110,7 @@ with(as(values(regions.gr),"data.frame"),plot(width(regions.gr), n.cmp, pch = 20
 ``` 
 
 
-```{r cumsum, fig = TRUE, width = 8, eval = TRUE, echo = FALSE}
+```{r cumsum, fig = TRUE, width = 8, eval = TRUE, echo = FALSE, cache = TRUE}
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
 names(chrlength) <- c(names(chrlength[-1]),"foo")
@@ -142,7 +142,7 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 ``` 
 
 
-```{r cumsum2, fig = TRUE, width = 8, eval = TRUE, echo = FALSE}
+```{r cumsum2, fig = TRUE, width = 8, eval = TRUE, echo = FALSE, cache = TRUE}
 #TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 #chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
 #names(chrlength) <- c(names(chrlength[-1]),"foo")
@@ -174,3 +174,19 @@ with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, -log10(p.min), pch = 
 with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, trans.median, pch = 20))
 with(as(values(regions.gr.clean),"data.frame"),plot(width(regions.gr.clean), n.cmp, pch = 20))
 ``` 
+
+```{r density, echo = FALSE}
+pos.vec <- getPosition(beaty_snpAnnot)
+chr.vec <- getChromosome(beaty_snpAnnot)
+diff.vec <- diff(pos.vec)
+pos.vec <- rev(rev(pos.vec)[-1])
+chr.vec <- rev(rev(chr.vec)[-1])
+indx <- chr.vec==16 & pos.vec >= (32404517-1e6) & pos.vec <= (32530051+1e6)
+plot(spline(pos.vec[indx],1/diff.vec[indx], n = ceiling(diff(range(pos.vec[indx]))/75e3)), type = "l", ylim = c(0,0.05))
+indx <- chr.vec==15 & pos.vec >= (19768826-1e6) & pos.vec <= (19982036+1e6)
+plot(spline(pos.vec[indx],1/diff.vec[indx], n = ceiling(diff(range(pos.vec[indx]))/75e3)), type = "l", ylim = c(0,0.05))
+indx <- chr.vec==7 & pos.vec >= (141419097-1e6) & pos.vec <= (141441259+1e6)
+plot(spline(pos.vec[indx],1/diff.vec[indx], n = ceiling(diff(range(pos.vec[indx]))/75e3)), type = "l", ylim = c(0,0.05))
+indx <- chr.vec==8 & pos.vec >= (39356825-1e6) & pos.vec <= (39497557+1e6)
+plot(spline(pos.vec[indx],1/diff.vec[indx], n = ceiling(diff(range(pos.vec[indx]))/75e3)), type = "l", ylim = c(0,0.05))
+```
