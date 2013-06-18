@@ -1,0 +1,102 @@
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;trioClasses&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;GWASTools&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;CleftCNVAssoc&quot;</span>)</code></pre>
+<p>First we create a vector of offspring IDs that we want plotted.</p>
+<pre class="sourceCode r"><code class="sourceCode r">offspring.vec &lt;- <span class="kw">as.character</span>(<span class="kw">completeTrios</span>(fe.beaty)$id)</code></pre>
+<p>Now we incorporate it into a GRange object with the ranges in this case being the chr15 region for each of the offspring.</p>
+<pre class="sourceCode r"><code class="sourceCode r">gr &lt;- <span class="kw">GRanges</span>(<span class="dt">seqnames =</span> <span class="kw">rep</span>(<span class="st">&quot;chr15&quot;</span>, <span class="kw">length</span>(offspring.vec)), <span class="dt">ranges =</span> <span class="kw">IRanges</span>(<span class="dt">start =</span> <span class="dv">19768826</span>, 
+    <span class="dt">end =</span> <span class="dv">19982036</span>), <span class="dt">id =</span> offspring.vec)</code></pre>
+<p>Now we apply a function from CleftCNVAssoc to retrieve data from GWASTools objects. These data exist only on an encrypted hard drive and enigma.</p>
+<pre class="sourceCode r"><code class="sourceCode r">raw.df.list &lt;- <span class="kw">getRaw</span>(gr + <span class="fl">1e+06</span>, <span class="dt">intensfile =</span> intensfile, <span class="dt">snpAnnot =</span> beaty_snpAnnot, 
+    <span class="dt">scan.id =</span> scan.ids, <span class="dt">fa.id =</span> fa.id, <span class="dt">ma.id =</span> ma.id, <span class="dt">genofile =</span> genofile, <span class="dt">xyfile =</span> xyfile)</code></pre>
+<p>Here are the data for the first offspring's first 5 markers.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(raw.df.list[[<span class="dv">1</span>]], <span class="dv">5</span>)</code></pre>
+<pre><code>     logr    baf      pos logr.fa logr.ma baf.fa baf.ma geno geno.fa
+1 -0.2163 0.0000 18788683 -0.0209  0.2160 0.0000 0.0616   NA      NA
+2 -0.1305 0.4200 18822301  0.1224  0.1599 0.4511 0.4183   NA      NA
+3 -0.2070 0.9655 18832819  0.2894  0.1535 0.5595 0.5668   NA      NA
+4 -0.3455 0.0045 18850028 -0.0927 -0.0213 0.0107 0.0177   NA      NA
+5 -0.0958 0.9988 18851201  0.0892 -0.0873 0.9916 1.0000    0       0
+  geno.ma     x     y  x.fa  y.fa  x.ma  y.ma    snpname
+1      NA 1.063 0.003 1.218 0.003 1.290 0.149  rs4114751
+2      NA 0.611 1.198 0.636 1.520 0.752 1.461  rs4414456
+3      NA 0.048 0.578 0.194 0.689 0.175 0.628  rs1813365
+4      NA 1.300 0.061 1.537 0.085 1.600 0.104  rs8041088
+5       0 0.046 1.128 0.064 1.271 0.042 1.140 rs28690063</code></pre>
+<p>Plot the logR values for everyone stratified by F,M,O. Purple is offspring, red is father, and blue is mother.</p>
+<p>Not very informative so we turn to individual trios with an untransmitted deletion. First, we need to find a vector offspring IDs with an untransmitted deletion. This is a property of the CNVMatrix within the FamilyExperiment object and can be manipulated with the non-exported method TrioAssay. To begin we first subset the CNVMatrix on the chr15 region.</p>
+<pre class="sourceCode r"><code class="sourceCode r">chr15.gr &lt;- <span class="kw">GRanges</span>(<span class="dt">seqnames =</span> <span class="st">&quot;chr15&quot;</span>, <span class="dt">ranges =</span> <span class="kw">IRanges</span>(<span class="dt">start =</span> <span class="dv">19768826</span>, <span class="dt">end =</span> <span class="dv">19982036</span>))
+
+(fe.beaty.chr15 &lt;- fe.beaty[<span class="kw">queryHits</span>(<span class="kw">findOverlaps</span>(<span class="kw">rowData</span>(fe.beaty), chr15.gr))])</code></pre>
+<pre><code>class: FamilyExperiment 
+dim: 21 1339 
+exptData(0):
+assays(1): cnv
+rownames(21): comp5379 comp5380 ... comp5398 comp5399
+rowData metadata column names(0):
+colnames(1339): 11005_01@1008472480 11005_02@1008472482 ...
+  18117_02@0070298660 18117_03@0070298657
+colData names(1): id
+pedigree(2082): famid id fid mid sex dx
+complete trios(445):</code></pre>
+<p>Now with the smaller FE object we can easily construct the trio-states.</p>
+<pre class="sourceCode r"><code class="sourceCode r">trioAssay.chr15 &lt;- trioClasses:::<span class="kw">TrioAssay</span>(fe.beaty.chr15, <span class="dt">type =</span> <span class="st">&quot;cnv&quot;</span>)
+trioStates.chr15 &lt;- <span class="kw">with</span>(trioAssay.chr15, <span class="kw">matrix</span>(<span class="kw">paste0</span>(F, M, O), <span class="dt">nrow =</span> <span class="kw">nrow</span>(O), 
+    <span class="dt">ncol =</span> <span class="kw">ncol</span>(O)))
+<span class="kw">dimnames</span>(trioStates.chr15) &lt;- <span class="kw">dimnames</span>(trioAssay.chr15$O)
+<span class="kw">head</span>(trioStates.chr15[, <span class="dv">1</span>:<span class="dv">5</span>], <span class="dv">10</span>)</code></pre>
+<pre><code>                    comp5379 comp5380 comp5381 comp5382 comp5383
+11005_01@1008472480 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+11021_01@1008472417 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+11035_01@1008471376 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12002_01@1008489061 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12004_01@1008489060 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12005_01@1008490117 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12008_01@1008490140 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12014_01@1008490162 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12015_01@1008490100 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
+12017_01@1008489083 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   </code></pre>
+<p>Now we identify trio-cnv pairs with an untransmitted deletion, i.e., trio-states 100, 010, or 110. (This is not a complete list of trio-states with a non-transmission.)</p>
+<pre class="sourceCode r"><code class="sourceCode r">untrans.mat &lt;- <span class="kw">matrix</span>(trioStates.chr15 %in% <span class="kw">c</span>(<span class="st">&quot;100&quot;</span>, <span class="st">&quot;010&quot;</span>, <span class="st">&quot;110&quot;</span>), <span class="dt">nrow =</span> <span class="kw">nrow</span>(trioStates.chr15), 
+    <span class="dt">ncol =</span> <span class="kw">ncol</span>(trioStates.chr15), <span class="dt">byrow =</span> <span class="ot">FALSE</span>, <span class="dt">dimnames =</span> <span class="kw">dimnames</span>(trioStates.chr15))
+<span class="kw">head</span>(untrans.mat[, <span class="dv">1</span>:<span class="dv">10</span>], <span class="dv">10</span>)</code></pre>
+<pre><code>                    comp5379 comp5380 comp5381 comp5382 comp5383 comp5384
+11005_01@1008472480    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+11021_01@1008472417    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+11035_01@1008471376    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12002_01@1008489061    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12004_01@1008489060    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12005_01@1008490117    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12008_01@1008490140    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12014_01@1008490162    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12015_01@1008490100    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+12017_01@1008489083    FALSE    FALSE    FALSE    FALSE    FALSE    FALSE
+                    comp5385 comp5386 comp5387 comp5388
+11005_01@1008472480    FALSE    FALSE    FALSE    FALSE
+11021_01@1008472417    FALSE    FALSE    FALSE    FALSE
+11035_01@1008471376    FALSE    FALSE    FALSE    FALSE
+12002_01@1008489061    FALSE    FALSE    FALSE    FALSE
+12004_01@1008489060    FALSE    FALSE    FALSE    FALSE
+12005_01@1008490117    FALSE    FALSE    FALSE    FALSE
+12008_01@1008490140    FALSE    FALSE    FALSE    FALSE
+12014_01@1008490162    FALSE    FALSE    FALSE    FALSE
+12015_01@1008490100    FALSE    FALSE    FALSE    FALSE
+12017_01@1008489083    FALSE    FALSE    FALSE    FALSE</code></pre>
+<p>And finally we find the IDs of those with more than zero untransmitted deletions.</p>
+<pre class="sourceCode r"><code class="sourceCode r">offspring.chr15 &lt;- <span class="kw">rownames</span>(untrans.mat)[<span class="kw">which</span>(<span class="kw">rowSums</span>(untrans.mat) &gt; <span class="dv">0</span>)]
+<span class="kw">length</span>(offspring.chr15)</code></pre>
+<pre><code>[1] 31</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(offspring.chr15)</code></pre>
+<pre><code>[1] &quot;12054_01@1008494951&quot; &quot;12081_01@0067868174&quot; &quot;12093_01@0067866270&quot;
+[4] &quot;12102_01@0067866338&quot; &quot;12158_01@0067866940&quot; &quot;12173_01@0067866951&quot;</code></pre>
+<p><img src="figures/logrplot2-chr151.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr152.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr153.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr154.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr155.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr156.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr157.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr158.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr159.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1510.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1511.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1512.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1513.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1514.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1515.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1516.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1517.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1518.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1519.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1520.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1521.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1522.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1523.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1524.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1525.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1526.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1527.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1528.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1529.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1530.png" alt="plot of chunk logrplot2-chr15" /> <img src="figures/logrplot2-chr1531.png" alt="plot of chunk logrplot2-chr15" /></p>
+<p>Now for the transmitted deletions in the chr15 region.</p>
+<pre class="sourceCode r"><code class="sourceCode r">trans.mat &lt;- <span class="kw">matrix</span>(trioStates.chr15 %in% <span class="kw">c</span>(<span class="st">&quot;101&quot;</span>, <span class="st">&quot;011&quot;</span>, <span class="st">&quot;112&quot;</span>), <span class="dt">nrow =</span> <span class="kw">nrow</span>(trioStates.chr15), 
+    <span class="dt">ncol =</span> <span class="kw">ncol</span>(trioStates.chr15), <span class="dt">byrow =</span> <span class="ot">FALSE</span>, <span class="dt">dimnames =</span> <span class="kw">dimnames</span>(trioStates.chr15))</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">offspring.chr15 &lt;- <span class="kw">rownames</span>(trans.mat)[<span class="kw">which</span>(<span class="kw">rowSums</span>(trans.mat) &gt; <span class="dv">0</span>)]
+<span class="kw">length</span>(offspring.chr15)</code></pre>
+<pre><code>[1] 31</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(offspring.chr15)</code></pre>
+<pre><code>[1] &quot;12059_01@1008494932&quot; &quot;12066_01@0067868260&quot; &quot;12112_01@0067866334&quot;
+[4] &quot;12137_01@0067867189&quot; &quot;12151_01@0067866460&quot; &quot;12157_01@0067866969&quot;</code></pre>
+<p><img src="figures/logrplot3-chr151.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr152.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr153.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr154.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr155.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr156.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr157.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr158.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr159.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1510.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1511.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1512.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1513.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1514.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1515.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1516.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1517.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1518.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1519.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1520.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1521.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1522.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1523.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1524.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1525.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1526.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1527.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1528.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1529.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1530.png" alt="plot of chunk logrplot3-chr15" /> <img src="figures/logrplot3-chr1531.png" alt="plot of chunk logrplot3-chr15" /></p>

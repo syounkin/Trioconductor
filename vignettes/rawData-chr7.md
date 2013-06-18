@@ -57,7 +57,7 @@ head(raw.df.list[[1]], 5)
 
 
 Plot the logR values for everyone stratified by F,M,O.  Purple is offspring, red is father, and blue is mother.
-![plot of chunk logrplot-chr7](figures/logrplot-chr71.png) ![plot of chunk logrplot-chr7](figures/logrplot-chr72.png) ![plot of chunk logrplot-chr7](figures/logrplot-chr73.png) 
+
 
 Not very informative so we turn to individual trios with an untransmitted deletion. First, we need to find a vector offspring IDs with an untransmitted deletion.  This is a property of the CNVMatrix within the FamilyExperiment object and can be manipulated with the non-exported method TrioAssay.  To begin we first subset the CNVMatrix on the chr7 region.
 
@@ -88,21 +88,7 @@ trioAssay.chr7 <- trioClasses:::TrioAssay(fe.beaty.chr7, type = "cnv")
 trioStates.chr7 <- with(trioAssay.chr7, matrix(paste0(F, M, O), nrow = nrow(O), 
     ncol = ncol(O)))
 dimnames(trioStates.chr7) <- dimnames(trioAssay.chr7$O)
-head(trioStates.chr7[, 1:5], 10)
-```
-
-```
-                    comp3086 comp3087 comp3088 comp3089 comp3090
-11005_01@1008472480 "000"    "000"    "000"    "000"    "000"   
-11021_01@1008472417 "200"    "200"    "200"    "200"    "200"   
-11035_01@1008471376 "000"    "000"    "000"    "000"    "000"   
-12002_01@1008489061 "000"    "000"    "000"    "000"    "000"   
-12004_01@1008489060 "000"    "010"    "010"    "010"    "010"   
-12005_01@1008490117 "000"    "000"    "000"    "000"    "000"   
-12008_01@1008490140 "000"    "000"    "000"    "000"    "000"   
-12014_01@1008490162 "021"    "021"    "021"    "021"    "021"   
-12015_01@1008490100 "000"    "000"    "000"    "000"    "000"   
-12017_01@1008489083 "000"    "000"    "000"    "000"    "000"   
+# head(trioStates.chr7[,1:5],10)
 ```
 
 Now we identify trio-cnv pairs with an untransmitted deletion, i.e., trio-states 100, 010, or 110.  (This is not a complete list of trio-states with a non-transmission.)

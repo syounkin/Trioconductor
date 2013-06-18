@@ -1,5 +1,5 @@
 ```{r setup, echo = FALSE}
-opts_chunk$set(fig.width=7, fig.height=5, comment = "", warning = FALSE, tidy = TRUE, highlight = TRUE, fig.path = 'figures/', dev = 'png', background = 'red', width = 100)
+opts_chunk$set(fig.width=7, fig.height=10, comment = "", warning = FALSE, tidy = TRUE, highlight = TRUE, fig.path = 'figures/', dev = 'png', background = 'red', width = 100)
 ```
 ```{r libs}
 library("trioClasses")
@@ -47,9 +47,12 @@ pos.vec <- raw.df.list[[1]]$pos
 logr.list <- lapply(raw.df.list, function(df) df$logr )
 logr.fa.list <- lapply(raw.df.list, function(df) df$logr.fa )
 logr.ma.list <- lapply(raw.df.list, function(df) df$logr.ma )
+baf.list <- lapply(raw.df.list, function(df) df$baf )
+baf.fa.list <- lapply(raw.df.list, function(df) df$baf.fa )
+baf.ma.list <- lapply(raw.df.list, function(df) df$baf.ma )
 ```
 Plot the logR values for everyone stratified by F,M,O.  Purple is offspring, red is father, and blue is mother.
-```{r logrplot, fig.width = 24, echo = FALSE, cache = FALSE}
+```{r logrplot, fig.width = 24, echo = FALSE, cache = FALSE, eval = FALSE}
 par(bg="lightyellow")
 plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,2) )
 for( i in 1:length(logr.list) ){
@@ -87,16 +90,28 @@ offspring.chr16 <- rownames(untrans.mat)[which(rowSums(untrans.mat)>0)]
 length(offspring.chr16)
 head(offspring.chr16)
 ```
-Now we have what we need to dig deeper into the cause of the under-transmission.
-```{r logrplot2, fig.width = 24, echo = FALSE, cache = FALSE}
+Finally, the raw intensity and baf plots per trio.
+```{r logrplot2, fig.width = 24, fig.height = 10, echo = FALSE, cache = FALSE}
 par(bg="lightyellow")
 for( i in which(names(logr.list) %in% offspring.chr16) ){
-  plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,6) )
+  plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-1,11), axes = FALSE, main = paste0(names(logr.list)[i]), xlab = "MB", ylab = "")
+
+  axis(1, at = at <- seq(min(pos.vec),max(pos.vec),length.out=5), labels = round(at/1e6,2) )
+
+  lines( range(pos.vec), rep(0,2), lty = 2 )
+  lines( range(pos.vec), rep(3,2), lty = 2 )
+  lines( range(pos.vec), rep(6.5,2), lty = 2 )
+  lines( range(pos.vec), rep(9.5,2), lty = 2 )
+
   points(pos.vec, logr.list[[i]], pch = 20, col = "purple")
-  points(pos.vec, 4+logr.fa.list[[i]], pch = 20, col = "red")
-  points(pos.vec, 4+logr.ma.list[[i]], pch = 20, col = "blue")
+  points(pos.vec, 3+logr.fa.list[[i]], pch = 20, col = "red")
+  points(pos.vec, 3+logr.ma.list[[i]], pch = 20, col = "blue")
+  points(pos.vec, 6 + baf.list[[i]], pch = 20, col = "purple")
+  points(pos.vec, 9 + baf.fa.list[[i]], pch = 20, col = "red")
+  points(pos.vec, 9 + baf.ma.list[[i]], pch = 20, col = "blue")
+
   foo <- reduce(rowData(fe.beaty.chr16)[untrans.mat[names(logr.list)[i],]])
-  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2), lwd = 2, col = "red")
+  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(1.5,2), lwd = 5, col = "red")
   }
 ```
 Now for the transmitted deletions in the chr16 region.
@@ -108,15 +123,27 @@ offspring.chr16 <- rownames(trans.mat)[which(rowSums(trans.mat)>0)]
 length(offspring.chr16)
 head(offspring.chr16)
 ```
-```{r logrplot3, fig.width = 24, echo = FALSE, cache = FALSE}
+```{r logrplot3, fig.width = 24, fig.height = 10, echo = FALSE, cache = FALSE}
 par(bg="lightyellow")
 for( i in which(names(logr.list) %in% offspring.chr16) ){
-  plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-2,6) )
+  plot(1, type = 'n', xlim = range(pos.vec), ylim = c(-1,11), axes = FALSE, main = paste0(names(logr.list)[i]), xlab = "MB", ylab = "")
+
+  axis(1, at = at <- seq(min(pos.vec),max(pos.vec),length.out=5), labels = round(at/1e6,2) )
+
+  lines( range(pos.vec), rep(0,2), lty = 2 )
+  lines( range(pos.vec), rep(3,2), lty = 2 )
+  lines( range(pos.vec), rep(6.5,2), lty = 2 )
+  lines( range(pos.vec), rep(9.5,2), lty = 2 )
+
   points(pos.vec, logr.list[[i]], pch = 20, col = "purple")
-  points(pos.vec, 4+logr.fa.list[[i]], pch = 20, col = "red")
-  points(pos.vec, 4+logr.ma.list[[i]], pch = 20, col = "blue")
+  points(pos.vec, 3+logr.fa.list[[i]], pch = 20, col = "red")
+  points(pos.vec, 3+logr.ma.list[[i]], pch = 20, col = "blue")
+  points(pos.vec, 6 + baf.list[[i]], pch = 20, col = "purple")
+  points(pos.vec, 9 + baf.fa.list[[i]], pch = 20, col = "red")
+  points(pos.vec, 9 + baf.ma.list[[i]], pch = 20, col = "blue")
+
   foo <- reduce(rowData(fe.beaty.chr16)[trans.mat[names(logr.list)[i],]])
-  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(2,2), lwd = 2, col = "purple")
+  for( j in 1:length(foo) ) lines(c(start(foo[j]),end(foo[j])),rep(1.5,2), lwd = 5, col = "purple")
   }
 ```
 So we see an increase in density in the region that likely has an increase in false positive rate.  Is it the case that false positive rate and marker density are correlated?  Maybe in an effort to better identify known CNPs the manufacturers increased marker density which increased both false positive and negative rates.  And now, with trio data, we can identify the regions by under-transmission of deletions.

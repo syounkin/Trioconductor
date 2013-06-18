@@ -23,7 +23,7 @@
 3       0 0.012 0.907 0.585 0.641 0.000 0.932    rs557962
 4       1 0.982 0.869 1.600 0.012 1.041 0.896   rs4726259
 5      NA 0.018 0.611 0.008 0.561 0.010 0.573 cnvi0014398</code></pre>
-<p>Plot the logR values for everyone stratified by F,M,O. Purple is offspring, red is father, and blue is mother. <img src="figures/logrplot-chr71.png" alt="plot of chunk logrplot-chr7" /> <img src="figures/logrplot-chr72.png" alt="plot of chunk logrplot-chr7" /> <img src="figures/logrplot-chr73.png" alt="plot of chunk logrplot-chr7" /></p>
+<p>Plot the logR values for everyone stratified by F,M,O. Purple is offspring, red is father, and blue is mother.</p>
 <p>Not very informative so we turn to individual trios with an untransmitted deletion. First, we need to find a vector offspring IDs with an untransmitted deletion. This is a property of the CNVMatrix within the FamilyExperiment object and can be manipulated with the non-exported method TrioAssay. To begin we first subset the CNVMatrix on the chr7 region.</p>
 <pre class="sourceCode r"><code class="sourceCode r">chr7.gr &lt;- <span class="kw">GRanges</span>(<span class="dt">seqnames =</span> <span class="st">&quot;chr7&quot;</span>, <span class="dt">ranges =</span> <span class="kw">IRanges</span>(<span class="dt">start =</span> <span class="dv">141419097</span>, <span class="dt">end =</span> <span class="dv">141441259</span>))
 
@@ -44,18 +44,7 @@ complete trios(445):</code></pre>
 trioStates.chr7 &lt;- <span class="kw">with</span>(trioAssay.chr7, <span class="kw">matrix</span>(<span class="kw">paste0</span>(F, M, O), <span class="dt">nrow =</span> <span class="kw">nrow</span>(O), 
     <span class="dt">ncol =</span> <span class="kw">ncol</span>(O)))
 <span class="kw">dimnames</span>(trioStates.chr7) &lt;- <span class="kw">dimnames</span>(trioAssay.chr7$O)
-<span class="kw">head</span>(trioStates.chr7[, <span class="dv">1</span>:<span class="dv">5</span>], <span class="dv">10</span>)</code></pre>
-<pre><code>                    comp3086 comp3087 comp3088 comp3089 comp3090
-11005_01@1008472480 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
-11021_01@1008472417 &quot;200&quot;    &quot;200&quot;    &quot;200&quot;    &quot;200&quot;    &quot;200&quot;   
-11035_01@1008471376 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
-12002_01@1008489061 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
-12004_01@1008489060 &quot;000&quot;    &quot;010&quot;    &quot;010&quot;    &quot;010&quot;    &quot;010&quot;   
-12005_01@1008490117 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
-12008_01@1008490140 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
-12014_01@1008490162 &quot;021&quot;    &quot;021&quot;    &quot;021&quot;    &quot;021&quot;    &quot;021&quot;   
-12015_01@1008490100 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   
-12017_01@1008489083 &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;    &quot;000&quot;   </code></pre>
+<span class="co"># head(trioStates.chr7[,1:5],10)</span></code></pre>
 <p>Now we identify trio-cnv pairs with an untransmitted deletion, i.e., trio-states 100, 010, or 110. (This is not a complete list of trio-states with a non-transmission.)</p>
 <pre class="sourceCode r"><code class="sourceCode r">untrans.mat &lt;- <span class="kw">matrix</span>(trioStates.chr7 %in% <span class="kw">c</span>(<span class="st">&quot;100&quot;</span>, <span class="st">&quot;010&quot;</span>, <span class="st">&quot;110&quot;</span>), <span class="dt">nrow =</span> <span class="kw">nrow</span>(trioStates.chr7), 
     <span class="dt">ncol =</span> <span class="kw">ncol</span>(trioStates.chr7), <span class="dt">byrow =</span> <span class="ot">FALSE</span>, <span class="dt">dimnames =</span> <span class="kw">dimnames</span>(trioStates.chr7))
