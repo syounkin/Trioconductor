@@ -1,0 +1,178 @@
+:toc:
+:numbered:
+:data-uri:
+
+<<junk,echo=FALSE>>=    Somehow, this avoids the "figure margins too large" error ~kbroman
+par(mar=rep(0,4))
+@
+== Association ==
+<<options, echo=FALSE, eval = TRUE, echo = FALSE>>=
+#setCacheDir("Rcache")
+options(width=132, digits=3, scipen=4, continue =" ")
+library(trioClasses)
+#library("Gviz")
+  library("TxDb.Hsapiens.UCSC.hg18.knownGene")
+##  data("fe-25", package = "trioClasses")
+  data("fe", package = "trioClasses")
+  data("pedigrees", package="CleftCNVAssoc")
+  data("penncnvjoint", package = "CleftCNVAssoc")
+  data("cnv", package = "trioClasses")
+##data("cnv-25", package = "trioClasses")
+@ 
+
+<<FamilyExperiment, echo = FALSE, eval = TRUE>>=
+  fe.beaty.parents <- fe.beaty[,colnames(fe.beaty)%in%parents(fe.beaty)]
+  fe.pitt.parents <- fe.pitt[,colnames(fe.pitt)%in%parents(fe.pitt)]
+@ 
+<<freq-vec, echo = FALSE, eval = TRUE>>=
+    freq.beaty.vec <- colSums(cnv(fe.beaty.parents))/nrow(cnv(fe.beaty.parents))
+    freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
+@ 
+// The above must have been written before the MAF method was implemented.
+<<trioStates, eval = TRUE, echo = FALSE>>=
+    trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
+    trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+    dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+    trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt, type = "cnv")
+    trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+    dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+@ 
+<<table-list, eval = TRUE, echo = FALSE>>=
+    table.list.beaty <- apply(trioStates.beaty, 2, "table")
+    table.list.pitt <- apply(trioStates.pitt, 2, "table")
+@ 
+Compute a DataFrame containing counts of transmissions by case/control with rows for components.  This is partly what distinguishes a DataFrame from a data.frame --- the ability to keep a GRanges object in a column.
+<<TU, eval = TRUE, echo = TRUE>>=
+TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
+TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
+TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
+testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+TU.mat <- TU.mat[testable,]
+rownames(TU.mat) <- names(table.list.beaty)[testable]
+colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
+colnames(DF) <- c("grange", colnames(TU.mat))
+@ 
+Now with that DataFrame we construct a histogram of overall transmission rate by component.
+<<hist, fig = TRUE, eval = TRUE, echo = FALSE>>=
+hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
+@ 
+Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
+<<fish, eval = TRUE, echo = FALSE>>=
+fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
+p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
+(DF <- DataFrame(DF,p.vec, trans.vec))
+@ 
+Number of components and number of regions is given below.
+<<length1>>=
+c(length(DF$grange),length(reduce(DF$grange)))
+@ 
+<<qqplot, fig = TRUE, eval = TRUE, echo = FALSE>>=
+n <- nrow(DF)
+plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
+lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
+@ 
+
+
+<<pmin, eval = TRUE, echo = FALSE>>=
+regions.gr <- reduce(DF$grange)
+index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
+DF.list <- split(DF, index.vec)
+p.min.DF <- trioClasses:::f.cmp( DF, "p.vec", min, na.rm = TRUE )
+n.DF <- trioClasses:::f.cmp( DF, "p.vec", function(vec){sum(!is.na(vec), na.rm = TRUE)})
+p.median.DF <- trioClasses:::f.cmp( DF, "p.vec", median, na.rm = TRUE )
+trans.median.DF <- trioClasses:::f.cmp( DF, "trans.vec", median, na.rm = TRUE )
+@
+
+<<meta, eval = TRUE, echo = FALSE>>=
+meta <- values(regions.gr)
+meta <- DataFrame(meta, p.min = p.min.DF$value, p.median = p.median.DF$value, trans.median = trans.median.DF$value, n.cmp = n.DF$value)
+values(regions.gr) <- meta
+@
+<<tophits, eval = TRUE, echo = FALSE>>=
+head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),25)
+@ 
+<<transvp, fig = TRUE, eval = TRUE, echo = FALSE>>=
+layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
+with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(width(regions.gr)/1e3, n.cmp, pch = 20))
+@ 
+<<chr16, eval = TRUE, echo = FALSE>>=
+(bad.region.gr <- regions.gr[which(values(regions.gr)$n.cmp >= 120)])
+@ 
+The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
+
+<<transvp2, fig = TRUE, eval = FALSE, echo = FALSE>>=
+regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
+layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
+with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
+with(as(values(regions.gr),"data.frame"),plot(width(regions.gr), n.cmp, pch = 20))
+@ 
+<<cumsum, fig = TRUE, width = 8, eval = TRUE, echo = FALSE>>=
+TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
+names(chrlength) <- c(names(chrlength[-1]),"foo")
+chrlength <- rev(rev(chrlength)[-1])
+chrstart <- cumsum(chrlength)
+
+plot(1, type = "n", xlim = c(1,3e9), ylim = c(0,6 ), axes = FALSE, xlab = "", ylab = "" )
+for( i in 1:length(regions.gr) ){
+  points( chrstart[as(seqnames(regions.gr[i]),"character")] + start(DF.list[[i]]$grange), -log10(DF.list[[i]]$p.vec), pch = 20, col = i)
+}
+axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
+axis(2)
+@ 
+<<transmedianhist, fig = TRUE, eval = TRUE, echo = FALSE>>=
+with(as(values(regions.gr),"data.frame"),hist(trans.median))
+@ 
+<<thresh, echo = FALSE>>=
+thresh <- with(as(values(regions.gr),"data.frame"),median(trans.median))
+regions.gr.clean <- regions.gr[which(values(regions.gr)$trans.median >= thresh)]
+DF.clean <- DF[queryHits(findOverlaps(DF$grange, regions.gr.clean)),]
+
+@ 
+<<qqplot-clean, fig = TRUE, eval = TRUE, echo = FALSE>>=
+n <- nrow(DF.clean)
+plot( -log10((1:n)/n), -log10(DF.clean$p.vec[order(DF.clean$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
+lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
+@ 
+<<cumsum2, fig = TRUE, width = 8, eval = TRUE, echo = FALSE>>=
+#TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+#chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
+#names(chrlength) <- c(names(chrlength[-1]),"foo")
+#chrlength <- rev(rev(chrlength)[-1])
+#chrstart <- cumsum(chrlength)
+index.vec <- subjectHits(findOverlaps(DF.clean$grange,regions.gr.clean))
+DF.clean.list <- split(DF.clean, index.vec)
+
+plot(1, type = "n", xlim = c(1,3e9), ylim = c(0,6 ), axes = FALSE, xlab = "", ylab = "" )
+for( i in 1:length(regions.gr.clean) ){
+  points( chrstart[as(seqnames(regions.gr.clean[i]),"character")] + start(DF.clean.list[[i]]$grange), -log10(DF.clean.list[[i]]$p.vec), pch = 20, col = i)
+}
+lines( c(1,(chrstart+chrlength)[22]), rep(-log10(0.05/n),2), lty = 3)
+axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
+axis(2)
+@ 
+<<phist, fig = TRUE,  eval = FALSE, echo = FALSE>>=
+with(as(values(regions.gr.clean),"data.frame"),hist(p.min, breaks = 10))
+@ 
+<<transvp3, fig = TRUE, eval = FALSE, echo = FALSE>>=
+#regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
+layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
+with(as(values(regions.gr.clean),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
+with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
+with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, trans.median, pch = 20))
+with(as(values(regions.gr.clean),"data.frame"),plot(width(regions.gr.clean), n.cmp, pch = 20))
+@ 
+
+== Transmission Rate CI ==
+
+
+
+== New Counting Method ==
+Here I will try to implement the new counting method proposed by Ingo.
+
