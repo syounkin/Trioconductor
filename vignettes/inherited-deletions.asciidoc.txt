@@ -18,75 +18,23 @@ Compute a DataFrame containing counts of transmissions by case/control with rows
 > colnames(DF) <- c("grange", colnames(TU.mat))
 ----
 Now with that DataFrame we construct a histogram of overall transmission rate by component.
+----
+> hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
+----
 image::figures/fig-hist.jpg[]
 
 Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
-----
-DataFrame with 632 rows and 7 columns
-       grange    T.case    U.case     T.con     U.con     p.vec trans.vec
-    <GRanges> <integer> <integer> <integer> <integer> <numeric> <numeric>
-1    ########        28        30        13        26     0.105     0.423
-2    ########        28        31        17        28     0.216     0.433
-3    ########        29        31        17        28     0.190     0.438
-4    ########        35        32        23        33     0.146     0.472
-5    ########        43        33        29        35     0.123     0.514
-...       ...       ...       ...       ...       ...       ...       ...
-628  ########        19        19        12        15     0.425     0.477
-629  ########        19        19        13        17     0.382     0.471
-630  ########        17        18        13        17     0.432     0.462
-631  ########        46        44        40        28     0.870     0.544
-632  ########        47        47        41        29     0.894     0.537
-----
 Number of components and number of regions is given below.
 ----
 > c(length(DF$grange),length(reduce(DF$grange)))
-[1] 632  45
 ----
 image::figures/fig-qqplot.jpg[]
 
 
 
 
-----
-   seqnames     start       end  width strand     p.min p.median trans.median n.cmp
-1     chr15  19768826  19982036 213211      * 0.0000307 0.001369        0.330    21
-2      chr7 141419097 141441259  22163      * 0.0000983 0.000659        0.541     8
-3     chr15  19341464  19545168 203705      * 0.0001407 0.001276        0.333    30
-4      chr8  39356825  39497557 140733      * 0.0022040 0.012376        0.536    17
-5      chr6  32611466  32643872  32407      * 0.0022198 0.015087        0.361    43
-6      chr6  32059186  32065343   6158      * 0.0025599 0.006837        0.449     5
-7     chr15  19095051  19205581 110531      * 0.0043068 0.015037        0.356    13
-8     chr17  41785962  41914286 128325      * 0.0062858 0.010970        0.454    22
-9      chr6  32094298  32107594  13297      * 0.0323497 0.046251        0.258    11
-10     chr6  32066939  32093133  26195      * 0.0359375 0.307320        0.273    15
-11     chr6  32650822  32664356  13535      * 0.0396005 0.066098        0.224     9
-12    chr16  33778130  33820307  42178      * 0.0422303 0.316474        0.516    12
-13    chr11  55124465  55209499  85035      * 0.0574315 0.529904        0.535    26
-14     chr3  75502426  75719139 216714      * 0.0582423 0.302094        0.432    15
-15    chr14  18347035  18372086  25052      * 0.0587674 0.413121        0.455    12
-16     chr5  97074222  97125076  50855      * 0.0716268 0.085417        0.478     5
-17     chr1 103941535 104099390 157856      * 0.1051024 0.267315        0.480    25
-18     chr5  69359352  69433008  73657      * 0.1057531 0.180652        0.262     9
-19     chr6  31388080  31397263   9184      * 0.1339235 0.376097        0.478    14
-20    chr19  20404485  20507068 102584      * 0.1456802 0.373094        0.501     6
-21    chr11  48890168  48918267  28100      * 0.1614379 0.485123        0.465    20
-22    chr16  32404517  32530051 125535      * 0.1906860 0.682627        0.277   123
-23    chr12  36404411  36532019 127609      * 0.2296317 0.315588        0.185     7
-24     chr1 195087039 195087039      1      * 0.2583597 0.258360        0.404     1
-25     chr9  43594114  43674189  80076      * 0.2810095 0.463009        0.372    14
-----
 image::figures/fig-transvp.jpg[]
 
-----
-GRanges with 1 range and 4 metadata columns:
-      seqnames               ranges strand |             p.min          p.median      trans.median     n.cmp
-         <Rle>            <IRanges>  <Rle> |         <numeric>         <numeric>         <numeric> <integer>
-  [1]    chr16 [32404517, 32530051]      * | 0.190686032146876 0.682627027049546 0.276872964169381       123
-  ---
-  seqlengths:
-            chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
-       247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
-----
 The outlier is on chromsome 16.  It is a region with 123 components, and has width 125.535 kB. chr16:32404517-32530051.  
 
 image::figures/fig-cumsum.jpg[]
@@ -99,5 +47,66 @@ image::figures/fig-cumsum2.jpg[]
 
 
 == New Counting Method ==
-Here I will try to implement the new counting method proposed by Ingo.
 
+----
+> reduce(rowData(fe.beaty))
+GRanges with 2237 ranges and 0 metadata columns:
+         seqnames               ranges strand
+            <Rle>            <IRanges>  <Rle>
+     [1]     chr1   [ 354188,  613900]      *
+     [2]     chr1   [ 836671, 1617665]      *
+     [3]     chr1   [1672234, 1782971]      *
+     [4]     chr1   [2072349, 2564816]      *
+     [5]     chr1   [2689509, 2739781]      *
+     ...      ...                  ...    ...
+  [2233]    chr22 [47520376, 47559621]      *
+  [2234]    chr22 [47791598, 47892761]      *
+  [2235]    chr22 [47983471, 48039811]      *
+  [2236]    chr22 [48892935, 49130879]      *
+  [2237]    chr22 [49276447, 49337535]      *
+  ---
+  seqlengths:
+            chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
+       247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
+----
+
+----
+> trans.mat <- c()
+> i <- 1 # index for regions
+> n.reg <- length(reduce(rowData(fe.beaty)))
+> system.time(
+ for( i in 1:n.reg){
+ fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(reduce(rowData(fe.beaty))[i], rowData(fe.beaty)))]
+ fe.pitt.i <- fe.pitt[subjectHits(findOverlaps(reduce(rowData(fe.pitt))[i], rowData(fe.pitt)))]
+ 
+ if( length(rowData(fe.beaty.i)) > 1 ){
+     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty.i, type = "cnv")
+     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+ 
+     trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt.i, type = "cnv")
+     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+ 
+     trans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+ 
+     untrans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+ 
+     trans.beaty <- sum(trans.beaty.logical)
+ 
+     untrans.beaty <- sum(untrans.beaty.logical & !trans.beaty.logical)
+ 
+     trans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+ 
+     untrans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+ 
+     trans.pitt <- sum(trans.pitt.logical)
+ 
+     untrans.pitt <- sum(untrans.pitt.logical & !trans.pitt.logical)
+ 
+     trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt) )
+ }else{
+     trans.mat <- rbind( trans.mat, c(NA,NA,NA,NA) )
+ }
+ }
+ )
