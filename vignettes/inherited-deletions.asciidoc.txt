@@ -2,7 +2,66 @@
 :numbered:
 :data-uri:
 
-== Association ==
+
+== Construct CNV Matrix ==
+Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
+----
+> library("trioClasses")
+> source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
+> gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
+> homos.beaty <- with(values(gr.deletion.beaty),cn==0)
+> gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
+> homos.pitt <- with(values(gr.deletion.pitt),cn==0)
+> gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.deletion.beaty)$id))), unlist(reduce(split(gr.deletion.beaty[homos.beaty], values(gr.deletion.beaty[homos.beaty])$id))))
+> gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
+----
+Now with these GRanges objects we use the trioClasses function CNVMatrix to construct the CNV matrices.
+----
+> system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
+> system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
+> save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
+----
+
+== Make Data ==
+Now we use the CNV matrix as part of a FamilyExperiment object, as defined in trioClasses.  With the FE object we may easily acces trio-states of CNV components and regions.
+----
+>   library("CleftCNVAssoc")
+>   data("pedigrees", package="CleftCNVAssoc")
+>   data("cnv", package = "trioClasses")
+----
+Now we create the FamilyExperiment for the cleft group.
+----
+> fe.beaty
+class: FamilyExperiment 
+dim: 7256 1339 
+exptData(0):
+assays(1): cnv
+rownames(7256): comp1 comp2 ... comp7255 comp7256
+rowData metadata column names(0):
+colnames(1339): 11005_01@1008472480 11005_02@1008472482 ...
+  18117_02@0070298660 18117_03@0070298657
+colData names(1): id
+pedigree(2082): famid id fid mid sex dx
+complete trios(445):
+----
+The control group.
+----
+> fe.pitt
+class: FamilyExperiment 
+dim: 7256 902 
+exptData(0):
+assays(1): cnv
+rownames(7256): comp1 comp2 ... comp7255 comp7256
+rowData metadata column names(0):
+colnames(902): 173000367@0070353602 173000562@0070278291 ...
+  175198958@0070318441 175199696@0072922513
+colData names(1): id
+pedigree(752): famid id fid mid sex dx
+complete trios(391):
+----
+
+== Association (Component-wise) ==
+Our first idea was to do a two by two test on the transmitted and non-transmitted counts in clefts and controls.  In the process of doing so we identified regions of under-transmission, as well as a few signifcany regions.
 
 // The above must have been written before the MAF method was implemented.
 Compute a DataFrame containing counts of transmissions by case/control with rows for components.  This is partly what distinguishes a DataFrame from a data.frame --- the ability to keep a GRanges object in a column.
@@ -27,6 +86,7 @@ Histogram of transmission rate component-wise.  We see a clear bimodal distribut
 Number of components and number of regions is given below.
 ----
 > c(length(DF$grange),length(reduce(DF$grange)))
+[1] 632  45
 ----
 image::figures/fig-qqplot.jpg[]
 
@@ -46,8 +106,10 @@ image::figures/fig-qqplot-clean.jpg[]
 image::figures/fig-cumsum2.jpg[]
 
 
-== New Counting Method ==
+== Association (Region-wise) ==
+Note that this uses a very strict definition for non-transmitted.  To be non-transmitted a region must have no component in region with a trio-state that indicates non-transmission.  This may bias the estimate towards over-transmission.
 
+First we see how many regions there are to begin with.
 ----
 > reduce(rowData(fe.beaty))
 GRanges with 2237 ranges and 0 metadata columns:
@@ -69,7 +131,7 @@ GRanges with 2237 ranges and 0 metadata columns:
             chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
        247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
 ----
-
+But many of these are rare.  Later we filter out the rare regions.
 ----
 > TU.mat <- trans.mat
 > testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
@@ -135,3 +197,36 @@ image::figures/fig-cifigall.jpg[]
 
 .How do we filter regions that are undertransmitted?
 * Any region whose overall transmission rate CI does not cover 0.5
+
+== Session Info ==
+----
+> sessionInfo()
+R version 3.0.0 (2013-04-03)
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=C                 LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                  AnnotationDbi_1.23.11                  
+ [4] CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                   GWASTools_1.7.3                        
+ [7] sandwich_2.2-10                         zoo_1.7-9                               gdsfmt_0.9.14                          
+[10] ncdf_1.6.6                              Biobase_2.21.2                          trioClasses_1.0.8                      
+[13] snpStats_1.11.0                         Matrix_1.0-12                           lattice_0.20-15                        
+[16] survival_2.37-4                         GenomicRanges_1.13.15                   XVector_0.1.0                          
+[19] IRanges_1.19.8                          BiocGenerics_0.7.2                      cacheSweave_0.6-1                      
+[22] stashR_0.3-5                            filehash_2.2-1                          ascii_2.1                              
+
+loaded via a namespace (and not attached):
+ [1] affyio_1.29.0        BiocInstaller_1.11.1 biomaRt_2.17.1       Biostrings_2.29.3    bit_1.1-10           bitops_1.0-5        
+ [7] BSgenome_1.29.0      codetools_0.2-8      DBI_0.2-7            digest_0.6.3         DNAcopy_1.35.0       ff_2.2-11           
+[13] foreach_1.4.0        grid_3.0.0           GWASExactHW_1.01     iterators_1.0.6      lmtest_0.9-31        matrixStats_0.8.1   
+[19] msm_1.2              mvtnorm_0.9-9994     oligoClasses_1.23.0  quantsmooth_1.27.0   RCurl_1.95-4.1       R.methodsS3_1.4.2   
+[25] Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   stats4_3.0.0         tools_3.0.0          VanillaICE_1.23.0   
+[31] XML_3.96-1.1         zlibbioc_1.7.0      
+----
