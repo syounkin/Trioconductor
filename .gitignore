@@ -21,7 +21,6 @@ script
 compile
 scan-trios-cpp*
 8q24*
-*.R
 cache
 trioClasses.Rcheck
 trioClasses.pdf
