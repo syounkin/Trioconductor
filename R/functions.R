@@ -52,7 +52,7 @@ get.est <- function(obj){
 get.ci <- function(obj){
   if(!is.na(obj)){
     return(obj$conf.int)
-  }else{
+xo  }else{
     return(NA)
   }
 }
@@ -90,3 +90,4 @@ f.cmp <- function(obj, colname, FUN, ...){
   val.vec <- as(unlist(lapply( x.list, FUN, ...)),"numeric")
   return(DataFrame( gr, value = val.vec ) ) 
 }
+

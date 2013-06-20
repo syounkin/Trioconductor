@@ -175,7 +175,7 @@ with(as(values(regions.gr.clean),"data.frame"),plot(width(regions.gr.clean), n.c
 reduce(rowData(fe.beaty))
 @
 
-<<trioStates2, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<trioStates2, eval = TRUE, echo = FALSE, cache = TRUE>>=
 trans.mat <- c()
 i <- 1 # index for regions
 n.reg <- length(reduce(rowData(fe.beaty)))
@@ -216,5 +216,77 @@ if( length(rowData(fe.beaty.i)) > 1 ){
 }
 )
 colnames(trans.mat) <- c("trans.cleft","untrans.cleft", "trans.con","untrans.con")
-tail(trans.mat)
+save(trans.mat, file = "./../data/trans.mat.RData")
 @
+<<loadtrans, eval = FALSE, echo = FALSE, cache = FALSE>>=
+load(file = "./../data/trans.mat.RData")
+@
+<<transrate, echo = FALSE, eval = TRUE, cache = FALSE>>=
+transrate.cleft <- trans.mat[,"trans.cleft"]/rowSums(trans.mat[,c("trans.cleft","untrans.cleft")])
+transrate.con <- trans.mat[,"trans.con"]/rowSums(trans.mat[,c("trans.con","untrans.con")])
+transrate.all <- rowSums(trans.mat[,c("trans.cleft","trans.con")])/rowSums(trans.mat[,c("trans.cleft","untrans.cleft","trans.con","untrans.con")])
+@
+<<testable, cache = FALSE, results = verbatim>>=
+TU.mat <- trans.mat
+testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+TU.mat <- TU.mat[testable,]
+@
+<<testable2, echo = FALSE, eval = TRUE, cache = FALSE>>=
+rownames(TU.mat) <- names(table.list.beaty)[testable]
+colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat)
+colnames(DF) <- c("grange", colnames(TU.mat))
+@
+<<TUfish, eval = TRUE, echo = TRUE, cache = FALSE>>=
+trioClasses:::TU.fish
+@
+<<fish2, eval = TRUE, echo = TRUE, cache = FALSE>>=
+fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
+p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
+DF <- DataFrame(DF,p.vec,transrate.all[testable])
+head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
+@
+<<headtrans, eval = TRUE, echo = TRUE, cache = FALSE>>=
+head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.frame"))
+@ 
+<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE>>=
+hist(DF$transrate.all.testable.)
+@
+<<cifigcleft, fig = TRUE, cache = FALSE>>=
+htest.list.cleft <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+}
+ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
+ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+o <- order(DF$transrate.all.testable.)
+plot(1, type = "n", xlim = c(1,nrow(ci.mat.cleft)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Cleft Transmission Rate", main = "" )
+polygon( x = c(x <- 1:nrow(ci.mat.cleft), rev(x)), y = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = "orange", border = "black")
+lines( c(1,nrow(ci.mat.cleft)), rep(0.5,2), lty = 3 )
+@
+<<cifigcon, fig = TRUE, cache = FALSE, echo = FALSE>>=
+htest.list.con <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+}
+ci.list.con <- lapply(htest.list.con, trioClasses:::get.ci)
+ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+o <- order(DF$transrate.all.testable.)
+plot(1, type = "n", xlim = c(1,nrow(ci.mat.con)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Con Transmission Rate", main = "" )
+polygon( x = c(x <- 1:nrow(ci.mat.con), rev(x)), y = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = "blue", border = "black")
+lines( c(1,nrow(ci.mat.con)), rep(0.5,2), lty = 3 )
+@
+<<cifigall, fig = TRUE, cache = FALSE, echo = FALSE>>=
+htest.list.all <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
+}
+ci.list.all <- lapply(htest.list.all, trioClasses:::get.ci)
+ci.mat.all <- matrix(unlist(ci.list.all),nrow = length(htest.list.all), ncol = 2, byrow = TRUE )
+o <- order(DF$transrate.all.testable.)
+plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
+polygon( x = c(x <- 1:nrow(ci.mat.all), rev(x)), y = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = "green", border = "black")
+lines( c(1,nrow(ci.mat.all)), rep(0.5,2), lty = 3 )
+@
+.How do we filter regions that are undertransmitted?
+* Any region whose overall transmission rate CI does not cover 0.5
