@@ -228,8 +228,8 @@ First we see how many regions there are to begin with.
 <<regions>>=
 reduce(rowData(fe.beaty))
 @
-But many of these are rare.  Later we filter out the rare regions.
-<<trioStates2, eval = TRUE, echo = FALSE, cache = TRUE>>=
+But many of these are rare.  Later we filter out the rare regions. Foo!
+<<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = TRUE>>=
 trans.mat <- c()
 i <- 1 # index for regions
 n.reg <- length(reduce(rowData(fe.beaty)))
@@ -242,29 +242,20 @@ if( length(rowData(fe.beaty.i)) > 1 ){
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty.i, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
-
     trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt.i, type = "cnv")
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
-
     trans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
-
     untrans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
-
     trans.beaty <- sum(trans.beaty.logical)
-
     untrans.beaty <- sum(untrans.beaty.logical & !trans.beaty.logical)
-
     trans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
-
     untrans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
-
     trans.pitt <- sum(trans.pitt.logical)
-
     untrans.pitt <- sum(untrans.pitt.logical & !trans.pitt.logical)
-
     trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt) )
 }else{
+    cat(i,sep="\n")
     trans.mat <- rbind( trans.mat, c(NA,NA,NA,NA) )
 }
 }
@@ -272,6 +263,7 @@ if( length(rowData(fe.beaty.i)) > 1 ){
 colnames(trans.mat) <- c("trans.cleft","untrans.cleft", "trans.con","untrans.con")
 save(trans.mat, file = "./../data/trans.mat.RData")
 @
+Note that we exclude any region made up of only on component.
 <<loadtrans, eval = FALSE, echo = FALSE, cache = FALSE>>=
 load(file = "./../data/trans.mat.RData")
 @
@@ -301,6 +293,7 @@ DF <- DataFrame(DF,p.vec,transrate.all[testable])
 head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
 @
 <<headtrans, eval = TRUE, echo = TRUE, cache = FALSE>>=
+nrow(DF)
 head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.frame"))
 @ 
 <<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE>>=

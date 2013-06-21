@@ -131,7 +131,8 @@ GRanges with 2237 ranges and 0 metadata columns:
             chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
        247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
 ----
-But many of these are rare.  Later we filter out the rare regions.
+But many of these are rare.  Later we filter out the rare regions. Foo!
+Note that we exclude any region made up of only on component.
 ----
 > TU.mat <- trans.mat
 > testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
@@ -163,6 +164,8 @@ function (TU.vec)
 6           chr17     41755843   42148466       392624             *     93     74    38    48 0.054580                   0.518
 ----
 ----
+> nrow(DF)
+[1] 39
 > head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.frame"))
   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con p.vec transrate.all.testable.
 1           chr12     36270798   36733128       462331             *      7     24     5    26 0.375                   0.194
