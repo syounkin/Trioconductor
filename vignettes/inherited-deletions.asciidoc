@@ -5,10 +5,12 @@
 <<junk,echo=FALSE>>=    Somehow, this avoids the "figure margins too large" error ~kbroman
 par(mar=rep(0,4))
 @
-
+<<trioClasses, echo = TRUE, eval = TRUE, cache = FALSE>>=
+library("trioClasses")
+@
 == Construct CNV Matrix ==
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
-<<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<package, echo = TRUE, eval = FALSE, cache = FALSE>>=
 library("trioClasses")
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
@@ -231,10 +233,11 @@ reduce(rowData(fe.beaty))
 But many of these are rare.  Later we filter out the rare regions. Foo!
 <<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = TRUE>>=
 trans.mat <- c()
-i <- 1 # index for regions
+#i <- 1 # index for regions
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
-for( i in 1:n.reg){
+#for( i in 1:n.reg){
+for( i in 1:100){
 fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(reduce(rowData(fe.beaty))[i], rowData(fe.beaty)))]
 fe.pitt.i <- fe.pitt[subjectHits(findOverlaps(reduce(rowData(fe.pitt))[i], rowData(fe.pitt)))]
 
@@ -255,8 +258,21 @@ if( length(rowData(fe.beaty.i)) > 1 ){
     untrans.pitt <- sum(untrans.pitt.logical & !trans.pitt.logical)
     trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt) )
 }else{
-    cat(i,sep="\n")
-    trans.mat <- rbind( trans.mat, c(NA,NA,NA,NA) )
+    trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty.i, type = "cnv")
+    trioStates.beaty <- matrix(with(trioAssay.beaty, paste0(F,M,O)),ncol=1)
+    dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+    trans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    untrans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    trans.beaty <- sum(trans.beaty.logical)
+    untrans.beaty <- sum(untrans.beaty.logical & !trans.beaty.logical)
+    trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt.i, type = "cnv")
+    trioStates.pitt <- matrix(with(trioAssay.pitt, paste0(F,M,O)),ncol=1)
+    dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+    trans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    untrans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    trans.pitt <- sum(trans.pitt.logical)
+    untrans.pitt <- sum(untrans.pitt.logical & !trans.pitt.logical)
+    trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt) )
 }
 }
 )
