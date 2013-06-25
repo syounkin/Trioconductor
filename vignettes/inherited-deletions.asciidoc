@@ -80,16 +80,16 @@ library(trioClasses)
   data("cnv", package = "trioClasses")
 @ 
 
-<<FamilyExperiment, echo = FALSE, eval = TRUE, cache = TRUE>>=
+<<FamilyExperiment, echo = FALSE, eval = TRUE, cache = FALSE>>=
   fe.beaty.parents <- fe.beaty[,colnames(fe.beaty)%in%parents(fe.beaty)]
   fe.pitt.parents <- fe.pitt[,colnames(fe.pitt)%in%parents(fe.pitt)]
 @ 
-<<freq-vec, echo = FALSE, eval = TRUE, cache = TRUE>>=
+<<freq-vec, echo = FALSE, eval = TRUE, cache = FALSE>>=
     freq.beaty.vec <- colSums(cnv(fe.beaty.parents))/nrow(cnv(fe.beaty.parents))
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 // The above must have been written before the MAF method was implemented.
-<<trioStates, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<trioStates, eval = TRUE, echo = FALSE, cache = FALSE>>=
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -97,12 +97,12 @@ library(trioClasses)
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
-<<table-list, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<table-list, eval = TRUE, echo = FALSE, cache = FALSE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
 Compute a DataFrame containing counts of transmissions by case/control with rows for components.  This is partly what distinguishes a DataFrame from a data.frame --- the ability to keep a GRanges object in a column.
-<<TU, eval = TRUE, echo = TRUE, cache = TRUE>>=
+<<TU, eval = TRUE, echo = TRUE, cache = FALSE>>=
 TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
@@ -118,7 +118,7 @@ Now with that DataFrame we construct a histogram of overall transmission rate by
 hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
 @ 
 Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
-<<fish, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<fish, eval = TRUE, echo = FALSE, cache = FALSE>>=
 fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 (DF <- DataFrame(DF,p.vec, trans.vec))
@@ -134,7 +134,7 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
 
 
-<<pmin, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<pmin, eval = TRUE, echo = FALSE, cache = FALSE>>=
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
@@ -144,12 +144,12 @@ p.median.DF <- trioClasses:::f.cmp( DF, "p.vec", median, na.rm = TRUE )
 trans.median.DF <- trioClasses:::f.cmp( DF, "trans.vec", median, na.rm = TRUE )
 @
 
-<<meta, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<meta, eval = TRUE, echo = FALSE, cache = FALSE>>=
 meta <- values(regions.gr)
 meta <- DataFrame(meta, p.min = p.min.DF$value, p.median = p.median.DF$value, trans.median = trans.median.DF$value, n.cmp = n.DF$value)
 values(regions.gr) <- meta
 @
-<<tophits, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<tophits, eval = TRUE, echo = FALSE, cache = FALSE>>=
 head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),25)
 @ 
 <<transvp, fig = TRUE, eval = TRUE, echo = FALSE, cache = FALSE>>=
@@ -159,7 +159,7 @@ with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(width(regions.gr)/1e3, n.cmp, pch = 20))
 @ 
-<<chr16, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<chr16, eval = TRUE, echo = FALSE, cache = FALSE>>=
 (bad.region.gr <- regions.gr[which(values(regions.gr)$n.cmp >= 120)])
 @ 
 The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
@@ -189,7 +189,7 @@ axis(2)
 <<transmedianhist, fig = TRUE, eval = TRUE, echo = FALSE, cache = FALSE>>=
 with(as(values(regions.gr),"data.frame"),hist(trans.median))
 @ 
-<<thresh, echo = FALSE, cache = TRUE>>=
+<<thresh, echo = FALSE, cache = FALSE>>=
 thresh <- with(as(values(regions.gr),"data.frame"),median(trans.median))
 regions.gr.clean <- regions.gr[which(values(regions.gr)$trans.median >= thresh)]
 DF.clean <- DF[queryHits(findOverlaps(DF$grange, regions.gr.clean)),]
@@ -230,14 +230,12 @@ First we see how many regions there are to begin with.
 <<regions>>=
 reduce(rowData(fe.beaty))
 @
-But many of these are rare.  Later we filter out the rare regions. Foo!
-<<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = TRUE>>=
+But many of these are rare.  Later we filter out the rare regions.
+<<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = FALSE>>=
 trans.mat <- c()
-#i <- 1 # index for regions
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
-#for( i in 1:n.reg){
-for( i in 1:100){
+for( i in 1:n.reg){
 fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(reduce(rowData(fe.beaty))[i], rowData(fe.beaty)))]
 fe.pitt.i <- fe.pitt[subjectHits(findOverlaps(reduce(rowData(fe.pitt))[i], rowData(fe.pitt)))]
 
