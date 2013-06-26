@@ -10,7 +10,7 @@ library("trioClasses")
 @
 == Construct CNV Matrix ==
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
-<<package, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
 library("trioClasses")
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
@@ -21,7 +21,7 @@ gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.d
 gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
 @ 
 Now with these GRanges objects we use the trioClasses function CNVMatrix to construct the CNV matrices.
-<<cnvmatrix, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<cnvmatrix, echo = TRUE, eval = TRUE, cache = TRUE>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
@@ -29,14 +29,10 @@ save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in trioClasses.  With the FE object we may easily acces trio-states of CNV components and regions.
-<<reload0, echo = FALSE, eval = FALSE>>=
-source("~/trioClasses/R/reload.R")
-reload("trioClasses")
-@
-<<options, echo=TRUE, eval = TRUE, echo = TRUE>>=
+<<options, echo=TRUE, eval = TRUE >>=
   library("CleftCNVAssoc")
   data("pedigrees", package="CleftCNVAssoc")
-  data("cnv", package = "trioClasses")
+#  data("cnv", package = "trioClasses")
 @ 
 Now we create the FamilyExperiment for the cleft group.
 <<se-beaty, echo = FALSE, eval = TRUE>>=
@@ -60,15 +56,12 @@ The control group.
 <<fe-pitt, echo = TRUE, eval = TRUE, cache = FALSE>>=
 fe.pitt
 @
-<<save, echo = FALSE, eval = FALSE, cache = FALSE>>=
+<<save, echo = FALSE, eval = TRUE, cache = FALSE>>=
 save(fe.beaty, fe.pitt, file = "./../data/fe.RData" ) 
 @ 
 
 == Association (Component-wise) ==
 Our first idea was to do a two by two test on the transmitted and non-transmitted counts in clefts and controls.  In the process of doing so we identified regions of under-transmission, as well as a few signifcany regions.
-<<reload1, echo = FALSE, eval = FALSE>>=
-reload("trioClasses")
-@
 <<options, echo=FALSE, eval = TRUE, echo = FALSE, cache = FALSE>>=
 setCacheDir("sgy-cache")
 options(width=132, digits=3, scipen=4, continue =" ")
@@ -231,7 +224,7 @@ First we see how many regions there are to begin with.
 reduce(rowData(fe.beaty))
 @
 But many of these are rare.  Later we filter out the rare regions.
-<<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = FALSE>>=
+<<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = TRUE>>=
 trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(

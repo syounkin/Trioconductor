@@ -29,16 +29,16 @@ Now we use the CNV matrix as part of a FamilyExperiment object, as defined in tr
 ----
 >   library("CleftCNVAssoc")
 >   data("pedigrees", package="CleftCNVAssoc")
->   data("cnv", package = "trioClasses")
+> #  data("cnv", package = "trioClasses")
 ----
 Now we create the FamilyExperiment for the cleft group.
 ----
 > fe.beaty
 class: FamilyExperiment 
-dim: 4288 1339 
+dim: 7256 1339 
 exptData(0):
 assays(1): cnv
-rownames(4288): comp1 comp2 ... comp4287 comp4288
+rownames(7256): comp1 comp2 ... comp7255 comp7256
 rowData metadata column names(0):
 colnames(1339): 11005_01@1008472480 11005_02@1008472482 ...
   18117_02@0070298660 18117_03@0070298657
@@ -50,10 +50,10 @@ The control group.
 ----
 > fe.pitt
 class: FamilyExperiment 
-dim: 3916 902 
+dim: 7256 902 
 exptData(0):
 assays(1): cnv
-rownames(3916): comp1 comp2 ... comp3915 comp3916
+rownames(7256): comp1 comp2 ... comp7255 comp7256
 rowData metadata column names(0):
 colnames(902): 173000367@0070353602 173000562@0070278291 ...
   175198958@0070318441 175199696@0072922513
@@ -71,3 +71,221 @@ Compute a DataFrame containing counts of transmissions by case/control with rows
 > TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 > TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 > TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
+> testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+> TU.mat <- TU.mat[testable,]
+> rownames(TU.mat) <- names(table.list.beaty)[testable]
+> colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+> DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
+> colnames(DF) <- c("grange", colnames(TU.mat))
+----
+Now with that DataFrame we construct a histogram of overall transmission rate by component.
+----
+> hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
+----
+image::figures/fig-hist.jpg[]
+
+Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
+----
+DataFrame with 632 rows and 7 columns
+       grange    T.case    U.case     T.con     U.con     p.vec trans.vec
+    <GRanges> <integer> <integer> <integer> <integer> <numeric> <numeric>
+1    ########        28        30        13        26     0.105     0.423
+2    ########        28        31        17        28     0.216     0.433
+3    ########        29        31        17        28     0.190     0.438
+4    ########        35        32        23        33     0.146     0.472
+5    ########        43        33        29        35     0.123     0.514
+...       ...       ...       ...       ...       ...       ...       ...
+628  ########        19        19        12        15     0.425     0.477
+629  ########        19        19        13        17     0.382     0.471
+630  ########        17        18        13        17     0.432     0.462
+631  ########        46        44        40        28     0.870     0.544
+632  ########        47        47        41        29     0.894     0.537
+----
+Number of components and number of regions is given below.
+----
+> c(length(DF$grange),length(reduce(DF$grange)))
+[1] 632  45
+----
+image::figures/fig-qqplot.jpg[]
+
+
+
+
+----
+   seqnames     start       end  width strand     p.min p.median trans.median n.cmp
+1     chr15  19768826  19982036 213211      * 0.0000307 0.001369        0.330    21
+2      chr7 141419097 141441259  22163      * 0.0000983 0.000659        0.541     8
+3     chr15  19341464  19545168 203705      * 0.0001407 0.001276        0.333    30
+4      chr8  39356825  39497557 140733      * 0.0022040 0.012376        0.536    17
+5      chr6  32611466  32643872  32407      * 0.0022198 0.015087        0.361    43
+6      chr6  32059186  32065343   6158      * 0.0025599 0.006837        0.449     5
+7     chr15  19095051  19205581 110531      * 0.0043068 0.015037        0.356    13
+8     chr17  41785962  41914286 128325      * 0.0062858 0.010970        0.454    22
+9      chr6  32094298  32107594  13297      * 0.0323497 0.046251        0.258    11
+10     chr6  32066939  32093133  26195      * 0.0359375 0.307320        0.273    15
+11     chr6  32650822  32664356  13535      * 0.0396005 0.066098        0.224     9
+12    chr16  33778130  33820307  42178      * 0.0422303 0.316474        0.516    12
+13    chr11  55124465  55209499  85035      * 0.0574315 0.529904        0.535    26
+14     chr3  75502426  75719139 216714      * 0.0582423 0.302094        0.432    15
+15    chr14  18347035  18372086  25052      * 0.0587674 0.413121        0.455    12
+16     chr5  97074222  97125076  50855      * 0.0716268 0.085417        0.478     5
+17     chr1 103941535 104099390 157856      * 0.1051024 0.267315        0.480    25
+18     chr5  69359352  69433008  73657      * 0.1057531 0.180652        0.262     9
+19     chr6  31388080  31397263   9184      * 0.1339235 0.376097        0.478    14
+20    chr19  20404485  20507068 102584      * 0.1456802 0.373094        0.501     6
+21    chr11  48890168  48918267  28100      * 0.1614379 0.485123        0.465    20
+22    chr16  32404517  32530051 125535      * 0.1906860 0.682627        0.277   123
+23    chr12  36404411  36532019 127609      * 0.2296317 0.315588        0.185     7
+24     chr1 195087039 195087039      1      * 0.2583597 0.258360        0.404     1
+25     chr9  43594114  43674189  80076      * 0.2810095 0.463009        0.372    14
+----
+image::figures/fig-transvp.jpg[]
+
+----
+GRanges with 1 range and 4 metadata columns:
+      seqnames               ranges strand |             p.min          p.median      trans.median     n.cmp
+         <Rle>            <IRanges>  <Rle> |         <numeric>         <numeric>         <numeric> <integer>
+  [1]    chr16 [32404517, 32530051]      * | 0.190686032146876 0.682627027049546 0.276872964169381       123
+  ---
+  seqlengths:
+            chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
+       247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
+----
+The outlier is on chromsome 16.  It is a region with 123 components, and has width 125.535 kB. chr16:32404517-32530051.  
+
+image::figures/fig-cumsum.jpg[]
+
+image::figures/fig-transmedianhist.jpg[]
+
+image::figures/fig-qqplot-clean.jpg[]
+
+image::figures/fig-cumsum2.jpg[]
+
+
+== Association (Region-wise) ==
+Note that this uses a very strict definition for non-transmitted.  To be non-transmitted a region must have no component in region with a trio-state that indicates non-transmission.  This may bias the estimate towards over-transmission.
+
+First we see how many regions there are to begin with.
+----
+> reduce(rowData(fe.beaty))
+GRanges with 2237 ranges and 0 metadata columns:
+         seqnames               ranges strand
+            <Rle>            <IRanges>  <Rle>
+     [1]     chr1   [ 354188,  613900]      *
+     [2]     chr1   [ 836671, 1617665]      *
+     [3]     chr1   [1672234, 1782971]      *
+     [4]     chr1   [2072349, 2564816]      *
+     [5]     chr1   [2689509, 2739781]      *
+     ...      ...                  ...    ...
+  [2233]    chr22 [47520376, 47559621]      *
+  [2234]    chr22 [47791598, 47892761]      *
+  [2235]    chr22 [47983471, 48039811]      *
+  [2236]    chr22 [48892935, 49130879]      *
+  [2237]    chr22 [49276447, 49337535]      *
+  ---
+  seqlengths:
+            chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
+       247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
+----
+But many of these are rare.  Later we filter out the rare regions.
+Note that we exclude any region made up of only on component.
+----
+> TU.mat <- trans.mat
+> testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+> TU.mat <- TU.mat[testable,]
+----
+----
+> trioClasses:::TU.fish
+function (TU.vec) 
+{
+    if (!identical(c("T.case", "U.case", "T.con", "U.con"), names(TU.vec))) 
+        return("TU vector must have the correct names.")
+    fish <- fisher.test(matrix(TU.vec, nrow = 2, ncol = 2, byrow = TRUE), 
+        alternative = "greater")
+    return(fish)
+}
+<environment: namespace:trioClasses>
+----
+----
+> fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
+> p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
+> DF <- DataFrame(DF,p.vec,transrate.all[testable])
+> head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con    p.vec transrate.all.testable.
+1           chr15     18474541   20730425      2255885             *     54     47    44    94 0.000644                   0.410
+2            chr7    141380317  141447476        67160             *     69     38    68    78 0.003397                   0.542
+3            chr8     39341981   39548228       206248             *    140    104    32    45 0.010868                   0.536
+4            chr6     32536895   32684456       147562             *     54     53    45    78 0.023386                   0.430
+5            chr6     32055573   32124218        68646             *     35     33    17    32 0.052925                   0.444
+6           chr17     41755843   42148466       392624             *     93     74    38    48 0.054580                   0.518
+----
+----
+> nrow(DF)
+[1] 39
+> head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.frame"))
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con p.vec transrate.all.testable.
+1           chr12     36270798   36733128       462331             *      7     24     5    26 0.375                   0.194
+2            chr6     32694224   32788048        93825             *      5     23     8    17 0.935                   0.245
+3            chr1    147272181  147849072       576892             *      8     32    34    87 0.890                   0.261
+4            chr9     43515795   44821332      1305538             *     32     49    46    80 0.386                   0.377
+5            chr2     89132524   91107283      1974760             *     16     43    28    29 0.996                   0.379
+6            chr7    101914898  102109692       194795             *     11     18    19    28 0.675                   0.395
+----
+----
+> hist(DF$transrate.all.testable.)
+----
+image::figures/fig-transhist.jpg[]
+
+----
+> htest.list.cleft <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+ }
+> ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
+> ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+> o <- order(DF$transrate.all.testable.)
+> plot(1, type = "n", xlim = c(1,nrow(ci.mat.cleft)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Cleft Transmission Rate", main = "" )
+> polygon( x = c(x <- 1:nrow(ci.mat.cleft), rev(x)), y = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = "orange", border = "black")
+> lines( c(1,nrow(ci.mat.cleft)), rep(0.5,2), lty = 3 )
+----
+image::figures/fig-cifigcleft.jpg[]
+
+image::figures/fig-cifigcon.jpg[]
+
+image::figures/fig-cifigall.jpg[]
+
+.How do we filter regions that are undertransmitted?
+* Any region whose overall transmission rate CI does not cover 0.5
+
+== Session Info ==
+----
+> sessionInfo()
+R version 3.0.0 (2013-04-03)
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=C                 LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                  AnnotationDbi_1.23.11                  
+ [4] CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                   GWASTools_1.7.3                        
+ [7] sandwich_2.2-10                         zoo_1.7-9                               gdsfmt_0.9.14                          
+[10] ncdf_1.6.6                              Biobase_2.21.2                          trioClasses_1.0.8                      
+[13] snpStats_1.11.0                         Matrix_1.0-12                           lattice_0.20-15                        
+[16] survival_2.37-4                         GenomicRanges_1.13.15                   XVector_0.1.0                          
+[19] IRanges_1.19.8                          BiocGenerics_0.7.2                      cacheSweave_0.6-1                      
+[22] stashR_0.3-5                            filehash_2.2-1                          ascii_2.1                              
+
+loaded via a namespace (and not attached):
+ [1] affyio_1.29.0        BiocInstaller_1.11.1 biomaRt_2.17.1       Biostrings_2.29.3    bit_1.1-10           bitops_1.0-5        
+ [7] BSgenome_1.29.0      codetools_0.2-8      DBI_0.2-7            digest_0.6.3         DNAcopy_1.35.0       ff_2.2-11           
+[13] foreach_1.4.0        grid_3.0.0           GWASExactHW_1.01     iterators_1.0.6      lmtest_0.9-31        matrixStats_0.8.1   
+[19] msm_1.2              mvtnorm_0.9-9994     oligoClasses_1.23.0  quantsmooth_1.27.0   RCurl_1.95-4.1       R.methodsS3_1.4.2   
+[25] Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   stats4_3.0.0         tools_3.0.0          VanillaICE_1.23.0   
+[31] XML_3.96-1.1         zlibbioc_1.7.0      
+----
