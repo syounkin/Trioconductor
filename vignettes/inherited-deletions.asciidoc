@@ -82,7 +82,7 @@ library(trioClasses)
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 // The above must have been written before the MAF method was implemented.
-<<trioStates, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<trioStates, eval = TRUE, echo = FALSE, cache = TRUE>>=
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -90,7 +90,7 @@ library(trioClasses)
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
-<<table-list, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<table-list, eval = TRUE, echo = FALSE, cache = TRUE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
@@ -127,7 +127,7 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
 
 
-<<pmin, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<pmin, eval = TRUE, echo = FALSE, cache = TRUE>>=
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
@@ -306,7 +306,7 @@ head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.fram
 <<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE>>=
 hist(DF$transrate.all.testable.)
 @
-<<cifigcleft, fig = TRUE, cache = FALSE>>=
+<<cifigcleft, fig = TRUE, cache = FALSE, echo = FALSE>>=
 htest.list.cleft <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
@@ -317,6 +317,8 @@ o <- order(DF$transrate.all.testable.)
 plot(1, type = "n", xlim = c(1,nrow(ci.mat.cleft)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Cleft Transmission Rate", main = "" )
 polygon( x = c(x <- 1:nrow(ci.mat.cleft), rev(x)), y = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = "orange", border = "black")
 lines( c(1,nrow(ci.mat.cleft)), rep(0.5,2), lty = 3 )
+lines( rep(28,2), c(0,1), lty = 3 )
+lines( rep(34,2), c(0,1), lty = 3 )
 @
 <<cifigcon, fig = TRUE, cache = FALSE, echo = FALSE>>=
 htest.list.con <- list(NA, length = nrow(TU.mat))
@@ -329,6 +331,8 @@ o <- order(DF$transrate.all.testable.)
 plot(1, type = "n", xlim = c(1,nrow(ci.mat.con)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Con Transmission Rate", main = "" )
 polygon( x = c(x <- 1:nrow(ci.mat.con), rev(x)), y = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = "blue", border = "black")
 lines( c(1,nrow(ci.mat.con)), rep(0.5,2), lty = 3 )
+lines( rep(28,2), c(0,1), lty = 3 )
+lines( rep(34,2), c(0,1), lty = 3 )
 @
 <<cifigall, fig = TRUE, cache = FALSE, echo = FALSE>>=
 htest.list.all <- list(NA, length = nrow(TU.mat))
@@ -341,9 +345,24 @@ o <- order(DF$transrate.all.testable.)
 plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
 polygon( x = c(x <- 1:nrow(ci.mat.all), rev(x)), y = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = "green", border = "black")
 lines( c(1,nrow(ci.mat.all)), rep(0.5,2), lty = 3 )
+lines( rep(28,2), c(0,1), lty = 3 )
+lines( rep(34,2), c(0,1), lty = 3 )
 @
 .How do we filter regions that are undertransmitted?
 * Any region whose overall transmission rate CI does not cover 0.5
+Foobar!
+
+<<chr7ci, eval = TRUE, echo = TRUE>>=
+as(reduce(rowData(fe.beaty))[testable,],"data.frame")
+ci.mat.cleft[25,]
+ci.mat.con[25,]
+ci.mat.all[25,]
+ci.mat.cleft[26,]
+ci.mat.con[26,]
+ci.mat.all[26,]
+which(o==25)
+which(o==26)
+@
 
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
