@@ -402,14 +402,24 @@ legend(x = 0.8, y = 1, legend = c("All","Control", "Cleft"), pch = 19, col = c("
 === Tables ===
 
 .Transmission Counts
-[width="60%",cols="7"]
+[width="60%",cols="8"]
 [options="header",grid="rows"]
 |======
-|pos|width|p-value|cleft transmitted|cleft untransmitted|control transmitted|control untransmitted
-|chr7:141,380,317-141,447,476|67,160|0.003397|69 (0.645)|38|68 (0.466)|78
-|chr8:39,341,981-39,548,228|206,248 |0.010868|140 (0.574)|104|32 (0.416)|45
-|chr15:18,474,541-20,730,425|2,255,885|0.000644|54 (0.535)|47|44 (0.319)|94
+|pos|width|p-value|nearest gene|cleft transmitted|cleft untransmitted|control transmitted|control untransmitted
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=Chr7:141380317-141447476[chr7:141380317-141447476]|67,160|0.003397|link:http://genome.ucsc.edu/cgi-bin/hgGene?hgg_gene=uc003vwy.1&hgg_prot=NP_004659&hgg_chrom=chr7&hgg_start=141342147&hgg_end=141453016&hgg_type=knownGene&db=hg18&hgsid=340436443[MGAM]|69 (0.645)|38|68 (0.466)|78
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=Chr8:39341981-39548228[chr8:39,341,981-39,548,228]|206,248 |0.010868|link:http://genome.ucsc.edu/cgi-bin/hgc?hgsid=340437289&c=chr8&o=39427720&t=39499665&g=refGene&i=NR_073423[ADAM3A], link:http://genome.ucsc.edu/cgi-bin/hgc?hgsid=340437289&c=chr8&o=39291338&t=39379532&g=refGene&i=NR_001448[ADAM5]|140 (0.574)|104|32 (0.416)|45
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr15:18474541-20730425[chr15:18,474,541-20,730,425]|2,255,885|0.000644|too many, centromere|54 (0.535)|47|44 (0.319)|94
 |======
+
+=== MGAM & ADAM9 ===
+
+.MGAM
+[quote, Vincent-Chong et al., PLoS One 2013]
+____
+This study has identified a novel genomic amplification on chromosome 7q34 which was present in 34 out of 46 OSCC samples. The MGAM gene at this locus was significantly over expressed (6.6 fold) in 29 out of 30 samples analysed. It has been previously suggested that MGAM is a carbohydrate active enzyme that is involved in cell metabolism by breaking down the dietary starches and sugars into glucose [67]. The involvement of this gene in carcinogenesis could be explained by the Warburg effect which implies that during tumor progression, alterations are observed in glucose metabolism including glycolysis and oxidative phosphorylation process in cancer cells [68]. It could be hypothesized that over expression of MGAM may promote tumor growth by altering cell metabolism. Further investigation of this gene is required to elucidate its function, regulation and role in oral carcinogenesis.
+____
+
+See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054705[Vincent-Chong et al.] in Plos One -  "Genome Wide Analysis of Chromosomal Alterations in Oral Squamous Cell Carcinomas Revealed over Expression of MGAM and ADAM9." link:http://www.ncbi.nlm.nih.gov/pubmed/?term=23405089[PMID:23405089]
 
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
