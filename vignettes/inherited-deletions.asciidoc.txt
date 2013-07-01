@@ -139,8 +139,6 @@ image::figures/fig-qqplot.jpg[]
 24     chr1 195087039 195087039      1      * 0.2583597 0.258360        0.404     1
 25     chr9  43594114  43674189  80076      * 0.2810095 0.463009        0.372    14
 ----
-image::figures/fig-transvp.jpg[]
-
 ----
 GRanges with 1 range and 4 metadata columns:
       seqnames               ranges strand |             p.min          p.median      trans.median     n.cmp
@@ -232,7 +230,8 @@ function (TU.vec)
 6            chr7    101914898  102109692       194795             *     11     18    19    28 0.675                   0.395
 ----
 ----
-> hist(DF$transrate.all.testable.)
+> par(bg="lightyellow")
+> hist(DF$transrate.all.testable., col = "darkgreen", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
 ----
 image::figures/fig-transhist.jpg[]
 
@@ -242,69 +241,10 @@ image::figures/fig-cifigcon.jpg[]
 
 image::figures/fig-cifigall.jpg[]
 
-.How do we filter regions that are undertransmitted?
-* Any region whose overall transmission rate CI does not cover 0.5
-Foobar!
 
-----
-> as(reduce(rowData(fe.beaty))[testable,],"data.frame")
-   seqnames     start       end   width strand
-1      chr1  12769266  13058015  288750      *
-2      chr1 103899238 104126342  227105      *
-3      chr1 147272181 147849072  576892      *
-4      chr1 194976397 195199868  223472      *
-5      chr2  40785003  41129076  344074      *
-6      chr2  89132524  91107283 1974760      *
-7      chr2 242565979 242692820  126842      *
-8      chr3  46765401  46827683   62283      *
-9      chr3  65159939  65187636   27698      *
-10     chr3  75470851  75730577  259727      *
-11     chr4  68997831  69258302  260472      *
-12     chr4 161252445 161314427   61983      *
-13     chr5   8756085   8811041   54957      *
-14     chr5  68871012  70700419 1829408      *
-15     chr5  97073409  97267981  194573      *
-16     chr6  29940311  30032810   92500      *
-17     chr6  31382534  31422222   39689      *
-18     chr6  32055573  32124218   68646      *
-19     chr6  32536895  32684456  147562      *
-20     chr6  32694224  32788048   93825      *
-21     chr6  67065007  67111682   46676      *
-22     chr6  79022244  79098876   76633      *
-23     chr7  57778797  62099233 4320437      *
-24     chr7 101914898 102109692  194795      *
-25     chr7 141380317 141447476   67160      *
-26     chr8  39341981  39548228  206248      *
-27     chr9  43515795  44821332 1305538      *
-28    chr11  48220946  48986763  765818      *
-29    chr11  55116789  55216671   99883      *
-30    chr12  36270798  36733128  462331      *
-31    chr14  18189975  19502504 1312530      *
-32    chr15  18474541  20730425 2255885      *
-33    chr15  32459510  32631865  172356      *
-34    chr16  31931481  33820307 1888827      *
-35    chr17  41755843  42148466  392624      *
-36    chr18  64879175  64906488   27314      *
-37    chr19  20349698  20523385  173688      *
-38    chr19  47939188  48537433  598246      *
-39    chr20  52080333  52094148   13816      *
-> ci.mat.cleft[25,]
-[1] 0.546 0.735
-> ci.mat.con[25,]
-[1] 0.383 0.550
-> ci.mat.all[25,]
-[1] 0.478 0.604
-> ci.mat.cleft[26,]
-[1] 0.509 0.637
-> ci.mat.con[26,]
-[1] 0.304 0.534
-> ci.mat.all[26,]
-[1] 0.480 0.591
-> which(o==25)
-[1] 34
-> which(o==26)
-[1] 28
-----
+
+image::figures/fig-cifig1.jpg[]
+
 
 == Session Info ==
 ----

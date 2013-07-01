@@ -4,6 +4,7 @@
 
 <<junk,echo=FALSE>>=    Somehow, this avoids the "figure margins too large" error ~kbroman
 par(mar=rep(0,4))
+par(bg="lightyellow")
 @
 <<trioClasses, echo = TRUE, eval = TRUE, cache = FALSE>>=
 library("trioClasses")
@@ -145,7 +146,7 @@ values(regions.gr) <- meta
 <<tophits, eval = TRUE, echo = FALSE, cache = FALSE>>=
 head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),25)
 @ 
-<<transvp, fig = TRUE, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<transvp, fig = TRUE, eval = FALSE, echo = FALSE, cache = FALSE>>=
 layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
 with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
@@ -304,7 +305,8 @@ nrow(DF)
 head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.frame"))
 @ 
 <<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE>>=
-hist(DF$transrate.all.testable.)
+par(bg="lightyellow")
+hist(DF$transrate.all.testable., col = "darkgreen", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
 @
 <<cifigcleft, fig = TRUE, cache = FALSE, echo = FALSE>>=
 htest.list.cleft <- list(NA, length = nrow(TU.mat))
@@ -319,6 +321,7 @@ polygon( x = c(x <- 1:nrow(ci.mat.cleft), rev(x)), y = c(ci.mat.cleft[o,1],rev(c
 lines( c(1,nrow(ci.mat.cleft)), rep(0.5,2), lty = 3 )
 lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
+lines( rep(8,2), c(0,1), lty = 3 )
 @
 <<cifigcon, fig = TRUE, cache = FALSE, echo = FALSE>>=
 htest.list.con <- list(NA, length = nrow(TU.mat))
@@ -333,6 +336,7 @@ polygon( x = c(x <- 1:nrow(ci.mat.con), rev(x)), y = c(ci.mat.con[o,1],rev(ci.ma
 lines( c(1,nrow(ci.mat.con)), rep(0.5,2), lty = 3 )
 lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
+lines( rep(8,2), c(0,1), lty = 3 )
 @
 <<cifigall, fig = TRUE, cache = FALSE, echo = FALSE>>=
 htest.list.all <- list(NA, length = nrow(TU.mat))
@@ -347,12 +351,10 @@ polygon( x = c(x <- 1:nrow(ci.mat.all), rev(x)), y = c(ci.mat.all[o,1],rev(ci.ma
 lines( c(1,nrow(ci.mat.all)), rep(0.5,2), lty = 3 )
 lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
+lines( rep(8,2), c(0,1), lty = 3 )
 @
-.How do we filter regions that are undertransmitted?
-* Any region whose overall transmission rate CI does not cover 0.5
-Foobar!
 
-<<chr7ci, eval = TRUE, echo = TRUE>>=
+<<chr7ci, eval = TRUE, echo = FALSE, results = hide>>=
 as(reduce(rowData(fe.beaty))[testable,],"data.frame")
 ci.mat.cleft[25,]
 ci.mat.con[25,]
@@ -360,8 +362,39 @@ ci.mat.all[25,]
 ci.mat.cleft[26,]
 ci.mat.con[26,]
 ci.mat.all[26,]
+ci.mat.cleft[32,]
+ci.mat.con[32,]
+ci.mat.all[32,]
 which(o==25)
 which(o==26)
+which(o==32)
+@
+
+<<cifig1, fig = TRUE, width = 5, height = 5, echo = FALSE>>=
+eps <- 0.05
+plot(1,type = "n", xlim = c(0,1), ylim = c(0,1), xlab = "Transmission Rate", ylab = "", main = "95% Confidence Interval", axes = FALSE)
+
+lines(x = ci.mat.cleft[25,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
+lines(x = ci.mat.con[25,], y = rep(0.75,2), lwd = 2, col = "blue")
+lines(x = ci.mat.all[25,], y = rep(0.75+eps,2), lwd = 2, col = "green")
+
+lines(x = ci.mat.cleft[26,], y = rep(0.5-eps,2), lwd = 2, col = "orange")
+lines(x = ci.mat.con[26,], y = rep(0.5,2), lwd = 2, col = "blue")
+lines(x = ci.mat.all[26,], y = rep(0.5+eps,2), lwd = 2, col = "green")
+
+lines(x = ci.mat.cleft[32,], y = rep(0.25-eps,2), lwd = 2, col = "orange")
+lines(x = ci.mat.con[32,], y = rep(0.25,2), lwd = 2, col = "blue")
+lines(x = ci.mat.all[32,], y = rep(0.25+eps,2), lwd = 2, col = "green")
+
+lines(rep(0.5,2), c(0,1), lty = 3 )
+
+axis(1, at = at <- c(0.25, 0.5, 0.75), labels = at )
+text( x = 0.1, y = 0.75, labels = "Chr. 7 (34)" )
+text( x = 0.1, y = 0.5, labels = "Chr. 8 (28)" )
+text( x = 0.1, y = 0.25, labels = "Chr. 15 (8)" )
+
+legend(x = 0.8, y = 1, legend = c("All","Control", "Cleft"), pch = 19, col = c("green", "blue","orange"), cex = 0.75)
+
 @
 
 == Session Info ==
