@@ -106,6 +106,9 @@ Number of components and number of regions is given below.
 > c(length(DF$grange),length(reduce(DF$grange)))
 [1] 632  45
 ----
+
+=== Figures ===
+
 image::figures/fig-qqplot.jpg[]
 
 
@@ -185,13 +188,14 @@ GRanges with 2237 ranges and 0 metadata columns:
             chr1   chr1_random          chr2   chr2_random          chr3 ...          chrX   chrX_random          chrY          chrM
        247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
 ----
-But many of these are rare.  Later we filter out the rare regions.
-Note that we exclude any region made up of only on component.
+But many of these are rare.
+Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.
 ----
 > TU.mat <- trans.mat
 > testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 > TU.mat <- TU.mat[testable,]
 ----
+First we display the function that performs Fisher's exact test.
 ----
 > trioClasses:::TU.fish
 function (TU.vec) 
@@ -204,6 +208,7 @@ function (TU.vec)
 }
 <environment: namespace:trioClasses>
 ----
+Then we apply it to each region after filtering out regions that did not have enough observations.
 ----
 > fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
 > p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
@@ -217,9 +222,8 @@ function (TU.vec)
 5            chr6     32055573   32124218        68646             *     35     33    17    32 0.052925                   0.444
 6           chr17     41755843   42148466       392624             *     93     74    38    48 0.054580                   0.518
 ----
+There are 39 regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
 ----
-> nrow(DF)
-[1] 39
 > head(as(DF[with(as(DF,"data.frame"),order(transrate.all.testable.)),],"data.frame"))
   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con p.vec transrate.all.testable.
 1           chr12     36270798   36733128       462331             *      7     24     5    26 0.375                   0.194
@@ -229,11 +233,13 @@ function (TU.vec)
 5            chr2     89132524   91107283      1974760             *     16     43    28    29 0.996                   0.379
 6            chr7    101914898  102109692       194795             *     11     18    19    28 0.675                   0.395
 ----
-----
-> par(bg="lightyellow")
-> hist(DF$transrate.all.testable., col = "darkgreen", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
-----
+
+Note that a region on chromosome six appears twice in the top six by p-value.  However we see in the six regions with the lowest transmissin rates that there is a region with extremly low transmission rate nearby.  It seems likely that both the chr15 and chr6 signals are spurious and due to false positives in the controls.
+
+=== Figures ===
+
 image::figures/fig-transhist.jpg[]
+
 
 image::figures/fig-cifigcleft.jpg[]
 
@@ -241,13 +247,25 @@ image::figures/fig-cifigcon.jpg[]
 
 image::figures/fig-cifigall.jpg[]
 
-
-
 image::figures/fig-cifig1.jpg[]
 
 
+=== Tables ===
+
+.Transmission Counts
+[width="60%",cols="7"]
+[options="header",grid="rows"]
+|======
+|pos|width|p-value|cleft transmitted|cleft untransmitted|control transmitted|control untransmitted
+|chr7:141,380,317-141,447,476|67,160|0.003397|69 (0.645)|38|68 (0.466)|78
+|chr8:39,341,981-39,548,228|206,248 |0.010868|140 (0.574)|104|32 (0.416)|45
+|chr15:18,474,541-20,730,425|2,255,885|0.000644|54 (0.535)|47|44 (0.319)|94
+|======
+
 == Session Info ==
 ----
+> date()
+[1] "Mon Jul  1 12:50:57 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
