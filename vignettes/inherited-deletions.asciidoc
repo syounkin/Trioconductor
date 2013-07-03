@@ -399,6 +399,52 @@ text( x = 0.1, y = 0.25, labels = "Chr. 15 (8)" )
 legend(x = 0.8, y = 1, legend = c("All","Control", "Cleft"), pch = 19, col = c("green", "blue","orange"), cex = 0.75)
 @
 
+<<cifigcleftnew, fig = FALSE, cache = FALSE, echo = FALSE, results = hide>>=
+htest.list.cleft <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+}
+ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
+ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+#o <- order(DF$transrate.all.testable.)
+o <- order(DF$p.vec)
+alpha <- 1/2
+pdf(file = "./figures/cifigcleftnew.pdf", width = 4, height = 12)
+plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "Regional p-value Rank", xlab = "Cleft Transmission Rate", main = "Transmission Rate 95% CI\n(Centromere/Telomere Included)", axes = FALSE )
+polygon( y = c(x <- nrow(ci.mat.cleft):1, rev(x)), x = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = rgb(1,0,0,alpha), border = NA)
+
+htest.list.con <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+}
+ci.list.con <- lapply(htest.list.con, trioClasses:::get.ci)
+ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+#o <- order(DF$transrate.all.testable.)
+#plot(1, type = "n", xlim = c(1,nrow(ci.mat.con)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Con Transmission Rate", main = "" )
+polygon( y = c(x, rev(x)), x = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = rgb(0,0,1,alpha), border = NA)
+
+htest.list.all <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
+}
+ci.list.all <- lapply(htest.list.all, trioClasses:::get.ci)
+ci.mat.all <- matrix(unlist(ci.list.all),nrow = length(htest.list.all), ncol = 2, byrow = TRUE )
+#o <- order(DF$transrate.all.testable.)
+#plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
+polygon( y = c(x, rev(x)), x = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = NA, border = "black", lwd = 3)
+lines( y = c(1,nrow(ci.mat.all)), x = rep(0.5,2), lty = 3, lwd = 2 )
+
+axis(1, at = at <- c(0.25,0.5,0.75), labels = at )
+axis(2, at = at <- (max(x) - 0:(max(x)-1)), labels = 1:max(x), las = 2 )
+
+legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","all"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),"black"), pch = c(15,15,22), cex = 0.8 )
+dev.off()
+@
+
+link:figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
+// image::figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
+
+
 === Tables ===
 
 .Transmission Counts

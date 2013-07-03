@@ -250,6 +250,11 @@ image::figures/fig-cifigall.jpg[]
 image::figures/fig-cifig1.jpg[]
 
 
+
+link:figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
+// image::figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
+
+
 === Tables ===
 
 .Transmission Counts
@@ -275,7 +280,7 @@ See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054
 == Session Info ==
 ----
 > date()
-[1] "Mon Jul  1 16:17:07 2013"
+[1] "Wed Jul  3 09:55:15 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
