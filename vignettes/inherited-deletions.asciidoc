@@ -400,18 +400,33 @@ legend(x = 0.8, y = 1, legend = c("All","Control", "Cleft"), pch = 19, col = c("
 @
 
 <<cifigcleftnew, fig = FALSE, cache = FALSE, echo = FALSE, results = hide>>=
+
+o <- order(DF$p.vec)
+pdf(file = "./figures/cifigcleftnew-by-pvalue.pdf", width = 7, height = 12)
+
+# o <- 1:length(DF$p.vec)
+# pdf(file = "./figures/cifigcleftnew-by-pos.pdf", width = 7, height = 12)
+
+par(mai=c(1,3,1,0.25), bg = "lightyellow")
+#layout(matrix(1:2,nrow=1,ncol=2))
+plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "", xlab = "Cleft Transmission Rate", main = "", axes = FALSE )
+
 htest.list.cleft <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
 }
 ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
 ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
-#o <- order(DF$transrate.all.testable.)
-o <- order(DF$p.vec)
 alpha <- 1/2
-pdf(file = "./figures/cifigcleftnew.pdf", width = 4, height = 12)
-plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "Regional p-value Rank", xlab = "Cleft Transmission Rate", main = "Transmission Rate 95% CI\n(Centromere/Telomere Included)", axes = FALSE )
-polygon( y = c(x <- nrow(ci.mat.cleft):1, rev(x)), x = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = rgb(1,0,0,alpha), border = NA)
+
+
+for( i in 1:nrow(ci.mat.cleft) ){
+
+     lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1,2), lwd = 3, col = rgb(1,0,0,alpha))
+
+}
+
+#polygon( y = c(x <- nrow(ci.mat.cleft):1, rev(x)), x = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = rgb(1,0,0,alpha), border = NA)
 
 htest.list.con <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
@@ -421,29 +436,49 @@ ci.list.con <- lapply(htest.list.con, trioClasses:::get.ci)
 ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
 #o <- order(DF$transrate.all.testable.)
 #plot(1, type = "n", xlim = c(1,nrow(ci.mat.con)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Con Transmission Rate", main = "" )
-polygon( y = c(x, rev(x)), x = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = rgb(0,0,1,alpha), border = NA)
 
-htest.list.all <- list(NA, length = nrow(TU.mat))
-for( i in 1:nrow(TU.mat) ){
-     htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
+for( i in 1:nrow(ci.mat.con) ){
+
+     lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1,2), lwd = 3, col = rgb(0,0,1,alpha))
+
 }
-ci.list.all <- lapply(htest.list.all, trioClasses:::get.ci)
-ci.mat.all <- matrix(unlist(ci.list.all),nrow = length(htest.list.all), ncol = 2, byrow = TRUE )
-#o <- order(DF$transrate.all.testable.)
-#plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
-polygon( y = c(x, rev(x)), x = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = NA, border = "black", lwd = 3)
+
+#polygon( y = c(x, rev(x)), x = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = rgb(0,0,1,alpha), border = NA)
+
+# htest.list.all <- list(NA, length = nrow(TU.mat))
+# for( i in 1:nrow(TU.mat) ){
+#      htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
+# }
+# ci.list.all <- lapply(htest.list.all, trioClasses:::get.ci)
+# ci.mat.all <- matrix(unlist(ci.list.all),nrow = length(htest.list.all), ncol = 2, byrow = TRUE )
+# #o <- order(DF$transrate.all.testable.)
+# #plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
+# polygon( y = c(x, rev(x)), x = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = NA, border = "black", lwd = 3)
+
 lines( y = c(1,nrow(ci.mat.all)), x = rep(0.5,2), lty = 3, lwd = 2 )
 
-axis(1, at = at <- c(0.25,0.5,0.75), labels = at )
-axis(2, at = at <- (max(x) - 0:(max(x)-1)), labels = 1:max(x), las = 2 )
+axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
+axis(2, at = at <- (max(x) - 0:(max(x)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
+axis(3, at = at <- c(0.5,1), labels = round(c(0,max(-log10(DF$p.vec))),1))
 
-legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","all"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),"black"), pch = c(15,15,22), cex = 0.8 )
+mtext("-log10(p)",3, at = 0.75 )
+
+legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
+
+points(0.5+-log10(DF$p.vec[o])/2/max(-log10(DF$p.vec[o])), y = length(o):1, pch = 20, col = "black", cex = 1 )
+# lines(-log10(DF$p.vec[o])/max(-log10(DF$p.vec[o])), y = length(o):1, lty = 3 )
+
 dev.off()
 @
 
-link:figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
-// image::figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
+<<DF>>=
+@
 
+link:figures/cifigcleftnew-by-pos.pdf[Figure 1a? for manuscript]
+
+link:figures/cifigcleftnew-by-pvalue.pdf[Figure 1b? for manuscript]
+
+Foo!
 
 === Tables ===
 

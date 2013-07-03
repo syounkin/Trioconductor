@@ -251,9 +251,15 @@ image::figures/fig-cifig1.jpg[]
 
 
 
-link:figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
-// image::figures/cifigcleftnew.pdf[New Figure 1 for manuscript]
+----
+> NA
+----
 
+link:figures/cifigcleftnew-by-pos.pdf[Figure 1a? for manuscript]
+
+link:figures/cifigcleftnew-by-pvalue.pdf[Figure 1b? for manuscript]
+
+Foo!
 
 === Tables ===
 
@@ -280,7 +286,7 @@ See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054
 == Session Info ==
 ----
 > date()
-[1] "Wed Jul  3 09:55:15 2013"
+[1] "Wed Jul  3 12:26:54 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
