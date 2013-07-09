@@ -13,6 +13,8 @@ library("trioClasses")
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
 <<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
 library("trioClasses")
+@
+<<makedata, eval = FALSE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
 homos.beaty <- with(values(gr.deletion.beaty),cn==0)
@@ -22,7 +24,7 @@ gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.d
 gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
 @ 
 Now with these GRanges objects we use the trioClasses function CNVMatrix to construct the CNV matrices.
-<<cnvmatrix, echo = TRUE, eval = TRUE, cache = TRUE>>=
+<<cnvmatrix, echo = TRUE, eval = FALSE, cache = TRUE>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
@@ -33,7 +35,7 @@ Now we use the CNV matrix as part of a FamilyExperiment object, as defined in tr
 <<options, echo=TRUE, eval = TRUE >>=
   library("CleftCNVAssoc")
   data("pedigrees", package="CleftCNVAssoc")
-#  data("cnv", package = "trioClasses")
+  data("cnv", package = "trioClasses")
 @ 
 Now we create the FamilyExperiment for the cleft group.
 <<se-beaty, echo = FALSE, eval = TRUE>>=
@@ -478,7 +480,7 @@ link:figures/cifigcleftnew-by-pos.pdf[Figure 1a? for manuscript]
 
 link:figures/cifigcleftnew-by-pvalue.pdf[Figure 1b? for manuscript]
 
-Foo!
+
 
 === Tables ===
 
@@ -501,6 +503,27 @@ This study has identified a novel genomic amplification on chromosome 7q34 which
 ____
 
 See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054705[Vincent-Chong et al.] in Plos One -  "Genome Wide Analysis of Chromosomal Alterations in Oral Squamous Cell Carcinomas Revealed over Expression of MGAM and ADAM9." link:http://www.ncbi.nlm.nih.gov/pubmed/?term=23405089[PMID:23405089]
+
+=== Centromeres & Telomeres ===
+
+<<centromeres>>=
+data("centromere")
+centromere.gr
+dist.vec <- distanceToNearest(DF$grange,centromere.gr)$distance
+DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
+DF$grange
+@
+
+<<disthist, fig = TRUE, echo = FALSE, height = 4, width = 4>>=
+plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Centro/Telomere (MB)", main = "", axes = FALSE)
+axis(2)
+lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
+@
+
+<<disttrans, fig = TRUE, width = 4, height = 6>>=
+plot(DF$dist.vec.order.dist.vec.., DF$transrate.all.testable., pch = 20, col = ifelse(DF$dist.vec.order.dist.vec..<=1e6,"red","black"), xlim = c(0,50e6))
+lines(c(0,max(DF$dist.vec.order.dist.vec..)), rep(1/2,2), lty = 3 )
+@
 
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
