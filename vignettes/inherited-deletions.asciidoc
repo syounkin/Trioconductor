@@ -101,10 +101,13 @@ Compute a DataFrame containing counts of transmissions by case/control with rows
 TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
+colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+rownames(TU.mat) <- names(table.list.beaty)
+TU.mat.cmp <- TU.mat
+gr.cmp <- rowData(fe.beaty)
 testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 TU.mat <- TU.mat[testable,]
-rownames(TU.mat) <- names(table.list.beaty)[testable]
-colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+
 DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
 colnames(DF) <- c("grange", colnames(TU.mat))
 @ 
@@ -533,6 +536,36 @@ lines(c(0,max(DF$dist.vec.order.dist.vec..)), rep(1/2,2), lty = 3 )
 
 <<filterout, fig = TRUE, height = 6, width = 6, echo = FALSE>>=
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
+@
+
+=== Chromosome 7 ===
+
+<<gviz, echo = FALSE>>=
+library("Gviz")
+@
+
+<<chr7, fig = TRUE, echo = FALSE>>=
+chr <- 7
+wd <- 10e3
+chr7.region <- DF$grange[22]
+chr7.index <- subjectHits(findOverlaps(chr7.region,gr.cmp))
+gtrack <- GenomeAxisTrack()
+dtrack <- DataTrack( range = gr.cmp[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "s", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+plotTracks(list(dtrack,  gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd )
+@
+
+=== Chromosome 8 ===
+
+<<chr8, fig = TRUE, echo = FALSE>>=
+chr <- 8
+wd <- 10e3
+chr8.region <- DF$grange[28]
+chr8.index <- subjectHits(findOverlaps(chr8.region,gr.cmp))
+gtrack <- GenomeAxisTrack()
+dtrack <- DataTrack( range = gr.cmp[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "s", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+plotTracks(list(dtrack,  gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd )
 @
 
 == Session Info ==
