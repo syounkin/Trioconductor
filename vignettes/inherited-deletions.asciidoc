@@ -403,85 +403,6 @@ text( x = 0.1, y = 0.25, labels = "Chr. 15 (8)" )
 legend(x = 0.8, y = 1, legend = c("All","Control", "Cleft"), pch = 19, col = c("green", "blue","orange"), cex = 0.75)
 @
 
-<<cifigcleftnew, fig = FALSE, cache = FALSE, echo = FALSE, results = hide>>=
-
-o <- order(DF$p.vec)
-pdf(file = "./figures/cifigcleftnew-by-pvalue.pdf", width = 7, height = 12)
-
-# o <- 1:length(DF$p.vec)
-# pdf(file = "./figures/cifigcleftnew-by-pos.pdf", width = 7, height = 12)
-
-par(mai=c(1,3,1,0.25), bg = "lightyellow")
-#layout(matrix(1:2,nrow=1,ncol=2))
-plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "", xlab = "Cleft Transmission Rate", main = "", axes = FALSE )
-
-htest.list.cleft <- list(NA, length = nrow(TU.mat))
-for( i in 1:nrow(TU.mat) ){
-     htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
-}
-ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
-ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
-alpha <- 1/2
-
-
-for( i in 1:nrow(ci.mat.cleft) ){
-
-     lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1,2), lwd = 3, col = rgb(1,0,0,alpha))
-
-}
-
-#polygon( y = c(x <- nrow(ci.mat.cleft):1, rev(x)), x = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = rgb(1,0,0,alpha), border = NA)
-
-htest.list.con <- list(NA, length = nrow(TU.mat))
-for( i in 1:nrow(TU.mat) ){
-     htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
-}
-ci.list.con <- lapply(htest.list.con, trioClasses:::get.ci)
-ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
-#o <- order(DF$transrate.con.testable.)
-#plot(1, type = "n", xlim = c(1,nrow(ci.mat.con)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Con Transmission Rate", main = "" )
-
-for( i in 1:nrow(ci.mat.con) ){
-
-     lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1,2), lwd = 3, col = rgb(0,0,1,alpha))
-
-}
-
-#polygon( y = c(x, rev(x)), x = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = rgb(0,0,1,alpha), border = NA)
-
-# htest.list.all <- list(NA, length = nrow(TU.mat))
-# for( i in 1:nrow(TU.mat) ){
-#      htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
-# }
-# ci.list.all <- lapply(htest.list.all, trioClasses:::get.ci)
-# ci.mat.all <- matrix(unlist(ci.list.all),nrow = length(htest.list.all), ncol = 2, byrow = TRUE )
-# #o <- order(DF$transrate.con.testable.)
-# #plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
-# polygon( y = c(x, rev(x)), x = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = NA, border = "black", lwd = 3)
-
-lines( y = c(1,nrow(ci.mat.all)), x = rep(0.5,2), lty = 3, lwd = 2 )
-
-axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
-axis(2, at = at <- (max(x) - 0:(max(x)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
-axis(3, at = at <- c(0.5,1), labels = round(c(0,max(-log10(DF$p.vec))),1))
-
-mtext("-log10(p)",3, at = 0.75 )
-
-legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
-
-points(0.5+-log10(DF$p.vec[o])/2/max(-log10(DF$p.vec[o])), y = length(o):1, pch = 20, col = "black", cex = 1 )
-# lines(-log10(DF$p.vec[o])/max(-log10(DF$p.vec[o])), y = length(o):1, lty = 3 )
-
-dev.off()
-@
-
-
-link:figures/cifigcleftnew-by-pos.pdf[Figure 1a? for manuscript]
-
-link:figures/cifigcleftnew-by-pvalue.pdf[Figure 1b? for manuscript]
-
-
-
 === Tables ===
 
 .Transmission Counts
@@ -515,7 +436,8 @@ seqlevels(lowmap.gr) <- seqlevels(DF$grange)
 seqlengths(lowmap.gr) <- seqlengths(DF$grange)
 filter.gr <- reduce(c(lowmap.gr,centromere.gr))
 dist.vec <- as.data.frame(distanceToNearest(DF$grange,filter.gr))$distance
-DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
+#DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
+DF <- DataFrame(DF, dist.vec)
 as.data.frame(DF)
 @
 
@@ -530,8 +452,8 @@ lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
 In the figure above a horizontal line is drawn at 1 MB.  \Sexpr{sum(dist.vec <= 1e6 )} regions are within 1 MB of a bad region, which is \Sexpr{round(sum(dist.vec <= 1e6 )/length(dist.vec)*100,0)}% of all regions! Note that \Sexpr{sum(dist.vec == 0 )} regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
 
 <<disttrans, fig = TRUE, width = 12, height = 6, echo = FALSE>>=
-plot(DF$dist.vec.order.dist.vec.., DF$transrate.con.testable., pch = 20, col = ifelse(DF$dist.vec.order.dist.vec..<=1e6,"red","black"))
-lines(c(0,max(DF$dist.vec.order.dist.vec..)), rep(1/2,2), lty = 3 )
+plot(DF$dist.vec, DF$transrate.con.testable., pch = 20, col = ifelse(DF$dist.vec<=1e6,"red","black"))
+lines(c(0,max(DF$dist.vec)), rep(1/2,2), lty = 3 )
 @
 
 <<filterout, fig = TRUE, height = 6, width = 6, echo = FALSE>>=
@@ -544,10 +466,10 @@ boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6
 library("Gviz")
 @
 
-<<chr7, fig = TRUE, echo = FALSE>>=
+<<chr7, fig = TRUE, echo = FALSE, cache = FALSE>>=
 chr <- 7
 wd <- 10e3
-chr7.region <- DF$grange[22]
+chr7.region <- DF$grange[25]
 chr7.index <- subjectHits(findOverlaps(chr7.region,gr.cmp))
 gtrack <- GenomeAxisTrack()
 dtrack <- DataTrack( range = gr.cmp[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "s", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
@@ -557,10 +479,10 @@ plotTracks(list(dtrack,  gtrack, itrack ),  background.panel = "#FFFEDB", backgr
 
 === Chromosome 8 ===
 
-<<chr8, fig = TRUE, echo = FALSE>>=
+<<chr8, fig = TRUE, echo = FALSE, cache = FALSE>>=
 chr <- 8
 wd <- 10e3
-chr8.region <- DF$grange[28]
+chr8.region <- DF$grange[26]
 chr8.index <- subjectHits(findOverlaps(chr8.region,gr.cmp))
 gtrack <- GenomeAxisTrack()
 dtrack <- DataTrack( range = gr.cmp[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "s", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
@@ -568,8 +490,69 @@ itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 
 plotTracks(list(dtrack,  gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd )
 @
 
+=== Figure 1 ===
+
+<<cifigcleftnew, fig = TRUE, cache = FALSE, echo = FALSE, results = hide, height = 8, width = 10>>=
+
+TU.mat <- TU.mat[dist.vec > 1e6,]
+ci.mat.cleft <- ci.mat.cleft[dist.vec > 1e6,]
+ci.mat.con <- ci.mat.con[dist.vec > 1e6,]
+DF <- DF[dist.vec > 1e6,]
+
+layout(matrix(1:2,nrow=1,ncol=2))
+par(mai=c(1,2.5,0,0), bg = "lightyellow")
+
+o <- order(DF$p.vec)
+# o <- 1:nrow(ci.mat.cleft)
+
+plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "", xlab = "Transmission Rate", main = "", axes = FALSE )
+
+lines( y = c(1,length(o)), x = rep(0.5,2), lty = 3, lwd = 1 )
+
+htest.list.cleft <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+}
+ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
+ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+eps <- 1/8
+
+for( i in 1:nrow(ci.mat.cleft) ){
+
+     lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1+eps,2), lwd = 2, col = "black")
+
+}
+
+htest.list.con <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+}
+ci.list.con <- lapply(htest.list.con, trioClasses:::get.ci)
+ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+
+for( i in 1:nrow(ci.mat.con) ){
+
+     lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1-eps,2), lwd = 2, col = "black")
+
+}
+
+
+axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
+axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
+
+#legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
+
+par(mai=c(1,0,0,0), bg = "lightyellow")
+plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4))
+lines(rep(-log10(0.05/sum(dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
+lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
+axis(1)
+@
+
+
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
 date()
 sessionInfo()
 @
+Foo!
