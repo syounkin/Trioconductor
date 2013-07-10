@@ -5,12 +5,9 @@
 <<junk,echo=FALSE>>=    Somehow, this avoids the "figure margins too large" error ~kbroman
 par(mar=rep(0,4))
 par(bg="lightyellow")
-options(width=280, continue="  ")
+options(width=1000, continue="  ")
 @ 
 
-<<trioClasses, echo = TRUE, eval = TRUE, cache = FALSE>>=
-library("trioClasses")
-@
 == Construct CNV Matrix ==
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
 <<package, echo = TRUE, eval = TRUE, cache = FALSE>>=

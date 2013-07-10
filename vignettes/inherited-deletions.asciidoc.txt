@@ -3,9 +3,6 @@
 :data-uri:
 
 
-----
-> library("trioClasses")
-----
 == Construct CNV Matrix ==
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
 ----
@@ -406,7 +403,7 @@ image::figures/fig-filterout.jpg[]
 == Session Info ==
 ----
 > date()
-[1] "Wed Jul 10 12:16:09 2013"
+[1] "Wed Jul 10 12:22:22 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
