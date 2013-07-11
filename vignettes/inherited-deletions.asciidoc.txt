@@ -387,6 +387,7 @@ The filter accounts for 278 MB made up of 324 distinct regions.
 image::figures/fig-disthist.jpg[]
 
 
+
 In the figure above a horizontal line is drawn at 1 MB.  21 regions are within 1 MB of a bad region, which is 54% of all regions! Note that 19 regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
 
 image::figures/fig-disttrans.jpg[]
@@ -395,15 +396,18 @@ image::figures/fig-disttrans.jpg[]
 image::figures/fig-filterout.jpg[]
 
 
+
 === Chromosome 7 ===
 
 
 image::figures/fig-chr7.jpg[]
 
 
+
 === Chromosome 8 ===
 
 image::figures/fig-chr8.jpg[]
+
 
 
 === Figure 1 ===
@@ -412,10 +416,11 @@ image::figures/fig-cifigcleftnew.jpg[]
 
 
 
+
 == Session Info ==
 ----
 > date()
-[1] "Wed Jul 10 18:28:56 2013"
+[1] "Thu Jul 11 12:32:22 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)

@@ -120,6 +120,7 @@ Histogram of transmission rate component-wise.  We see a clear bimodal distribut
 fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 (DF <- DataFrame(DF,p.vec, trans.vec))
+DF.cmp <- DF
 @ 
 Number of components and number of regions is given below.
 <<length1, echo = TRUE, eval = TRUE, cache = FALSE>>=
@@ -449,6 +450,15 @@ axis(2)
 lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
 @
 
+<<disthistpdf, echo = FALSE, results = hide>>=
+pdf(file = "./figures/disthist.pdf")
+par(bg="lightyellow")
+plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
+axis(2)
+lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
+dev.off()
+@
+
 In the figure above a horizontal line is drawn at 1 MB.  \Sexpr{sum(dist.vec <= 1e6 )} regions are within 1 MB of a bad region, which is \Sexpr{round(sum(dist.vec <= 1e6 )/length(dist.vec)*100,0)}% of all regions! Note that \Sexpr{sum(dist.vec == 0 )} regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
 
 <<disttrans, fig = TRUE, width = 12, height = 6, echo = FALSE>>=
@@ -460,34 +470,60 @@ lines(c(0,max(DF$dist.vec)), rep(1/2,2), lty = 3 )
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
 @
 
+<<filteroutpdf, echo = FALSE, results = hide>>=
+pdf(file = "./figures/filterout.pdf")
+par(bg="lightyellow")
+boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
+dev.off()
+@
+
 === Chromosome 7 ===
 
 <<gviz, echo = FALSE>>=
 library("Gviz")
+library("TxDb.Hsapiens.UCSC.hg18.knownGene")
+txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 @
 
-<<chr7, fig = TRUE, echo = FALSE, cache = FALSE>>=
+<<chr7, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6>>=
 chr <- 7
-wd <- 10e3
+wd <- 100e3
 chr7.region <- DF$grange[25]
 chr7.index <- subjectHits(findOverlaps(chr7.region,gr.cmp))
+chr7.index2 <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
-dtrack <- DataTrack( range = gr.cmp[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "s", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID", )
+dtrack <- DataTrack( range = gr.cmp[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+dtrack2 <- DataTrack( range = DF.cmp$grange[chr7.index2], data = -log10(DF.cmp$p.vec[chr7.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-plotTracks(list(dtrack,  gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd )
+plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+@
+
+<<chr7pdf, echo = FALSE, cache = FALSE, results = hide>>=
+pdf(file = "./figures/chr7.pdf")
+plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+dev.off()
 @
 
 === Chromosome 8 ===
 
-<<chr8, fig = TRUE, echo = FALSE, cache = FALSE>>=
+<<chr8, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6>>=
 chr <- 8
-wd <- 10e3
 chr8.region <- DF$grange[26]
 chr8.index <- subjectHits(findOverlaps(chr8.region,gr.cmp))
+chr8.index2 <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
-dtrack <- DataTrack( range = gr.cmp[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "s", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID")
+dtrack <- DataTrack( range = gr.cmp[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+dtrack2 <- DataTrack( range = DF.cmp$grange[chr8.index2], data = -log10(DF.cmp$p.vec[chr8.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-plotTracks(list(dtrack,  gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd )
+plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+@
+
+<<chr8pdf, echo = FALSE, cache = FALSE, results = hide>>=
+pdf(file = "./figures/chr8.pdf")
+plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+dev.off()
 @
 
 === Figure 1 ===
@@ -549,10 +585,63 @@ lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
 axis(1)
 @
 
+<<cifigcleftnewpdf, cache = FALSE, echo = FALSE, results = hide>>=
+pdf(file = "./figures/cifigcleftnew.pdf", width = 12, height = 8)
+par(bg="lightyellow")
+layout(matrix(1:2,nrow=1,ncol=2))
+par(mai=c(1,2.5,0,0), bg = "lightyellow")
+
+o <- order(DF$p.vec)
+# o <- 1:nrow(ci.mat.cleft)
+
+plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "", xlab = "Transmission Rate", main = "", axes = FALSE )
+
+lines( y = c(1,length(o)), x = rep(0.5,2), lty = 3, lwd = 1 )
+
+htest.list.cleft <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+}
+ci.list.cleft <- lapply(htest.list.cleft, trioClasses:::get.ci)
+ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+eps <- 1/8
+
+for( i in 1:nrow(ci.mat.cleft) ){
+
+     lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1+eps,2), lwd = 2, col = "black")
+
+}
+
+htest.list.con <- list(NA, length = nrow(TU.mat))
+for( i in 1:nrow(TU.mat) ){
+     htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+}
+ci.list.con <- lapply(htest.list.con, trioClasses:::get.ci)
+ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+
+for( i in 1:nrow(ci.mat.con) ){
+
+     lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1-eps,2), lwd = 2, col = "black")
+
+}
+
+
+axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
+axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
+
+#legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
+
+par(mai=c(1,0,0,0), bg = "lightyellow")
+plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4))
+lines(rep(-log10(0.05/sum(dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
+lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
+axis(1)
+dev.off()
+@
+
 
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
 date()
 sessionInfo()
 @
-Foo!
