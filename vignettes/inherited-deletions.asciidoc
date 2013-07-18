@@ -426,16 +426,42 @@ ____
 
 See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054705[Vincent-Chong et al.] in Plos One -  "Genome Wide Analysis of Chromosomal Alterations in Oral Squamous Cell Carcinomas Revealed over Expression of MGAM and ADAM9." link:http://www.ncbi.nlm.nih.gov/pubmed/?term=23405089[PMID:23405089]
 
-=== Centromeres, Telomeres & Low Mapability ===
+=== Filter ===
 
-We create a filter based on UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability.
+==== HLA Super-Locus ====
+
+Five distinct but nearby regions on chromosome 6 appear between 29,940,311 and 32,788,048 (hg18) with transmission rates of 0.540, 0.483, 0.444, 0.430, 0.245.  The exceptionally low transmission rate for the last of these regions raised eyebrows and upon inspection of the genomic location we immediately observed that 4 of 5 of these regions contain a gene in the HLA family.  The HLA family of genes are known to be...
+
+.Chromosome 6 Regions & HLA
+[width="60%",cols="3"]
+[options="header",grid="rows"]
+|======
+|UCSC Genome Browser (hg18)|band
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:29940311-30032810[chr6:29940311-30032810]|6p21.33|0.540
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:31382534-31422222[chr6:31382534-31422222]|6p21.33|0.483
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32055573-32124218[chr6:32055573-32124218]|6p21.32|0.444
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32536895-32684456[chr6:32536895-32684456]|6p21.32|0.430
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32694224-32788048[chr6:32694224-32788048]|6p21.32|0.245
+|======
+
+image:figures/HLA.jpg[link="https://en.wikipedia.org/wiki/Human_leukocyte_antigen"]
+
+We choose to remove these due to the unusually high amount of known variability in this region.  We believe the noisy control data, coupled with the highly variable HLA region results in deflated transmission rates in the controls, and therefore testing against the controls will result in false positive detection.
+
+<<filterhla>>=
+hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788048))
+@
+
+==== Centromeres, Telomeres & Low Mapability ====
+
+We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
 
 <<filter>>=
 data("centromere")
 lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
 seqlevels(lowmap.gr) <- seqlevels(DF$grange)
 seqlengths(lowmap.gr) <- seqlengths(DF$grange)
-filter.gr <- reduce(c(lowmap.gr,centromere.gr))
+filter.gr <- reduce(c(lowmap.gr,centromere.gr,hla.gr))
 dist.vec <- as.data.frame(distanceToNearest(DF$grange,filter.gr))$distance
 #DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
 DF <- DataFrame(DF, dist.vec)
@@ -443,6 +469,13 @@ as.data.frame(DF)
 @
 
 The filter accounts for \Sexpr{round(sum(width(filter.gr))/1e6,0)} MB made up of \Sexpr{length(filter.gr)} distinct regions.
+
+<<filtercmp>>=
+dist.vec <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
+#DF.cmp <- DataFrame(DF.cmp[order(dist.vec),],dist.vec[order(dist.vec)])
+DF.cmp <- DataFrame(DF.cmp, dist.vec)
+@
+
 
 <<disthist, fig = TRUE, echo = FALSE, height = 4, width = 4>>=
 plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
@@ -477,6 +510,22 @@ boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6
 dev.off()
 @
 
+==== Region-wise ====
+
+<<filteregion>>=
+TU.mat <- TU.mat[DF$dist.vec > 1e6,]
+ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
+ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
+DF <- DF[DF$dist.vec > 1e6,]
+@
+
+==== Component-wise ====
+
+<<filtercomp>>=
+TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
+DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
+@
+
 === Chromosome 7 ===
 
 <<gviz, echo = FALSE>>=
@@ -485,7 +534,7 @@ library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 @
 
-<<chr7, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6>>=
+<<chr7, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
 chr <- 7
 wd <- 100e3
 chr7.region <- DF$grange[25]
@@ -499,7 +548,7 @@ itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr7pdf, echo = FALSE, cache = FALSE, results = hide>>=
+<<chr7pdf, echo = FALSE, cache = FALSE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/chr7.pdf")
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -507,7 +556,7 @@ dev.off()
 
 === Chromosome 8 ===
 
-<<chr8, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6>>=
+<<chr8, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
 chr <- 8
 chr8.region <- DF$grange[26]
 chr8.index <- subjectHits(findOverlaps(chr8.region,gr.cmp))
@@ -520,7 +569,7 @@ itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr8pdf, echo = FALSE, cache = FALSE, results = hide>>=
+<<chr8pdf, echo = FALSE, cache = FALSE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/chr8.pdf")
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -530,10 +579,6 @@ dev.off()
 
 <<cifigcleftnew, fig = TRUE, cache = FALSE, echo = FALSE, results = hide, height = 8, width = 10>>=
 
-TU.mat <- TU.mat[dist.vec > 1e6,]
-ci.mat.cleft <- ci.mat.cleft[dist.vec > 1e6,]
-ci.mat.con <- ci.mat.con[dist.vec > 1e6,]
-DF <- DF[dist.vec > 1e6,]
 
 layout(matrix(1:2,nrow=1,ncol=2))
 par(mai=c(1,2.5,0,0), bg = "lightyellow")
@@ -556,6 +601,7 @@ eps <- 1/8
 for( i in 1:nrow(ci.mat.cleft) ){
 
      lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1+eps,2), lwd = 2, col = "black")
+     points( x = DF$transrate.cleft.testable.[o][i], y = nrow(ci.mat.cleft)-i+1+eps, pch = 19)
 
 }
 
@@ -569,9 +615,10 @@ ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2
 for( i in 1:nrow(ci.mat.con) ){
 
      lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1-eps,2), lwd = 2, col = "black")
+     points( x = DF$transrate.con.testable.[o][i], y = nrow(ci.mat.con)-i+1-eps, pch = 1 )
+
 
 }
-
 
 axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
 axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
@@ -580,7 +627,7 @@ axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$gr
 
 par(mai=c(1,0,0,0), bg = "lightyellow")
 plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4))
-lines(rep(-log10(0.05/sum(dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
+lines(rep(-log10(0.05/sum(DF$dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
 lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
 axis(1)
 @
@@ -588,6 +635,7 @@ axis(1)
 <<cifigcleftnewpdf, cache = FALSE, echo = FALSE, results = hide>>=
 pdf(file = "./figures/cifigcleftnew.pdf", width = 12, height = 8)
 par(bg="lightyellow")
+
 layout(matrix(1:2,nrow=1,ncol=2))
 par(mai=c(1,2.5,0,0), bg = "lightyellow")
 
@@ -609,6 +657,7 @@ eps <- 1/8
 for( i in 1:nrow(ci.mat.cleft) ){
 
      lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1+eps,2), lwd = 2, col = "black")
+     points( x = DF$transrate.cleft.testable.[o][i], y = nrow(ci.mat.cleft)-i+1+eps, pch = 19)
 
 }
 
@@ -622,9 +671,10 @@ ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2
 for( i in 1:nrow(ci.mat.con) ){
 
      lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1-eps,2), lwd = 2, col = "black")
+     points( x = DF$transrate.con.testable.[o][i], y = nrow(ci.mat.con)-i+1-eps, pch = 1)
+
 
 }
-
 
 axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
 axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
@@ -636,9 +686,73 @@ plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, a
 lines(rep(-log10(0.05/sum(dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
 lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
 axis(1)
+@
+
+
+=== QQ Plot ===
+
+<<qqregion, fig = TRUE, width = 6, height = 6, eval = FALSE, echo = FALSE>>=
+o <- order(-log10(DF$p.vec), decreasing = TRUE)
+plot( -log10((1:length(DF$p.vec))/length(DF$p.vec)), -log10(DF$p.vec)[o], xlim = xlim <- c(0,max(-log10(DF$p.vec))), ylim = xlim, xlab = "Expected -log10p", ylab = "Observed -log10p", main = "")
+lines( x = c(0,4), y = c(0,4), lty = 3)
+@
+
+<<qqPlotregion, fig = TRUE, width = 6, height = 6>>=
+library("snpStats")
+par(bg="lightyellow")
+qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
+
+@
+
+<<qqPlotregionpdf>>=
+pdf(file="figures/qqplotregion.pdf")
+par(bg="lightyellow")
+qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
 dev.off()
 @
 
+There are \Sexpr{length(DF$p.vec)} tests in this figure.
+
+<<showregion>>=
+o <- order(DF$p.vec)
+as.data.frame(DF[o,])
+@
+
+<<qqPlotcmp, fig = TRUE, width = 6, height = 6>>=
+par(bg="lightyellow")
+qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
+
+@
+
+<<qqPlotcmppdf>>=
+pdf(file="figures/qqplotcmp.pdf")
+par(bg="lightyellow")
+qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
+dev.off()
+@
+
+There are \Sexpr{length(DF.cmp$p.vec)} tests in this figure.
+
+<<showcmp>>=
+o <- order(DF.cmp$p.vec)
+as.data.frame(DF.cmp[o,])
+@
+
+==== Fisher's Method  ====
+
+===== Component-wise =====
+
+<<fishersmethod>>=
+(fishers.p.cmp <- sum(-2*log(DF.cmp$p.vec)))
+pchisq(fishers.p.cmp, df = 2*length(DF.cmp$p.vec), lower.tail = FALSE)
+@
+
+===== Region-wise. =====
+
+<<fishersmethod>>=
+(fishers.p <- sum(-2*log(DF$p.vec)))
+pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
+@
 
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=

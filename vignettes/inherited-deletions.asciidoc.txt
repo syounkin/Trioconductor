@@ -286,16 +286,42 @@ ____
 
 See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054705[Vincent-Chong et al.] in Plos One -  "Genome Wide Analysis of Chromosomal Alterations in Oral Squamous Cell Carcinomas Revealed over Expression of MGAM and ADAM9." link:http://www.ncbi.nlm.nih.gov/pubmed/?term=23405089[PMID:23405089]
 
-=== Centromeres, Telomeres & Low Mapability ===
+=== Filter ===
 
-We create a filter based on UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability.
+==== HLA Super-Locus ====
+
+Five distinct but nearby regions on chromosome 6 appear between 29,940,311 and 32,788,048 (hg18) with transmission rates of 0.540, 0.483, 0.444, 0.430, 0.245.  The exceptionally low transmission rate for the last of these regions raised eyebrows and upon inspection of the genomic location we immediately observed that 4 of 5 of these regions contain a gene in the HLA family.  The HLA family of genes are known to be...
+
+.Chromosome 6 Regions & HLA
+[width="60%",cols="3"]
+[options="header",grid="rows"]
+|======
+|UCSC Genome Browser (hg18)|band
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:29940311-30032810[chr6:29940311-30032810]|6p21.33|0.540
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:31382534-31422222[chr6:31382534-31422222]|6p21.33|0.483
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32055573-32124218[chr6:32055573-32124218]|6p21.32|0.444
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32536895-32684456[chr6:32536895-32684456]|6p21.32|0.430
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32694224-32788048[chr6:32694224-32788048]|6p21.32|0.245
+|======
+
+image:figures/HLA.jpg[link="https://en.wikipedia.org/wiki/Human_leukocyte_antigen"]
+
+We choose to remove these due to the unusually high amount of known variability in this region.  We believe the noisy control data, coupled with the highly variable HLA region results in deflated transmission rates in the controls, and therefore testing against the controls will result in false positive detection.
+
+----
+> hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788048))
+----
+
+==== Centromeres, Telomeres & Low Mapability ====
+
+We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
 
 ----
 > data("centromere")
 > lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
 > seqlevels(lowmap.gr) <- seqlevels(DF$grange)
 > seqlengths(lowmap.gr) <- seqlengths(DF$grange)
-> filter.gr <- reduce(c(lowmap.gr,centromere.gr))
+> filter.gr <- reduce(c(lowmap.gr,centromere.gr,hla.gr))
 > dist.vec <- as.data.frame(distanceToNearest(DF$grange,filter.gr))$distance
 > #DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
 > DF <- DataFrame(DF, dist.vec)
@@ -356,11 +382,11 @@ We create a filter based on UCSC centromere/telomere locations and R. Scharpfs l
 13                   0.617                     0.422  7892084
 14                   0.490                     0.429        0
 15                   0.400                     0.565  1519019
-16                   0.533                     0.546  2859310
-17                   0.450                     0.515  4301533
-18                   0.347                     0.515  4974572
-19                   0.366                     0.505  5455894
-20                   0.320                     0.179  5613223
+16                   0.533                     0.546        0
+17                   0.450                     0.515        0
+18                   0.347                     0.515        0
+19                   0.366                     0.505        0
+20                   0.320                     0.179        0
 21                   0.569                     0.537  4821006
 22                   0.574                     0.575 16628124
 23                   0.408                     0.394        0
@@ -382,13 +408,20 @@ We create a filter based on UCSC centromere/telomere locations and R. Scharpfs l
 39                   0.580                     0.494  8502852
 ----
 
-The filter accounts for 278 MB made up of 324 distinct regions.
+The filter accounts for 281 MB made up of 325 distinct regions.
+
+----
+> dist.vec <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
+> #DF.cmp <- DataFrame(DF.cmp[order(dist.vec),],dist.vec[order(dist.vec)])
+> DF.cmp <- DataFrame(DF.cmp, dist.vec)
+----
+
 
 image::figures/fig-disthist.jpg[]
 
 
 
-In the figure above a horizontal line is drawn at 1 MB.  21 regions are within 1 MB of a bad region, which is 54% of all regions! Note that 19 regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
+In the figure above a horizontal line is drawn at 1 MB.  548 regions are within 1 MB of a bad region, which is 87% of all regions! Note that 347 regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
 
 image::figures/fig-disttrans.jpg[]
 
@@ -397,16 +430,28 @@ image::figures/fig-filterout.jpg[]
 
 
 
+==== Region-wise ====
+
+----
+> TU.mat <- TU.mat[DF$dist.vec > 1e6,]
+> ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
+> ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
+> DF <- DF[DF$dist.vec > 1e6,]
+----
+
+==== Component-wise ====
+
+----
+> TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
+> DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
+----
+
 === Chromosome 7 ===
 
-
-image::figures/fig-chr7.jpg[]
 
 
 
 === Chromosome 8 ===
-
-image::figures/fig-chr8.jpg[]
 
 
 
@@ -417,10 +462,203 @@ image::figures/fig-cifigcleftnew.jpg[]
 
 
 
+=== QQ Plot ===
+
+
+----
+> library("snpStats")
+> par(bg="lightyellow")
+> qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+ 13.000   0.000   0.363 
+> 
+----
+image::figures/fig-qqPlotregion.jpg[]
+
+
+----
+> pdf(file="figures/qqplotregion.pdf")
+> par(bg="lightyellow")
+> qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+ 13.000   0.000   0.363 
+> dev.off()
+pdf 
+  2 
+----
+
+There are 13 tests in this figure.
+
+----
+> o <- order(DF$p.vec)
+> as.data.frame(DF[o,])
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con  p.vec transrate.all.testable.
+1             chr7    141380317  141447476        67160             *     69     38    68    78 0.0034                   0.542
+2             chr8     39341981   39548228       206248             *    140    104    32    45 0.0109                   0.536
+3             chr5     97073409   97267981       194573             *     35     27    20    30 0.0614                   0.491
+4            chr19     20349698   20523385       173688             *     54     43    40    38 0.3349                   0.537
+5             chr6     79022244   79098876        76633             *    154    114   108    80 0.5366                   0.575
+6             chr2     40785003   41129076       344074             *     66     63    57    52 0.6194                   0.517
+7             chr6     67065007   67111682        46676             *     72     62    58    44 0.7293                   0.551
+8            chr18     64879175   64906488        27314             *     22     21    26    20 0.7640                   0.539
+9             chr3     46765401   46827683        62283             *     12     15    18    14 0.8781                   0.508
+10           chr20     52080333   52094148        13816             *     44     45    40    29 0.8902                   0.532
+11            chr4    161252445  161314427        61983             *     28     33    35    27 0.9117                   0.512
+12           chr15     32459510   32631865       172356             *     61     64    64    46 0.9418                   0.532
+13            chr5      8756085    8811041        54957             *     19     26    29    18 0.9814                   0.522
+   transrate.con.testable. transrate.cleft.testable. dist.vec
+1                    0.466                     0.645  1481524
+2                    0.416                     0.574  4341772
+3                    0.400                     0.565  1519019
+4                    0.513                     0.557  3839615
+5                    0.574                     0.575 16628124
+6                    0.523                     0.512 35700002
+7                    0.569                     0.537  4821006
+8                    0.565                     0.512 48088174
+9                    0.562                     0.444 19283317
+10                   0.580                     0.494  8502852
+11                   0.565                     0.459 15971444
+12                   0.582                     0.488  1748509
+13                   0.617                     0.422  7892084
+----
+
+----
+> par(bg="lightyellow")
+> qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+  84.00    0.00    0.73 
+> 
+----
+image::figures/fig-qqPlotcmp.jpg[]
+
+
+----
+> pdf(file="figures/qqplotcmp.pdf")
+> par(bg="lightyellow")
+> qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+  84.00    0.00    0.73 
+> dev.off()
+pdf 
+  2 
+----
+
+There are 84 tests in this figure.
+
+----
+> o <- order(DF.cmp$p.vec)
+> as.data.frame(DF.cmp[o,])
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con     p.vec trans.vec dist.vec
+1             chr7    141435189  141439888         4700             *     77     31    67    75 0.0000983     0.576  1489112
+2             chr7    141419097  141420758         1662             *     83     43    74    91 0.0002667     0.540  1508242
+3             chr7    141420759  141423760         3002             *     83     44    75    90 0.0005212     0.541  1505240
+4             chr7    141429472  141433796         4325             *     83     44    75    89 0.0006241     0.543  1495204
+5             chr7    141423761  141427767         4007             *     83     45    75    90 0.0006938     0.539  1501233
+6             chr7    141427768  141429471         1704             *     83     45    75    89 0.0008276     0.541  1499529
+7             chr7    141433797  141435188         1392             *     82     42    74    82 0.0012667     0.557  1493812
+8             chr8     39356825   39370186        13362             *    147     86    27    37 0.0022040     0.586  4519814
+9             chr8     39370187   39379683         9497             *    161    112    31    45 0.0036342     0.550  4510317
+10            chr8     39379684   39393417        13734             *    163    117    31    45 0.0050418     0.545  4496583
+11            chr8     39476659   39497557        20899             *    139     74    21    26 0.0074682     0.615  4392443
+12            chr8     39428327   39442543        14217             *    165    131    34    50 0.0093737     0.524  4447457
+13            chr8     39460088   39469612         9525             *    153    111    30    42 0.0100639     0.545  4420388
+14            chr8     39442544   39449313         6770             *    165    132    34    50 0.0101454     0.522  4440687
+15            chr8     39449314   39449314            1             *    165    134    34    50 0.0118388     0.520  4440686
+16            chr8     39393418   39401865         8448             *    164    125    32    45 0.0123764     0.536  4488135
+17            chr8     39449315   39450167          853             *    164    132    34    49 0.0137356     0.522  4439833
+18            chr8     39473098   39476658         3561             *    152    108    27    37 0.0138689     0.552  4413342
+19            chr8     39421344   39428326         6983             *    165    130    34    48 0.0140152     0.528  4461674
+20            chr8     39401866   39408899         7034             *    164    125    33    45 0.0161666     0.537  4481101
+21            chr8     39408900   39421343        12444             *    164    127    33    45 0.0187519     0.534  4468657
+22            chr8     39457082   39460087         3006             *    161    124    31    42 0.0221473     0.536  4429913
+23            chr8     39469613   39473097         3485             *    152    108    28    36 0.0240164     0.556  4416903
+24            chr8     39450168   39457081         6914             *    162    128    31    42 0.0275342     0.532  4432919
+25            chr5     97076368   97087516        11149             *     35     29    20    31 0.0716268     0.478  1699484
+26            chr5     97087517   97121798        34282             *     35     30    20    31 0.0837526     0.474  1665202
+27            chr5     97075236   97076367         1132             *     35     29    20    30 0.0854169     0.482  1710633
+28            chr5     97121799   97125076         3278             *     35     30    20    30 0.0992070     0.478  1661924
+29            chr5     97074222   97075235         1014             *     31     27    18    28 0.1045871     0.471  1711765
+30            chr7    141439889  141441259         1371             *     12     17    13    38 0.1112185     0.312  1487741
+31           chr19     20404485   20413667         9183             *     42     34    22    28 0.1456802     0.508  3949333
+32           chr19     20413668   20418018         4351             *     45     44    26    38 0.1465092     0.464  3944982
+33           chr19     20422200   20482954        60755             *     56     52    40    43 0.3611987     0.503  3880046
+34            chr6     79031111   79031808          698             *    166    150    89    87 0.3730067     0.518 16695192
+35           chr19     20418019   20422199         4181             *     55     52    40    43 0.3849891     0.500  3940801
+36           chr19     20482955   20493452        10498             *     56     52    40    42 0.3924808     0.505  3869548
+37            chr6     79031809   79034385         2577             *    167    153    93    90 0.4196297     0.517 16692615
+38           chr19     20493453   20507068        13616             *     51     51    38    41 0.4588383     0.492  3855932
+39           chr18     64897188   64898547         1360             *     23     19    26    23 0.5195573     0.538 48106187
+40            chr6     79029649   79029919          271             *    144    136    80    76 0.5280326     0.514 16697081
+41            chr6     79029920   79031110         1191             *    144    136    80    76 0.5280326     0.514 16695890
+42            chr2     41092148   41101972         9825             *     69     66    61    58 0.5593940     0.512 36007147
+43           chr15     32505886   32518049        12164             *     45     44    37    36 0.5688152     0.506  1794885
+44           chr18     64904657   64905087          431             *     23     21    25    23 0.5756155     0.522 48113656
+45           chr18     64905088   64905367          280             *     23     21    25    23 0.5756155     0.522 48114087
+46           chr18     64905368   64906488         1121             *     22     21    25    23 0.6170188     0.516 48114367
+47           chr18     64903149   64904521         1373             *     23     22    25    23 0.6183544     0.516 48112148
+48           chr18     64904522   64904656          135             *     23     22    25    23 0.6183544     0.516 48113521
+49           chr18     64898548   64903148         4601             *     23     22    26    23 0.6537661     0.521 48107547
+50            chr6     79083327   79086086         2760             *    166    155   112    96 0.7152100     0.526 16640914
+51            chr6     79034386   79036116         1731             *    167    160   105    92 0.7206161     0.519 16690884
+52            chr6     79086087   79088461         2375             *    166    155   112    95 0.7345443     0.527 16638539
+53            chr6     79036117   79039486         3370             *    167    161   107    92 0.7659317     0.520 16687514
+54            chr6     79081010   79083326         2317             *    166    162   114    99 0.7733706     0.518 16643674
+55            chr6     79042356   79056616        14261             *    167    163   110    95 0.7810535     0.518 16670384
+56            chr6     79075016   79077157         2142             *    167    164   114    99 0.7842597     0.517 16649843
+57            chr6     79088462   79090197         1736             *    162    154   111    93 0.7855776     0.525 16636803
+58            chr6     79070426   79075015         4590             *    167    164   113    98 0.7859630     0.517 16651985
+59            chr6     79039487   79042355         2869             *    167    162   110    94 0.7878992     0.520 16684645
+60            chr6     79077158   79081009         3852             *    167    164   115    99 0.7987471     0.517 16645991
+61            chr6     79069278   79070425         1148             *    167    164   114    98 0.8004684     0.517 16656575
+62            chr6     79063712   79065998         2287             *    167    164   113    97 0.8022055     0.518 16661002
+63            chr6     67075448   67079426         3979             *     76     72    60    47 0.8086951     0.533  4831447
+64            chr6     79065999   79069277         3279             *    167    164   114    97 0.8160258     0.518 16657723
+65            chr6     79056617   79063711         7095             *    167    164   112    95 0.8195597     0.519 16663289
+66            chr6     67101258   67104015         2758             *     75     71    61    47 0.8250148     0.535  4857257
+67            chr6     67079427   67101257        21831             *     76     72    61    47 0.8262660     0.535  4835426
+68            chr6     67104016   67105019         1004             *     74     71    61    47 0.8380277     0.534  4860015
+69            chr3     46771354   46825614        54261             *     13     15    18    14 0.8457294     0.517 19285386
+70           chr15     32530025   32530130          106             *     64     67    64    52 0.8685106     0.518  1819024
+71           chr20     52081230   52081774          545             *     46     44    40    28 0.8697929     0.544  8515226
+72            chr4    161271979  161276892         4914             *     27     32    34    28 0.8810465     0.504 15990978
+73           chr15     32587888   32595161         7274             *     62     67    61    50 0.8839336     0.512  1876887
+74           chr15     32518050   32530024        11975             *     62     62    60    45 0.8873822     0.533  1807049
+75           chr15     32538343   32549650        11308             *     64     68    65    52 0.8928386     0.518  1827342
+76           chr20     52081775   52088118         6344             *     47     47    41    29 0.8939390     0.537  8508882
+77           chr15     32530131   32538342         8212             *     64     67    65    51 0.8953165     0.522  1819130
+78           chr15     32569801   32587887        18087             *     63     68    64    51 0.9052699     0.516  1858800
+79           chr15     32549651   32569800        20150             *     63     68    65    51 0.9154210     0.518  1838650
+80            chr4    161290510  161291569         1060             *     28     36    35    28 0.9343645     0.496 16009509
+81            chr4    161276893  161290509        13617             *     28     36    36    28 0.9443671     0.500 15995892
+82            chr5      8756148    8756614          467             *     19     27    29    18 0.9854716     0.516  7892147
+83            chr5      8756615    8800106        43492             *     19     28    29    18 0.9886375     0.511  7892614
+84            chr5      8756085    8756147           63             *     18     27    29    18 0.9892454     0.511  7892084
+----
+
+==== Fisher's Method  ====
+
+===== Component-wise =====
+
+----
+> (fishers.p.cmp <- sum(-2*log(DF.cmp$p.vec)))
+[1] 332
+> pchisq(fishers.p.cmp, df = 2*length(DF.cmp$p.vec), lower.tail = FALSE)
+[1] 7.73e-13
+----
+
+===== Region-wise. =====
+
+----
+> (fishers.p <- sum(-2*log(DF$p.vec)))
+[1] 32.4
+> pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
+[1] 0.181
+----
+
 == Session Info ==
 ----
 > date()
-[1] "Thu Jul 11 12:32:22 2013"
+[1] "Thu Jul 18 10:39:48 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -453,4 +691,3 @@ loaded via a namespace (and not attached):
 [31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3        
 [37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0      
 ----
-Foo!
