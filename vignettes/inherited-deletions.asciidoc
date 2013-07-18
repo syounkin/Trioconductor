@@ -470,10 +470,9 @@ as.data.frame(DF)
 
 The filter accounts for \Sexpr{round(sum(width(filter.gr))/1e6,0)} MB made up of \Sexpr{length(filter.gr)} distinct regions.
 
-<<filtercmp>>=
-dist.vec <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
-#DF.cmp <- DataFrame(DF.cmp[order(dist.vec),],dist.vec[order(dist.vec)])
-DF.cmp <- DataFrame(DF.cmp, dist.vec)
+<<filtercmp, echo = FALSE>>=
+dist.vec.cmp <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
+DF.cmp <- DataFrame(DF.cmp, dist.vec.cmp)
 @
 
 
