@@ -52,7 +52,7 @@ get.est <- function(obj){
 get.ci <- function(obj){
   if(!is.na(obj)){
     return(obj$conf.int)
-xo  }else{
+  }else{
     return(NA)
   }
 }
