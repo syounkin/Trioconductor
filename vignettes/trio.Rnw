@@ -45,7 +45,7 @@
 \begin{center}
 
 {\LARGE \bf Preparing Case-Parent Trio Data\\[-6pt] and Detecting Disease-Associated\\[-6pt]
-SNPs, SNP Interactions,\\[-6pt] and  Gene-Environment Interactions\\[12pt] with \texttt{trio}}
+SNPs, SNP Interactions,\\[-6pt] and  Gene-Environment Interactions\\[12pt] with \texttt{trio}/\texttt{trioClasses}}
 
 \vspace*{0.9cm}
 
