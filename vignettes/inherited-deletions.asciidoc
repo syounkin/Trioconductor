@@ -4,7 +4,7 @@
 
 <<junk,echo=FALSE>>=    Somehow, this avoids the "figure margins too large" error ~kbroman
 par(mar=rep(0,4))
-par(bg="lightyellow")
+par(bg="white")
 options(width=1000, continue="  ")
 @ 
 
@@ -320,7 +320,7 @@ Note that a region on chromosome six appears twice in the top six by p-value.  H
 === Figures ===
 
 <<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE, echo = FALSE, results = hide >>=
-par(bg="lightyellow")
+par(bg="white")
 hist(DF$transrate.con.testable., col = "gray", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
 @
 
@@ -487,7 +487,7 @@ lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
 
 <<disthistpdf, echo = FALSE, results = hide>>=
 pdf(file = "./figures/disthist.pdf")
-par(bg="lightyellow")
+par(bg="white")
 plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
 axis(2)
 lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
@@ -507,7 +507,7 @@ boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6
 
 <<filteroutpdf, echo = FALSE, results = hide>>=
 pdf(file = "./figures/filterout.pdf")
-par(bg="lightyellow")
+par(bg="white")
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
 dev.off()
 @
@@ -583,7 +583,7 @@ dev.off()
 
 
 layout(matrix(1:2,nrow=1,ncol=2))
-par(mai=c(1,2.5,0,0), bg = "lightyellow")
+par(mai=c(1,2.5,0,0), bg = "white")
 
 o <- order(DF$p.vec)
 # o <- 1:nrow(ci.mat.cleft)
@@ -627,7 +627,7 @@ axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$gr
 
 #legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
 
-par(mai=c(1,0,0,0), bg = "lightyellow")
+par(mai=c(1,0,0,0), bg = "white")
 plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4))
 lines(rep(-log10(0.05/sum(DF$dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
 lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
@@ -636,10 +636,10 @@ axis(1)
 
 <<cifigcleftnewpdf, cache = FALSE, echo = FALSE, results = hide>>=
 pdf(file = "./figures/cifigcleftnew.pdf", width = 12, height = 8)
-par(bg="lightyellow")
+par(bg="white")
 
 layout(matrix(1:2,nrow=1,ncol=2))
-par(mai=c(1,2.5,0,0), bg = "lightyellow")
+par(mai=c(1,2.5,0,0), bg = "white")
 
 o <- order(DF$p.vec)
 # o <- 1:nrow(ci.mat.cleft)
@@ -683,7 +683,7 @@ axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$gr
 
 #legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
 
-par(mai=c(1,0,0,0), bg = "lightyellow")
+par(mai=c(1,0,0,0), bg = "white")
 plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4))
 lines(rep(-log10(0.05/sum(dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
 lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
@@ -693,6 +693,99 @@ axis(1)
 
 === QQ Plot ===
 
+<<ingo, echo = FALSE>>=
+my.qq.func=function(p,f,pval=TRUE,gc=FALSE,tn,hc=0.99,hm=100,...){
+  if(missing(f)) f=rep(0,length(p))
+  wh=which(is.na(p)|is.na(f))
+  if(length(wh)>0){
+    p=p[-wh]
+    f=f[-wh]
+  }
+  wh=order(p)
+  p=p[wh]
+  f=f[wh]
+  if(gc){
+    z=qchisq(p,1,lower=F)
+    gcp=median(z)/qchisq(0.5,1)
+    cat("The genomic control parameter is ",gcp,"\n")
+    z=z/gcp
+    pchisq(z,1,lower=F)
+  }
+  n=length(p)
+  x1=1:n
+  x2=n+1-x1
+  x=x1/(n+1)
+  up=qbeta(0.975,x1,x2)
+  lo=qbeta(0.025,x1,x2)
+  if(pval==TRUE){
+    uu=up
+    up=-log10(lo)
+    lo=-log10(uu)
+    x=-log10(x)
+    z=-log10(p)
+  }
+  else{
+    up=qchisq(up,1)
+    lo=qchisq(lo,1)
+    x=qchisq(x,1)
+    z=qchisq(p,1,lower=F)
+  }
+  z=rev(z)
+  f=rev(f)
+  x=rev(x)
+  up=rev(up)
+  lo=rev(lo)
+  tt=NULL
+  if(!missing(tn)){
+    mx=10^tn
+    tt=list(tn=mx,k=rev(x)[mx])
+  }
+  if(hm>1){
+    nc=round(n*hc)
+    wh=seq(1,nc,hm)
+    wh=c(wh,(nc+1):n)
+    z=z[wh]
+    f=f[wh]
+    x=x[wh]
+    up=up[wh]
+    lo=lo[wh]
+  }
+  return(list(z=z,f=f,x=x,up=up,lo=lo,tt=tt))
+}
+
+my.qq.plot=function(zz,cut,rmx=0,mt="",mt.cex=1,mt.line=NA,mgp=c(3,1,0),tn.cex=1,plab=T,xr,yr,...){
+  if(!missing(cut)) zz$z[zz$z>cut]=cut
+  if(missing(xr)) xr=c(0,1.02*max(zz$x))
+  if(missing(yr)) yr=c(0,1.02*max(c(zz$up,zz$z,rmx)))
+  if(plab){
+    xl=expression(paste("expected  ",-log[10]," (p-value)",sep="")) 
+    yl=expression(paste("observed  ",-log[10]," (p-value)",sep="")) 
+  }
+  else{
+    xl=""
+    yl=""
+  }
+  par(las=1)
+  print(xr)
+  plot(range(zz$x),range(c(0,zz$up)),type="n",xlim=xr,ylim=yr,xlab=xl,ylab=yl,...)
+  axis(2,0:ceiling(yr)[2],...)
+  polygon(c(zz$x,rev(zz$x)),c(zz$lo,rev(zz$up)),col="lightgrey",border=F)
+  lines(c(0,max(zz$x)),c(0,max(zz$x)))
+  cls=c("blue","red")
+  cls=cls[zz$f+1]
+  points(zz$x,zz$z,pch=20,col=cls,cex=0.5)
+  par(mgp=mgp)
+  if(length(zz$tt)==2){
+    options(scipen=7)
+    axis(3,zz$tt$k,zz$tt$tn,cex.axis=tn.cex)
+    options(scipen=0)
+  }
+  title(mt,cex.main=mt.cex,line=mt.line)
+  par(mgp=c(3,1,0))
+}
+
+@
+
 <<qqregion, fig = TRUE, width = 6, height = 6, eval = FALSE, echo = FALSE>>=
 o <- order(-log10(DF$p.vec), decreasing = TRUE)
 plot( -log10((1:length(DF$p.vec))/length(DF$p.vec)), -log10(DF$p.vec)[o], xlim = xlim <- c(0,max(-log10(DF$p.vec))), ylim = xlim, xlab = "Expected -log10p", ylab = "Observed -log10p", main = "")
@@ -701,14 +794,14 @@ lines( x = c(0,4), y = c(0,4), lty = 3)
 
 <<qqPlotregion, fig = TRUE, width = 6, height = 6>>=
 library("snpStats")
-par(bg="lightyellow")
+par(bg="white")
 qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
 
 @
 
 <<qqPlotregionpdf>>=
 pdf(file="figures/qqplotregion.pdf")
-par(bg="lightyellow")
+par(bg="white")
 qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
 dev.off()
 @
@@ -721,14 +814,14 @@ as.data.frame(DF[o,])
 @
 
 <<qqPlotcmp, fig = TRUE, width = 6, height = 6>>=
-par(bg="lightyellow")
+par(bg="white")
 qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
 
 @
 
 <<qqPlotcmppdf>>=
 pdf(file="figures/qqplotcmp.pdf")
-par(bg="lightyellow")
+par(bg="white")
 qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
 dev.off()
 @
@@ -739,6 +832,50 @@ There are \Sexpr{length(DF.cmp$p.vec)} tests in this figure.
 o <- order(DF.cmp$p.vec)
 as.data.frame(DF.cmp[o,])
 @
+
+
+<<ingoplotreg, echo = FALSE, results = hide>>=
+zz <- my.qq.func(DF$p.vec,tn=0:4,hc=0.9,hm=1)
+
+pdf("figures/ingo.qq.reg.pdf",width=6,height=6)
+xr=c(0,1.02*max(zz$x))
+yr=c(0,1.02*max(c(zz$up,zz$z)))
+par(las=1,xaxs="i",yaxs="i")
+plot(range(zz$x),range(c(0,zz$up)),type="n",xlim=xr,ylim=yr,xlab="",ylab="",xaxt="n")
+axis(1,0:4)
+axis(3,zz$tt$k,zz$tt$tn,cex.axis=0.5)
+  polygon(c(zz$x,rev(zz$x)),c(zz$lo,rev(zz$up)),col="lightgrey",border=F)
+lines(c(0,max(zz$x)),c(0,max(zz$x)))
+cls=c("blue","red")
+cls=cls[zz$f+1]
+points(zz$x,zz$z,pch=19,col=cls,cex=0.75)
+mtext(expression(paste("expected  ",-log[10]," (p-value)",sep="")),side=1,line=3)
+par(las=0)
+mtext(expression(paste("observed  ",-log[10]," (p-value)",sep="")),side=2,line=2.5)
+dev.off()
+@
+
+<<ingoplotcmp, echo = FALSE, results = hide>>=
+zz <- my.qq.func(DF.cmp$p.vec,tn=0:4,hc=0.9,hm=1)
+
+pdf("figures/ingo.qq.cmp.pdf",width=6,height=6)
+xr=c(0,1.02*max(zz$x))
+yr=c(0,1.02*max(c(zz$up,zz$z)))
+par(las=1,xaxs="i",yaxs="i")
+plot(range(zz$x),range(c(0,zz$up)),type="n",xlim=xr,ylim=yr,xlab="",ylab="",xaxt="n")
+axis(1,0:4)
+axis(3,zz$tt$k,zz$tt$tn,cex.axis=0.5)
+  polygon(c(zz$x,rev(zz$x)),c(zz$lo,rev(zz$up)),col="lightgrey",border=F)
+lines(c(0,max(zz$x)),c(0,max(zz$x)))
+cls=c("blue","red")
+cls=cls[zz$f+1]
+points(zz$x,zz$z,pch=19,col=cls,cex=0.75)
+mtext(expression(paste("expected  ",-log[10]," (p-value)",sep="")),side=1,line=3)
+par(las=0)
+mtext(expression(paste("observed  ",-log[10]," (p-value)",sep="")),side=2,line=2.5)
+dev.off()
+@
+
 
 ==== Fisher's Method  ====
 

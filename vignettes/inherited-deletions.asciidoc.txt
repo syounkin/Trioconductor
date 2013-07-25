@@ -463,9 +463,10 @@ image::figures/fig-cifigcleftnew.jpg[]
 === QQ Plot ===
 
 
+
 ----
 > library("snpStats")
-> par(bg="lightyellow")
+> par(bg="white")
 > qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
       N omitted  lambda 
  13.000   0.000   0.363 
@@ -476,7 +477,7 @@ image::figures/fig-qqPlotregion.jpg[]
 
 ----
 > pdf(file="figures/qqplotregion.pdf")
-> par(bg="lightyellow")
+> par(bg="white")
 > qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
       N omitted  lambda 
  13.000   0.000   0.363 
@@ -521,7 +522,7 @@ There are 13 tests in this figure.
 ----
 
 ----
-> par(bg="lightyellow")
+> par(bg="white")
 > qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
       N omitted  lambda 
   84.00    0.00    0.73 
@@ -532,7 +533,7 @@ image::figures/fig-qqPlotcmp.jpg[]
 
 ----
 > pdf(file="figures/qqplotcmp.pdf")
-> par(bg="lightyellow")
+> par(bg="white")
 > qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
       N omitted  lambda 
   84.00    0.00    0.73 
@@ -632,6 +633,10 @@ There are 84 tests in this figure.
 83            chr5      8756615    8800106        43492             *     19     28    29    18 0.9886375     0.511      7892614
 84            chr5      8756085    8756147           63             *     18     27    29    18 0.9892454     0.511      7892084
 ----
+
+
+
+
 
 ==== Fisher's Method  ====
 
