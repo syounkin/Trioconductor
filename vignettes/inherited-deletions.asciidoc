@@ -765,7 +765,7 @@ fe.all <- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(f
 @
 
 <<perm2, cache = TRUE>>=
-n.perm <- 1e3
+n.perm <- 5e4
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
 for( i in 1:n.perm ){
@@ -793,10 +793,10 @@ for( i in 1:n.perm ){
      p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 }
 @
-These are the adjusted p values:
+These are the adjusted component-wise p-values:
 <<pmin>>=
 p.min <- apply(p.mat,1,"min")
-c(ecdf(p.min)(0.0000983),ecdf(p.min)(0.0022040))
+c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
 @
 
 == Session Info ==
@@ -804,4 +804,3 @@ c(ecdf(p.min)(0.0000983),ecdf(p.min)(0.0022040))
 date()
 sessionInfo()
 @
-Foo!

@@ -662,7 +662,7 @@ There are 84 tests in this figure.
 ----
 
 ----
-> n.perm <- 1e3
+> n.perm <- 5e4
 > p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 > set.seed(1)
 > for( i in 1:n.perm ){

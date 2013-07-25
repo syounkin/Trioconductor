@@ -9308,8 +9308,9 @@ pdf
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt; n.perm &lt;- 1e3
+<pre><tt>&gt; n.perm &lt;- 1e4
 &gt; p.mat &lt;- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
+&gt; set.seed(1)
 &gt; for( i in 1:n.perm ){
       cleft.index &lt;- sample(nrow(completeTrios(fe.all)),nrow(completeTrios(fe.beaty)), replace = FALSE )
       cleft.ids &lt;- unique(c(as.matrix(completeTrios(fe.all))[cleft.index,]))
@@ -9331,20 +9332,17 @@ pdf
       rownames(TU.mat) &lt;- names(table.list.beaty)
       TU.mat.cmp &lt;- TU.mat
       gr.cmp &lt;- rowData(fe.beaty.perm)
-      #testable &lt;- which(   (rowSums(TU.mat[,1:2])&gt;=25) &amp; (rowSums(TU.mat[,3:4])&gt;=25) )
-      #TU.mat &lt;- TU.mat[testable,]
       fish.list &lt;- apply(TU.mat,1,trioClasses:::TU.fish)
       p.mat[i,] &lt;- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
  }</tt></pre>
 </div></div>
+<div class="paragraph"><p>These are the adjusted component-wise p-values:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; p.min &lt;- apply(p.mat,1,"min")
-&gt; quantile(p.min, probs = c(0,0.05,0.10))
-       0%        5%       10%
-0.0000433 0.0021183 0.0053454
-&gt; ecdf(p.min)(0.0022040)
-[1] 0.052</tt></pre>
+&gt; c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+  chr7   chr8
+0.0019 0.0376</tt></pre>
 </div></div>
 </div>
 </div>
@@ -9355,7 +9353,7 @@ pdf
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; date()
-[1] "Thu Jul 25 13:17:29 2013"
+[1] "Thu Jul 25 14:30:22 2013"
 &gt; sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -9388,14 +9386,13 @@ loaded via a namespace (and not attached):
 [31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3
 [37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0</tt></pre>
 </div></div>
-<div class="paragraph"><p>Foo!</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-25 13:17:29 EDT
+Last updated 2013-07-25 14:30:22 EDT
 </div>
 </div>
 </body>
