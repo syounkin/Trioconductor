@@ -84,7 +84,7 @@ library(trioClasses)
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 // The above must have been written before the MAF method was implemented.
-<<trioStates, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<trioStates, eval = TRUE, echo = FALSE, cache = FALSE>>=
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -92,7 +92,7 @@ library(trioClasses)
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
-<<table-list, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<table-list, eval = TRUE, echo = FALSE, cache = FALSE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
@@ -103,11 +103,10 @@ TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nr
 TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
 colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 rownames(TU.mat) <- names(table.list.beaty)
-TU.mat.cmp <- TU.mat
 gr.cmp <- rowData(fe.beaty)
 testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 TU.mat <- TU.mat[testable,]
-
+TU.mat.cmp <- TU.mat
 DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
 colnames(DF) <- c("grange", colnames(TU.mat))
 @ 
@@ -136,7 +135,7 @@ lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
 
 
-<<pmin, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<pmin, eval = TRUE, echo = FALSE, cache = FALSE>>=
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
@@ -536,21 +535,21 @@ library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 @
 
-<<chr7, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
+<<chr7, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 7
 wd <- 100e3
-chr7.region <- DF$grange[25]
-chr7.index <- subjectHits(findOverlaps(chr7.region,gr.cmp))
+chr7.region <- DF$grange[8]
+chr7.index <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 chr7.index2 <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
 grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID", )
-dtrack <- DataTrack( range = gr.cmp[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+dtrack <- DataTrack( range = DF.cmp$grange[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
 dtrack2 <- DataTrack( range = DF.cmp$grange[chr7.index2], data = -log10(DF.cmp$p.vec[chr7.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr7pdf, echo = FALSE, cache = FALSE, results = hide, eval = FALSE>>=
+<<chr7pdf, echo = FALSE, cache = FALSE, results = hide, eval = TRUE>>=
 pdf(file = "./figures/chr7.pdf")
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -558,20 +557,20 @@ dev.off()
 
 === Chromosome 8 ===
 
-<<chr8, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
+<<chr8, fig = TRUE, echo = FALSE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 8
-chr8.region <- DF$grange[26]
-chr8.index <- subjectHits(findOverlaps(chr8.region,gr.cmp))
+chr8.region <- DF$grange[9]
+chr8.index <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 chr8.index2 <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
 grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID")
-dtrack <- DataTrack( range = gr.cmp[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+dtrack <- DataTrack( range = DF.cmp$grange[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
 dtrack2 <- DataTrack( range = DF.cmp$grange[chr8.index2], data = -log10(DF.cmp$p.vec[chr8.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
 itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr8pdf, echo = FALSE, cache = FALSE, results = hide, eval = FALSE>>=
+<<chr8pdf, echo = FALSE, cache = FALSE, results = hide, eval = TRUE>>=
 pdf(file = "./figures/chr8.pdf")
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -902,7 +901,7 @@ fe.all <- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(f
 @
 
 <<perm2, cache = TRUE>>=
-n.perm <- 4e3
+n.perm <- 1e3
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
 for( i in 1:n.perm ){
@@ -924,8 +923,8 @@ for( i in 1:n.perm ){
      TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
      colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
      rownames(TU.mat) <- names(table.list.beaty)
-     TU.mat.cmp <- TU.mat
-     gr.cmp <- rowData(fe.beaty.perm)
+     #TU.mat.cmp <- TU.mat
+     #gr.cmp <- rowData(fe.beaty.perm)
      fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
      p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 }
@@ -934,6 +933,10 @@ These are the adjusted component-wise p-values:
 <<pmin>>=
 p.min <- apply(p.mat,1,"min")
 c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+@
+And the threshold for niminal p-values is:
+<<padj>>=
+quantile(p.min,probs=0.05)
 @
 
 == Session Info ==

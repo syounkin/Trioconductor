@@ -71,10 +71,10 @@ Compute a DataFrame containing counts of transmissions by case/control with rows
 > TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
 > colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 > rownames(TU.mat) <- names(table.list.beaty)
-> TU.mat.cmp <- TU.mat
 > gr.cmp <- rowData(fe.beaty)
 > testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 > TU.mat <- TU.mat[testable,]
+> TU.mat.cmp <- TU.mat
 > DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
 > colnames(DF) <- c("grange", colnames(TU.mat))
 ----
@@ -447,9 +447,13 @@ image::figures/fig-filterout.jpg[]
 === Chromosome 7 ===
 
 
+image::figures/fig-chr7.jpg[]
+
 
 
 === Chromosome 8 ===
+
+image::figures/fig-chr8.jpg[]
 
 
 
@@ -646,7 +650,7 @@ There are 84 tests in this figure.
 > (fishers.p.cmp <- sum(-2*log(DF.cmp$p.vec)))
 [1] 332
 > pchisq(fishers.p.cmp, df = 2*length(DF.cmp$p.vec), lower.tail = FALSE)
-[1] 7.73e-13
+[1] 0.000000000000773
 ----
 
 ===== Region-wise. =====
@@ -667,7 +671,7 @@ There are 84 tests in this figure.
 ----
 
 ----
-> n.perm <- 4e3
+> n.perm <- 1e3
 > p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 > set.seed(1)
 > for( i in 1:n.perm ){
@@ -689,8 +693,8 @@ There are 84 tests in this figure.
       TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
       colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
       rownames(TU.mat) <- names(table.list.beaty)
-      TU.mat.cmp <- TU.mat
-      gr.cmp <- rowData(fe.beaty.perm)
+      #TU.mat.cmp <- TU.mat
+      #gr.cmp <- rowData(fe.beaty.perm)
       fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
       p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
  }
@@ -699,14 +703,20 @@ These are the adjusted component-wise p-values:
 ----
 > p.min <- apply(p.mat,1,"min")
 > c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
-  chr7   chr8 
-0.0015 0.0375 
+ chr7  chr8 
+0.002 0.038 
+----
+And the threshold for niminal p-values is:
+----
+> quantile(p.min,probs=0.05)
+     5% 
+0.00279 
 ----
 
 == Session Info ==
 ----
 > date()
-[1] "Fri Jul 26 06:43:48 2013"
+[1] "Fri Jul 26 09:59:07 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -720,22 +730,21 @@ attached base packages:
  [1] grid      splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Gviz_1.5.3                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                 
- [4] AnnotationDbi_1.23.11                   CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                  
- [7] GWASTools_1.7.3                         sandwich_2.2-10                         zoo_1.7-9                              
-[10] gdsfmt_0.9.14                           ncdf_1.6.6                              Biobase_2.21.2                         
-[13] trioClasses_1.0.9                       snpStats_1.11.0                         Matrix_1.0-12                          
-[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.13.15                  
-[19] XVector_0.1.0                           IRanges_1.19.8                          BiocGenerics_0.7.2                     
-[22] cacheSweave_0.6-1                       stashR_0.3-5                            filehash_2.2-1                         
-[25] ascii_2.1                              
+ [1] Gviz_1.4.0                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.12.0                 
+ [4] AnnotationDbi_1.22.2                    CleftCNVAssoc_0.0.2                     MinimumDistance_1.4.0                  
+ [7] GWASTools_1.6.0                         sandwich_2.2-10                         zoo_1.7-9                              
+[10] gdsfmt_0.9.12                           ncdf_1.6.6                              Biobase_2.20.0                         
+[13] trioClasses_1.0.8                       snpStats_1.10.0                         Matrix_1.0-12                          
+[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.12.2                   
+[19] IRanges_1.18.0                          BiocGenerics_0.6.0                      cacheSweave_0.6-1                      
+[22] stashR_0.3-5                            filehash_2.2-1                          ascii_2.1                              
 
 loaded via a namespace (and not attached):
- [1] affyio_1.29.0        BiocInstaller_1.11.3 biomaRt_2.17.1       Biostrings_2.29.3    biovizBase_1.9.1     bit_1.1-10          
- [7] bitops_1.0-5         BSgenome_1.29.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-7           
-[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
-[19] Hmisc_3.10-1.1       iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.8.1    msm_1.2             
-[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0   RColorBrewer_1.0-5  
-[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3        
-[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0      
+ [1] affyio_1.28.0        BiocInstaller_1.10.0 biomaRt_2.16.0       Biostrings_2.28.0    biovizBase_1.8.0     bit_1.1-10          
+ [7] bitops_1.0-5         BSgenome_1.28.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-6           
+[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.34.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
+[19] Hmisc_3.10-1         iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.6.2    msm_1.1.4           
+[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.22.0  plyr_1.8             quantsmooth_1.26.0   RColorBrewer_1.0-5  
+[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.12.2     RSQLite_0.11.3       rtracklayer_1.20.1   scales_0.2.3        
+[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.22.0    XML_3.96-1.1         zlibbioc_1.6.0      
 ----
