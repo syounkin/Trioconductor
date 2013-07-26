@@ -84,7 +84,7 @@ library(trioClasses)
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 // The above must have been written before the MAF method was implemented.
-<<trioStates, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<trioStates, eval = TRUE, echo = FALSE, cache = TRUE>>=
     trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -92,7 +92,7 @@ library(trioClasses)
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
-<<table-list, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<table-list, eval = TRUE, echo = FALSE, cache = TRUE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
@@ -901,7 +901,7 @@ fe.all <- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(f
 @
 
 <<perm2, cache = TRUE>>=
-n.perm <- 1e1
+n.perm <- 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
 for( i in 1:n.perm ){
@@ -944,3 +944,4 @@ quantile(p.min,probs=0.05)
 date()
 sessionInfo()
 @
+Foo!
