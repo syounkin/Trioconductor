@@ -9254,16 +9254,6 @@ pdf
 83            chr5      8756615    8800106        43492             *     19     28    29    18 0.9886375     0.511      7892614
 84            chr5      8756085    8756147           63             *     18     27    29    18 0.9892454     0.511      7892084</tt></pre>
 </div></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>pdf
-  2</tt></pre>
-</div></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>pdf
-  2</tt></pre>
-</div></div>
 <div class="sect3">
 <h4 id="_fisher_8217_s_method">4.8.1. Fisher&#8217;s Method</h4>
 <div class="sect4">
@@ -9298,7 +9288,7 @@ pdf
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt; n.perm &lt;- 1e2
+<pre><tt>&gt; n.perm &lt;- 4e3
 &gt; p.mat &lt;- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 &gt; set.seed(1)
 &gt; for( i in 1:n.perm ){
@@ -9331,8 +9321,8 @@ pdf
 <div class="content">
 <pre><tt>&gt; p.min &lt;- apply(p.mat,1,"min")
 &gt; c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
-chr7 chr8
-   0    0</tt></pre>
+  chr7   chr8
+0.0015 0.0375</tt></pre>
 </div></div>
 </div>
 </div>
@@ -9343,7 +9333,7 @@ chr7 chr8
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; date()
-[1] "Thu Jul 25 16:31:56 2013"
+[1] "Fri Jul 26 06:43:48 2013"
 &gt; sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -9382,7 +9372,7 @@ loaded via a namespace (and not attached):
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-25 16:31:56 EDT
+Last updated 2013-07-26 06:43:48 EDT
 </div>
 </div>
 </body>
