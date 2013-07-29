@@ -10822,7 +10822,7 @@ pdf
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt; n.perm &lt;- 1e4
+<pre><tt>&gt; n.perm &lt;- 1e5
 &gt; p.mat &lt;- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 &gt; set.seed(1)
 &gt; for( i in 1:n.perm ){
@@ -10855,15 +10855,15 @@ pdf
 <div class="content">
 <pre><tt>&gt; p.min &lt;- apply(p.mat,1,"min")
 &gt; c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
-  chr7   chr8
-0.0019 0.0376</tt></pre>
+   chr7    chr8
+0.00201 0.04030</tt></pre>
 </div></div>
 <div class="paragraph"><p>And the threshold for niminal p-values is:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; quantile(p.min,probs=0.05)
      5%
-0.00295</tt></pre>
+0.00285</tt></pre>
 </div></div>
 </div>
 </div>
@@ -10874,7 +10874,7 @@ pdf
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; date()
-[1] "Fri Jul 26 17:09:25 2013"
+[1] "Mon Jul 29 18:18:30 2013"
 &gt; sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -10907,14 +10907,13 @@ loaded via a namespace (and not attached):
 [31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3
 [37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0</tt></pre>
 </div></div>
-<div class="paragraph"><p>Foo!</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-07-26 17:09:25 EDT
+Last updated 2013-07-29 18:18:30 EDT
 </div>
 </div>
 </body>

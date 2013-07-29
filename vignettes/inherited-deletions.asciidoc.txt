@@ -698,3 +698,54 @@ There are 84 tests in this figure.
       fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
       p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
  }
+----
+These are the adjusted component-wise p-values:
+----
+> p.min <- apply(p.mat,1,"min")
+> c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+   chr7    chr8 
+0.00201 0.04030 
+----
+And the threshold for niminal p-values is:
+----
+> quantile(p.min,probs=0.05)
+     5% 
+0.00285 
+----
+
+== Session Info ==
+----
+> date()
+[1] "Mon Jul 29 18:18:30 2013"
+> sessionInfo()
+R version 3.0.0 (2013-04-03)
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=C                 LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+ [1] grid      splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] Gviz_1.5.3                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                 
+ [4] AnnotationDbi_1.23.11                   CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                  
+ [7] GWASTools_1.7.3                         sandwich_2.2-10                         zoo_1.7-9                              
+[10] gdsfmt_0.9.14                           ncdf_1.6.6                              Biobase_2.21.2                         
+[13] trioClasses_1.0.9                       snpStats_1.11.0                         Matrix_1.0-12                          
+[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.13.15                  
+[19] XVector_0.1.0                           IRanges_1.19.8                          BiocGenerics_0.7.2                     
+[22] cacheSweave_0.6-1                       stashR_0.3-5                            filehash_2.2-1                         
+[25] ascii_2.1                              
+
+loaded via a namespace (and not attached):
+ [1] affyio_1.29.0        BiocInstaller_1.11.3 biomaRt_2.17.1       Biostrings_2.29.3    biovizBase_1.9.1     bit_1.1-10          
+ [7] bitops_1.0-5         BSgenome_1.29.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-7           
+[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
+[19] Hmisc_3.10-1.1       iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.8.1    msm_1.2             
+[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0   RColorBrewer_1.0-5  
+[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3        
+[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0      
+----
