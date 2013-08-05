@@ -1,0 +1,36 @@
+:toc:
+:numbered:
+:data-uri:
+
+
+
+== 8q24 European ==
+
+----
+> Trioconductor:::ped2fe(ped = "./../inst/8q24-european.ped", map = "./../inst/8q24-european.map", n.snps=8951)
+class: FamilyExperiment 
+dim: 8951 960 
+exptData(0):
+assays(1): geno
+rownames(8951): chr8:129296000 chr8:129296113 ... chr8:130354703
+  chr8:130354790
+rowData metadata column names(0):
+colnames(960): H_ME-DS10776_2-DS10776_2 H_ME-DS10776_3-DS10776_3
+  ... H_ME-DS11313_3-DS11313_3 H_ME-DS11313_1-DS11313_1
+colData names(1): id
+pedigree(960): famid id fid mid sex dx
+complete trios(320):
+> (fe <- Trioconductor:::ped2fe(ped = "./../inst/8q24-european.ped", map = "./../inst/8q24-european.map", n.snps=8951))
+class: FamilyExperiment 
+dim: 8951 960 
+exptData(0):
+assays(1): geno
+rownames(8951): chr8:129296000 chr8:129296113 ... chr8:130354703
+  chr8:130354790
+rowData metadata column names(0):
+colnames(960): H_ME-DS10776_2-DS10776_2 H_ME-DS10776_3-DS10776_3
+  ... H_ME-DS11313_3-DS11313_3 H_ME-DS11313_1-DS11313_1
+colData names(1): id
+pedigree(960): famid id fid mid sex dx
+complete trios(320):
+----

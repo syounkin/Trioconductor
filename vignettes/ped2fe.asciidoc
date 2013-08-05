@@ -1,0 +1,19 @@
+:toc:
+:numbered:
+:data-uri:
+
+<<junk,echo=FALSE>>=    Somehow, this avoids the "figure margins too large" error ~kbroman
+par(mar=rep(0,4))
+@
+
+<<options, echo=FALSE, eval = TRUE, echo = FALSE>>=
+  options(width=75, continue = " ")
+  library("Trioconductor")
+@ 
+
+== 8q24 European ==
+
+<<8q24>>=
+Trioconductor:::ped2fe(ped = "./../inst/8q24-european.ped", map = "./../inst/8q24-european.map", n.snps=8951)
+(fe <- Trioconductor:::ped2fe(ped = "./../inst/8q24-european.ped", map = "./../inst/8q24-european.map", n.snps=8951))
+@
