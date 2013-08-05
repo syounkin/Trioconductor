@@ -91,3 +91,20 @@ f.cmp <- function(obj, colname, FUN, ...){
   return(DataFrame( gr, value = val.vec ) ) 
 }
 
+
+ped2fe <- function( pedfile, mapfile, n.snps ){
+    
+    read.obj <- snpStats:::read.pedfile(file = pedfile, snps = paste0("sgy",1:n.snps) )
+    names(read.obj$fam) <- c("famid", "id", "fid", "mid", "sex", "dx")
+    ped <- new("PedClass", DataFrame(read.obj$fam))
+    sm <- read.obj$geno
+    map <- read.table(file = mapfile, col.names = c("chr","name","cM","pos") )
+    gr <- GRanges( seqnames = map$chr, ranges = IRanges(start = map$pos, width = 1), strand = "*")
+    names(gr) <- map$name
+    colnames(sm) <- names(gr)
+    col.DF <- DataFrame( id = rownames(sm) )
+    rownames(col.DF) <-  rownames(sm) 
+    se <- SummarizedExperiment(assays = SimpleList(geno = t(sm)), colData = col.DF, rowData = gr )
+    fe <- FamilyExperiment(se, pedigree = ped )
+    return(fe)
+}
