@@ -48,7 +48,7 @@ setMethod("TrioAssay",  signature(object="FamilyExperiment"), function(object, t
 })
 
 setMethod("ctcbind", signature( object = "list"), function( object ){
-  holger <- with( object, matrix(c(t(cbind( as(F,"numeric"), as(M,"numeric"), as(O,"numeric")))), byrow = TRUE, nrow = 3*nrow(O), ncol = ncol(O)))
+  holger <- with( object, matrix(c(t(cbind( as(F,"numeric"), as(M,"numeric"), as(O,"numeric")))), byrow = FALSE, nrow = 3*nrow(O), ncol = ncol(O)))
   holger
 })
 
