@@ -2,7 +2,7 @@ Package: Trioconductor
 Type: Package
 Title: Trioconductor
 Version: 1.0.10
-Date: Mon Aug  5 13:11:09 EDT 2013
+Date: Tue Aug  6 12:55:48 EDT 2013
 Author: Samuel G. Younkin, Ingo Ruczinski, Margaret Taub, Holger Schwender, Robert B. Scharpf
 Maintainer: Samuel G. Younkin <syounkin@jhsph.edu>
 Description: The package Trioconductor presents the class FamilyExperiment, an extension of SummarizedExperiment.  This class is useful for analyzing genetic sequence data in parent-offspring study designs.  The package Trioconductor takes advantage of the vcf file format through the SummarizedExperiment class and the VCFTools package.
@@ -18,6 +18,7 @@ Collate: AllClasses.R
 	 methods-GRanges.R
 	 methods-GWASTools.R
 	 methods-PedClass.R
+	 TDTDF.R
 	 reload.R
          zzz.R
 LazyLoad: yes
