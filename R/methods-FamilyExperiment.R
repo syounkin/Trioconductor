@@ -87,6 +87,8 @@ setMethod("aTDT", signature(object="matrix"), function(object){
 setAs( from = "FamilyExperiment", to = "matrix", function(from){
   gtrio <- TrioAssay(from, type = "geno")
   holger <- ctcbind(gtrio)
+  rownames(holger) <- colnames(from)
+  colnames(holger) <- rownames(from)
   return(holger)
 })
 
