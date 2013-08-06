@@ -746,6 +746,7 @@ asciidoc.install(4);
 <div class="sect1">
 <h2 id="_toy_pedigree">1. Toy Pedigree</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>We start with a toy pedigree and map file, and read them in using ped2fe.  The ped2fe function is built on snpStats:::read.pedfile.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; (fe &lt;- Trioconductor:::ped2fe(ped = "./../inst/small.ped", map = "./../inst/small.map"))
@@ -761,7 +762,7 @@ colData names(1): id
 pedigree(6): famid id fid mid sex dx
 complete trios(2):</tt></pre>
 </div></div>
-<div class="paragraph"><p>Coercion top genotype matrix for trio package.</p></div>
+<div class="paragraph"><p>Now we may coerce the FE object to a genotype matrix suioted for the trio package.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; (geno.trio &lt;- as(fe,"matrix"))
@@ -773,7 +774,7 @@ complete trios(2):</tt></pre>
 [5,]    1    0    0
 [6,]    1    0    0</tt></pre>
 </div></div>
-<div class="paragraph"><p>small.ped</p></div>
+<div class="paragraph"><p>Here is the ped file, "small.ped":</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>DS10776 H_ME-DS10776_2-DS10776_2 0 0 1 1 1 2 2 2 0 0
@@ -783,13 +784,19 @@ DS10777 H_ME-DS10777_2-DS10777_2 0 0 1 1 1 2 2 2 2 2
 DS10777 H_ME-DS10777_3-DS10777_3 0 0 2 1 1 2 2 2 2 2
 DS10777 H_ME-DS10777_1-DS10777_1 H_ME-DS10777_2-DS10777_2 H_ME-DS10777_3-DS10777_3 2 2 1 2 2 2 2 2</tt></pre>
 </div></div>
-<div class="paragraph"><p>small.map</p></div>
+<div class="paragraph"><p>And here is the map file, "small.map":</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>8       chr8:129296000  0       129296000
 8       chr8:129296113  0       129296113
 8       chr8:129296185  0       129296185</tt></pre>
 </div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fe_methods">2. FE Methods</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Now we explore some of the methods associate with FE.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; rowData(fe)
@@ -861,7 +868,7 @@ $mendel
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-06 10:44:52 EDT
+Last updated 2013-08-06 11:02:19 EDT
 </div>
 </div>
 </body>

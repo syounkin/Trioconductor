@@ -1,7 +1,7 @@
-ped2fe.html: ped2fe.asciidoc
+Trioconductor.html: Trioconductor.asciidoc
 	R --vanilla < asciidoc.R
-	asciidoc -a data-uri -a toc -a toclevels=4 -a num ped2fe.asciidoc.txt
-	mv ped2fe.asciidoc.html ped2fe.html
+	asciidoc -a data-uri -a toc -a toclevels=4 -a num Trioconductor.asciidoc.txt
+	mv Trioconductor.asciidoc.html Trioconductor.html
 
 clean: 
 	\rm -r *~ *.bak *.dvi *.log *.aux *.tex *.html *.asciidoc.txt

@@ -12,16 +12,17 @@ par(mar=rep(0,4))
 @ 
 
 == Toy Pedigree ==
+We start with a toy pedigree and map file, and read them in using ped2fe.  The ped2fe function is built on snpStats:::read.pedfile.
 
 <<toyped>>=
 (fe <- Trioconductor:::ped2fe(ped = "./../inst/small.ped", map = "./../inst/small.map"))
 @
-Coercion top genotype matrix for trio package.
+Now we may coerce the FE object to a genotype matrix suioted for the trio package.
 <<coerce>>=
 (geno.trio <- as(fe,"matrix"))
 @
 
-small.ped
+Here is the ped file, "small.ped":
 ----
 DS10776 H_ME-DS10776_2-DS10776_2 0 0 1 1 1 2 2 2 0 0
 DS10776 H_ME-DS10776_3-DS10776_3 0 0 2 1 2 2 2 2 2 2
@@ -31,13 +32,15 @@ DS10777 H_ME-DS10777_3-DS10777_3 0 0 2 1 1 2 2 2 2 2
 DS10777 H_ME-DS10777_1-DS10777_1 H_ME-DS10777_2-DS10777_2 H_ME-DS10777_3-DS10777_3 2 2 1 2 2 2 2 2
 ----
 
-small.map
+And here is the map file, "small.map":
 ----
 8	chr8:129296000	0	129296000
 8	chr8:129296113	0	129296113
 8	chr8:129296185	0	129296185
 ----
 
+== FE Methods  ==
+Now we explore some of the methods associate with FE.
 <<rowdata>>=
 rowData(fe)
 @
