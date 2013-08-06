@@ -37,3 +37,26 @@ small.map
 8	chr8:129296113	0	129296113
 8	chr8:129296185	0	129296185
 ----
+
+<<rowdata>>=
+rowData(fe)
+@
+
+<<coldata>>=
+colData(fe)
+@
+
+<<MAF>>=
+MAF(fe)
+@
+We may use Trioconductor to create a list of three matrices, F, M and O.  A simple concatenation of these matrices gives a matrix of trio-states at each SNP-trio pair.
+<<TrioAssay>>=
+Trioconductor:::TrioAssay(fe, type = "geno")
+@
+We may also use Trioconductor to count transmissions and Mendelian errors in a given region defined by a GRanges object.
+
+<<TransCount>>=
+Trioconductor:::TransCount(fe, rowData(fe) )
+@
+
+Above we see there were four observeable transmission of which 2 minor alleles were transmitted and 2 major alleles were transmitted.  There are no Mendelian errors.

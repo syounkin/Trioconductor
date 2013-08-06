@@ -24,12 +24,12 @@ Coercion top genotype matrix for trio package.
 ----
 > (geno.trio <- as(fe,"matrix"))
      [,1] [,2] [,3]
-[1,]    1    1    1
-[2,]    1    1    1
-[3,]    0    0    0
-[4,]    0    0    0
-[5,]   NA    0    0
-[6,]    0    0    0
+[1,]    1    0   NA
+[2,]    1    0    0
+[3,]    1    0    0
+[4,]    1    0    0
+[5,]    1    0    0
+[6,]    1    0    0
 ----
 
 small.ped
@@ -48,3 +48,68 @@ small.map
 8	chr8:129296113	0	129296113
 8	chr8:129296185	0	129296185
 ----
+
+----
+> rowData(fe)
+GRanges with 3 ranges and 0 metadata columns:
+                 seqnames                 ranges strand
+                    <Rle>              <IRanges>  <Rle>
+  chr8:129296000        8 [129296000, 129296000]      *
+  chr8:129296113        8 [129296113, 129296113]      *
+  chr8:129296185        8 [129296185, 129296185]      *
+  ---
+  seqlengths:
+    8
+   NA
+----
+
+----
+> colData(fe)
+DataFrame with 6 rows and 1 column
+                                               id
+                                      <character>
+H_ME-DS10776_2-DS10776_2 H_ME-DS10776_2-DS10776_2
+H_ME-DS10776_3-DS10776_3 H_ME-DS10776_3-DS10776_3
+H_ME-DS10776_1-DS10776_1 H_ME-DS10776_1-DS10776_1
+H_ME-DS10777_2-DS10777_2 H_ME-DS10777_2-DS10777_2
+H_ME-DS10777_3-DS10777_3 H_ME-DS10777_3-DS10777_3
+H_ME-DS10777_1-DS10777_1 H_ME-DS10777_1-DS10777_1
+----
+
+----
+> MAF(fe)
+[1] 0.5 0.0 0.0
+----
+We may use Trioconductor to create a list of three matrices, F, M and O.  A simple concatenation of these matrices gives a matrix of trio-states at each SNP-trio pair.
+----
+> Trioconductor:::TrioAssay(fe, type = "geno")
+$O
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_1-DS10776_1              1              0              0
+H_ME-DS10777_1-DS10777_1              1              0              0
+
+$F
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_2-DS10776_2              1              0             NA
+H_ME-DS10777_2-DS10777_2              1              0              0
+
+$M
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_3-DS10776_3              1              0              0
+H_ME-DS10777_3-DS10777_3              1              0              0
+----
+We may also use Trioconductor to count transmissions and Mendelian errors in a given region defined by a GRanges object.
+
+----
+> Trioconductor:::TransCount(fe, rowData(fe) )
+$minor
+[1] 2
+
+$major
+[1] 2
+
+$mendel
+[1] 0
+----
+
+Above we see there were four observeable transmission of which 2 minor alleles were transmitted and 2 major alleles were transmitted.  There are no Mendelian errors.

@@ -766,12 +766,12 @@ complete trios(2):</tt></pre>
 <div class="content">
 <pre><tt>&gt; (geno.trio &lt;- as(fe,"matrix"))
      [,1] [,2] [,3]
-[1,]    1    1    1
-[2,]    1    1    1
-[3,]    0    0    0
-[4,]    0    0    0
-[5,]   NA    0    0
-[6,]    0    0    0</tt></pre>
+[1,]    1    0   NA
+[2,]    1    0    0
+[3,]    1    0    0
+[4,]    1    0    0
+[5,]    1    0    0
+[6,]    1    0    0</tt></pre>
 </div></div>
 <div class="paragraph"><p>small.ped</p></div>
 <div class="listingblock">
@@ -790,13 +790,78 @@ DS10777 H_ME-DS10777_1-DS10777_1 H_ME-DS10777_2-DS10777_2 H_ME-DS10777_3-DS10777
 8       chr8:129296113  0       129296113
 8       chr8:129296185  0       129296185</tt></pre>
 </div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&gt; rowData(fe)
+GRanges with 3 ranges and 0 metadata columns:
+                 seqnames                 ranges strand
+                    &lt;Rle&gt;              &lt;IRanges&gt;  &lt;Rle&gt;
+  chr8:129296000        8 [129296000, 129296000]      *
+  chr8:129296113        8 [129296113, 129296113]      *
+  chr8:129296185        8 [129296185, 129296185]      *
+  ---
+  seqlengths:
+    8
+   NA</tt></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&gt; colData(fe)
+DataFrame with 6 rows and 1 column
+                                               id
+                                      &lt;character&gt;
+H_ME-DS10776_2-DS10776_2 H_ME-DS10776_2-DS10776_2
+H_ME-DS10776_3-DS10776_3 H_ME-DS10776_3-DS10776_3
+H_ME-DS10776_1-DS10776_1 H_ME-DS10776_1-DS10776_1
+H_ME-DS10777_2-DS10777_2 H_ME-DS10777_2-DS10777_2
+H_ME-DS10777_3-DS10777_3 H_ME-DS10777_3-DS10777_3
+H_ME-DS10777_1-DS10777_1 H_ME-DS10777_1-DS10777_1</tt></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&gt; MAF(fe)
+[1] 0.5 0.0 0.0</tt></pre>
+</div></div>
+<div class="paragraph"><p>We may use Trioconductor to create a list of three matrices, F, M and O.  A simple concatenation of these matrices gives a matrix of trio-states at each SNP-trio pair.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&gt; Trioconductor:::TrioAssay(fe, type = "geno")
+$O
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_1-DS10776_1              1              0              0
+H_ME-DS10777_1-DS10777_1              1              0              0
+
+$F
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_2-DS10776_2              1              0             NA
+H_ME-DS10777_2-DS10777_2              1              0              0
+
+$M
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_3-DS10776_3              1              0              0
+H_ME-DS10777_3-DS10777_3              1              0              0</tt></pre>
+</div></div>
+<div class="paragraph"><p>We may also use Trioconductor to count transmissions and Mendelian errors in a given region defined by a GRanges object.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&gt; Trioconductor:::TransCount(fe, rowData(fe) )
+$minor
+[1] 2
+
+$major
+[1] 2
+
+$mendel
+[1] 0</tt></pre>
+</div></div>
+<div class="paragraph"><p>Above we see there were four observeable transmission of which 2 minor alleles were transmitted and 2 major alleles were transmitted.  There are no Mendelian errors.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-06 10:12:24 EDT
+Last updated 2013-08-06 10:44:52 EDT
 </div>
 </div>
 </body>
