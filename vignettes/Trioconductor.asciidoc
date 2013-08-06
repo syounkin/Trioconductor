@@ -62,4 +62,4 @@ We may also use Trioconductor to count transmissions and Mendelian errors in a g
 Trioconductor:::TransCount(fe, rowData(fe) )
 @
 
-Above we see there were four observeable transmission of which 2 minor alleles were transmitted and 2 major alleles were transmitted.  There are no Mendelian errors.
+Above we see there were four observeable transmission of which 1 minor allele was transmitted and 2 major alleles were transmitted.  There are no Mendelian errors.
