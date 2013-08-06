@@ -17,7 +17,7 @@ We start with a toy pedigree and map file, and read them in using ped2fe.  The p
 <<toyped>>=
 (fe <- Trioconductor:::ped2fe(ped = "./../inst/small.ped", map = "./../inst/small.map"))
 @
-Now we may coerce the FE object to a genotype matrix suioted for the trio package.
+Now we may coerce the FE object to a genotype matrix suited for the trio package.
 <<coerce>>=
 (geno.trio <- as(fe,"matrix"))
 @

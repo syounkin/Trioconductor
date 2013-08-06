@@ -21,16 +21,16 @@ colData names(1): id
 pedigree(6): famid id fid mid sex dx
 complete trios(2):
 ----
-Now we may coerce the FE object to a genotype matrix suioted for the trio package.
+Now we may coerce the FE object to a genotype matrix suited for the trio package.
 ----
 > (geno.trio <- as(fe,"matrix"))
-     [,1] [,2] [,3]
-[1,]    1    0   NA
-[2,]    1    0    0
-[3,]    1    0    0
-[4,]    1    0    0
-[5,]    1    0    0
-[6,]    1    0    0
+                         chr8:129296000 chr8:129296113 chr8:129296185
+H_ME-DS10776_2-DS10776_2              1              0             NA
+H_ME-DS10776_3-DS10776_3              2              0              0
+H_ME-DS10776_1-DS10776_1              1              0              0
+H_ME-DS10777_2-DS10777_2              1              0              0
+H_ME-DS10777_3-DS10777_3              1              0              0
+H_ME-DS10777_1-DS10777_1              1              0              0
 ----
 
 Here is the ped file, "small.ped":
@@ -81,7 +81,7 @@ H_ME-DS10777_1-DS10777_1 H_ME-DS10777_1-DS10777_1
 
 ----
 > MAF(fe)
-[1] 0.5 0.0 0.0
+[1] 0.375 0.000 0.000
 ----
 We may use Trioconductor to create a list of three matrices, F, M and O.  A simple concatenation of these matrices gives a matrix of trio-states at each SNP-trio pair.
 ----
@@ -98,7 +98,7 @@ H_ME-DS10777_2-DS10777_2              1              0              0
 
 $M
                          chr8:129296000 chr8:129296113 chr8:129296185
-H_ME-DS10776_3-DS10776_3              1              0              0
+H_ME-DS10776_3-DS10776_3              2              0              0
 H_ME-DS10777_3-DS10777_3              1              0              0
 ----
 We may also use Trioconductor to count transmissions and Mendelian errors in a given region defined by a GRanges object.
@@ -106,7 +106,7 @@ We may also use Trioconductor to count transmissions and Mendelian errors in a g
 ----
 > Trioconductor:::TransCount(fe, rowData(fe) )
 $minor
-[1] 2
+[1] 1
 
 $major
 [1] 2
