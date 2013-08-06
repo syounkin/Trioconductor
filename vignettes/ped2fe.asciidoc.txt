@@ -4,33 +4,47 @@
 
 
 
-== 8q24 European ==
+== Toy Pedigree ==
 
 ----
-> Trioconductor:::ped2fe(ped = "./../inst/8q24-european.ped", map = "./../inst/8q24-european.map", n.snps=8951)
+> (fe <- Trioconductor:::ped2fe(ped = "./../inst/small.ped", map = "./../inst/small.map"))
 class: FamilyExperiment 
-dim: 8951 960 
+dim: 3 6 
 exptData(0):
 assays(1): geno
-rownames(8951): chr8:129296000 chr8:129296113 ... chr8:130354703
-  chr8:130354790
+rownames(3): chr8:129296000 chr8:129296113 chr8:129296185
 rowData metadata column names(0):
-colnames(960): H_ME-DS10776_2-DS10776_2 H_ME-DS10776_3-DS10776_3
-  ... H_ME-DS11313_3-DS11313_3 H_ME-DS11313_1-DS11313_1
+colnames(6): H_ME-DS10776_2-DS10776_2 H_ME-DS10776_3-DS10776_3 ...
+  H_ME-DS10777_3-DS10777_3 H_ME-DS10777_1-DS10777_1
 colData names(1): id
-pedigree(960): famid id fid mid sex dx
-complete trios(320):
-> (fe <- Trioconductor:::ped2fe(ped = "./../inst/8q24-european.ped", map = "./../inst/8q24-european.map", n.snps=8951))
-class: FamilyExperiment 
-dim: 8951 960 
-exptData(0):
-assays(1): geno
-rownames(8951): chr8:129296000 chr8:129296113 ... chr8:130354703
-  chr8:130354790
-rowData metadata column names(0):
-colnames(960): H_ME-DS10776_2-DS10776_2 H_ME-DS10776_3-DS10776_3
-  ... H_ME-DS11313_3-DS11313_3 H_ME-DS11313_1-DS11313_1
-colData names(1): id
-pedigree(960): famid id fid mid sex dx
-complete trios(320):
+pedigree(6): famid id fid mid sex dx
+complete trios(2):
+----
+Coercion top genotype matrix for trio package.
+----
+> (geno.trio <- as(fe,"matrix"))
+     [,1] [,2] [,3]
+[1,]    1    1    1
+[2,]    1    1    1
+[3,]    0    0    0
+[4,]    0    0    0
+[5,]   NA    0    0
+[6,]    0    0    0
+----
+
+small.ped
+----
+DS10776 H_ME-DS10776_2-DS10776_2 0 0 1 1 1 2 2 2 0 0
+DS10776 H_ME-DS10776_3-DS10776_3 0 0 2 1 2 2 2 2 2 2
+DS10776 H_ME-DS10776_1-DS10776_1 H_ME-DS10776_2-DS10776_2 H_ME-DS10776_3-DS10776_3 2 2 1 2 2 2 2 2
+DS10777 H_ME-DS10777_2-DS10777_2 0 0 1 1 1 2 2 2 2 2
+DS10777 H_ME-DS10777_3-DS10777_3 0 0 2 1 1 2 2 2 2 2
+DS10777 H_ME-DS10777_1-DS10777_1 H_ME-DS10777_2-DS10777_2 H_ME-DS10777_3-DS10777_3 2 2 1 2 2 2 2 2
+----
+
+small.map
+----
+8	chr8:129296000	0	129296000
+8	chr8:129296113	0	129296113
+8	chr8:129296185	0	129296185
 ----
