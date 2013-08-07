@@ -6,7 +6,7 @@
 == Construct CNV Matrix ==
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
 ----
-> library("trioClasses")
+> library("Trioconductor")
 ----
 ----
 > source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
@@ -17,7 +17,7 @@ Before any analysis begins we construct the CNV matrix.  This matrix is a matrix
 > gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.deletion.beaty)$id))), unlist(reduce(split(gr.deletion.beaty[homos.beaty], values(gr.deletion.beaty[homos.beaty])$id))))
 > gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
 ----
-Now with these GRanges objects we use the trioClasses function CNVMatrix to construct the CNV matrices.
+Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
 ----
 > system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 > system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
@@ -25,11 +25,12 @@ Now with these GRanges objects we use the trioClasses function CNVMatrix to cons
 ----
 
 == Make Data ==
-Now we use the CNV matrix as part of a FamilyExperiment object, as defined in trioClasses.  With the FE object we may easily acces trio-states of CNV components and regions.
+Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
 ----
 >   library("CleftCNVAssoc")
 >   data("pedigrees", package="CleftCNVAssoc")
->   data("cnv", package = "trioClasses")
+>   data(cleansamples, package="CleftCNVAssoc")
+>   data("cnv", package = "Trioconductor")
 ----
 Now we create the FamilyExperiment for the cleft group.
 ----
@@ -40,10 +41,10 @@ exptData(0):
 assays(1): cnv
 rownames(7256): comp1 comp2 ... comp7255 comp7256
 rowData metadata column names(0):
-colnames(1339): 11005_01@1008472480 11005_02@1008472482 ... 18117_02@0070298660 18117_03@0070298657
-colData names(1): id
+colnames: NULL
+colData names(99): id mads ... site X_merge
 pedigree(2082): famid id fid mid sex dx
-complete trios(445):
+complete trios(0):
 ----
 The control group.
 ----
@@ -66,8 +67,8 @@ Our first idea was to do a two by two test on the transmitted and non-transmitte
 // The above must have been written before the MAF method was implemented.
 Compute a DataFrame containing counts of transmissions by case/control with rows for components.  This is partly what distinguishes a DataFrame from a data.frame --- the ability to keep a GRanges object in a column.
 ----
-> TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
-> TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
+> TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, Trioconductor:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
+> TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, Trioconductor:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 > TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
 > colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 > rownames(TU.mat) <- names(table.list.beaty)
@@ -154,13 +155,9 @@ GRanges with 1 range and 4 metadata columns:
 ----
 The outlier is on chromsome 16.  It is a region with 123 components, and has width 125.535 kB. chr16:32404517-32530051.  
 
-image::figures/fig-cumsum.jpg[]
-
 image::figures/fig-transmedianhist.jpg[]
 
 image::figures/fig-qqplot-clean.jpg[]
-
-image::figures/fig-cumsum2.jpg[]
 
 
 == Association (Region-wise) ==
@@ -197,7 +194,7 @@ Here we filter out any rare deletions by requiring at least 25 observeable trans
 ----
 First we display the function that performs Fisher's exact test.
 ----
-> trioClasses:::TU.fish
+> Trioconductor:::TU.fish
 function (TU.vec) 
 {
     if (!identical(c("T.case", "U.case", "T.con", "U.con"), names(TU.vec))) 
@@ -206,11 +203,11 @@ function (TU.vec)
         alternative = "greater")
     return(fish)
 }
-<environment: namespace:trioClasses>
+<environment: namespace:Trioconductor>
 ----
 Then we apply it to each region after filtering out regions that did not have enough observations.
 ----
-> fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
+> fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
 > p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 > DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transrate.cleft[testable])
 > head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
@@ -680,22 +677,22 @@ There are 84 tests in this figure.
       con.ids   <- unique(c(as.matrix(completeTrios(fe.all))[-cleft.index,]))
       fe.beaty.perm <- fe.all[,colnames(fe.all) %in% cleft.ids]
       fe.pitt.perm <- fe.all[,colnames(fe.all) %in% con.ids]
-      trioAssay.beaty <- trioClasses:::TrioAssay(fe.beaty.perm, type = "cnv")
+      trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty.perm, type = "cnv")
       trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
       dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
-      trioAssay.pitt <- trioClasses:::TrioAssay(fe.pitt.perm, type = "cnv")
+      trioAssay.pitt <- Trioconductor:::TrioAssay(fe.pitt.perm, type = "cnv")
       trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
       dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
       table.list.beaty <- apply(trioStates.beaty, 2, "table")
       table.list.pitt <- apply(trioStates.pitt, 2, "table")
-      TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, trioClasses:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
-      TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, trioClasses:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
+      TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, Trioconductor:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
+      TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, Trioconductor:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
       TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
       colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
       rownames(TU.mat) <- names(table.list.beaty)
       #TU.mat.cmp <- TU.mat
       #gr.cmp <- rowData(fe.beaty.perm)
-      fish.list <- apply(TU.mat,1,trioClasses:::TU.fish)
+      fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
       p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
  }
 ----
@@ -703,20 +700,16 @@ These are the adjusted component-wise p-values:
 ----
 > p.min <- apply(p.mat,1,"min")
 > c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
-   chr7    chr8 
-0.00201 0.04030 
 ----
 And the threshold for niminal p-values is:
 ----
 > quantile(p.min,probs=0.05)
-     5% 
-0.00285 
 ----
 
 == Session Info ==
 ----
 > date()
-[1] "Mon Jul 29 18:18:30 2013"
+[1] "Wed Aug  7 14:01:08 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -730,22 +723,21 @@ attached base packages:
  [1] grid      splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Gviz_1.5.3                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                 
- [4] AnnotationDbi_1.23.11                   CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                  
- [7] GWASTools_1.7.3                         sandwich_2.2-10                         zoo_1.7-9                              
-[10] gdsfmt_0.9.14                           ncdf_1.6.6                              Biobase_2.21.2                         
-[13] trioClasses_1.0.9                       snpStats_1.11.0                         Matrix_1.0-12                          
-[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.13.15                  
-[19] XVector_0.1.0                           IRanges_1.19.8                          BiocGenerics_0.7.2                     
-[22] cacheSweave_0.6-1                       stashR_0.3-5                            filehash_2.2-1                         
-[25] ascii_2.1                              
+ [1] Gviz_1.4.0                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.12.0                 
+ [4] AnnotationDbi_1.22.2                    CleftCNVAssoc_0.0.2                     MinimumDistance_1.4.0                  
+ [7] GWASTools_1.6.0                         sandwich_2.2-10                         zoo_1.7-9                              
+[10] gdsfmt_0.9.12                           ncdf_1.6.6                              Biobase_2.20.0                         
+[13] Trioconductor_1.0.8                     snpStats_1.10.0                         Matrix_1.0-12                          
+[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.12.2                   
+[19] IRanges_1.18.0                          BiocGenerics_0.6.0                      cacheSweave_0.6-1                      
+[22] stashR_0.3-5                            filehash_2.2-1                          ascii_2.1                              
 
 loaded via a namespace (and not attached):
- [1] affyio_1.29.0        BiocInstaller_1.11.3 biomaRt_2.17.1       Biostrings_2.29.3    biovizBase_1.9.1     bit_1.1-10          
- [7] bitops_1.0-5         BSgenome_1.29.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-7           
-[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
-[19] Hmisc_3.10-1.1       iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.8.1    msm_1.2             
-[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0   RColorBrewer_1.0-5  
-[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3        
-[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0      
+ [1] affyio_1.28.0        BiocInstaller_1.10.0 biomaRt_2.16.0       Biostrings_2.28.0    biovizBase_1.8.0     bit_1.1-10          
+ [7] bitops_1.0-5         BSgenome_1.28.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-6           
+[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.34.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
+[19] Hmisc_3.10-1         iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.6.2    msm_1.1.4           
+[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.22.0  plyr_1.8             quantsmooth_1.26.0   RColorBrewer_1.0-5  
+[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.12.2     RSQLite_0.11.3       rtracklayer_1.20.1   scales_0.2.3        
+[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.22.0    XML_3.96-1.1         zlibbioc_1.6.0      
 ----
