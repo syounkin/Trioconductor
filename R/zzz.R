@@ -1,8 +1,8 @@
-THISPKG <- "trioClasses"
+THISPKG <- "Trioconductor"
 .onAttach <- function(libname, pkgname) {
-	version <- packageDescription("trioClasses", fields="Version")
+	version <- packageDescription("Trioconductor", fields="Version")
 	packageStartupMessage(paste("
-Welcome to trioClasses version ", version, "\n",
+Welcome to Trioconductor version ", version, "\n",
 "~~~~~~~~~~~~~~~~~", "\n",
 ">()_  >()_  >()_ ", "\n",
 " (__)  (__)  (__)", "\n",
