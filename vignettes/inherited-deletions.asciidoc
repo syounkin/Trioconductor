@@ -45,6 +45,7 @@ Now we create the FamilyExperiment for the cleft group.
   ped <- PedClass(beaty.ped)
   fe.beaty <- FamilyExperiment(se.beaty, pedigree = ped )
   cD <- merge(colData(fe.beaty),beaty.clean.strict,by.x  = "id", by.y="Sample.Name", all.x = TRUE)
+  rownames(cD) <- cD$id
   colData(fe.beaty) <- cD
 @ 
 <<fe-beaty, echo = TRUE, eval = TRUE, cache = FALSE>>=
