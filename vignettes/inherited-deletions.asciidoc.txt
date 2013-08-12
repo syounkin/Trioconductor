@@ -34,7 +34,7 @@ Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Tr
 ----
 Now we create the FamilyExperiment for the cleft group.
 ----
-> fe.beaty
+> (fe.beaty.pheno <- fe.beaty)
 class: FamilyExperiment 
 dim: 7256 1339 
 exptData(0):
@@ -186,11 +186,29 @@ GRanges with 2237 ranges and 0 metadata columns:
        247249719       1663265     242951149        185571     199501827 ...     154913754       1719168      57772954         16571
 ----
 But many of these are rare.
+
+----
+     trans.cleft untrans.cleft trans.con untrans.con
+[1,]           0             0         0           4
+[2,]          15            17         0           6
+[3,]           0             1         0           0
+[4,]           5            18         1           2
+[5,]           1             0         0           0
+[6,]           0             0         0           0
+     trans.clp1 untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3
+[1,]          0            0          0            0          0            0
+[2,]          7           10          1            2          7            5
+[3,]          0            0          0            0          0            0
+[4,]          1           10          1            0          3            8
+[5,]          0            0          0            0          0            0
+[6,]          0            0          0            0          0            0
+----
 Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.
 ----
 > TU.mat <- trans.mat
 > testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 > TU.mat <- TU.mat[testable,]
+> trans.mat.clp <- trans.mat.clp[testable,]
 ----
 First we display the function that performs Fisher's exact test.
 ----
@@ -211,38 +229,38 @@ Then we apply it to each region after filtering out regions that did not have en
 > p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 > DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transrate.cleft[testable])
 > head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
-  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con    p.vec transrate.all.testable.
-1           chr15     18474541   20730425      2255885             *     54     47    44    94 0.000644                   0.410
-2            chr7    141380317  141447476        67160             *     69     38    68    78 0.003397                   0.542
-3            chr8     39341981   39548228       206248             *    140    104    32    45 0.010868                   0.536
-4            chr6     32536895   32684456       147562             *     54     53    45    78 0.023386                   0.430
-5            chr6     32055573   32124218        68646             *     35     33    17    32 0.052925                   0.444
-6           chr17     41755843   42148466       392624             *     93     74    38    48 0.054580                   0.518
-  transrate.con.testable. transrate.cleft.testable.
-1                   0.319                     0.535
-2                   0.466                     0.645
-3                   0.416                     0.574
-4                   0.366                     0.505
-5                   0.347                     0.515
-6                   0.442                     0.557
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
+1           chr15     18474541   20730425      2255885             *     54     47    44    94         15           16         14
+2            chr7    141380317  141447476        67160             *     69     38    68    78         17           13         21
+3            chr8     39341981   39548228       206248             *    140    104    32    45         46           28         38
+4            chr6     32536895   32684456       147562             *     54     53    45    78         17           13         16
+5            chr6     32055573   32124218        68646             *     35     33    17    32         10            6         11
+6           chr17     41755843   42148466       392624             *     93     74    38    48         30           22         23
+  untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
+1            9         25           22 0.000644                   0.410                   0.319                     0.535
+2           10         31           15 0.003397                   0.542                   0.466                     0.645
+3           33         56           43 0.010868                   0.536                   0.416                     0.574
+4           19         21           21 0.023386                   0.430                   0.366                     0.505
+5           16         14           11 0.052925                   0.444                   0.347                     0.515
+6           18         40           34 0.054580                   0.518                   0.442                     0.557
 ----
 There are 39 regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
 ----
 > head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
-  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con    p.vec transrate.all.testable.
-1           chr12     36270798   36733128       462331             *      7     24     5    26 0.374521                   0.194
-2            chr1    147272181  147849072       576892             *      8     32    34    87 0.890460                   0.261
-3           chr15     18474541   20730425      2255885             *     54     47    44    94 0.000644                   0.410
-4            chr6     32694224   32788048        93825             *      5     23     8    17 0.935376                   0.245
-5            chr6     32055573   32124218        68646             *     35     33    17    32 0.052925                   0.444
-6            chr9     43515795   44821332      1305538             *     32     49    46    80 0.385996                   0.377
-  transrate.con.testable. transrate.cleft.testable.
-1                   0.161                     0.226
-2                   0.281                     0.200
-3                   0.319                     0.535
-4                   0.320                     0.179
-5                   0.347                     0.515
-6                   0.365                     0.395
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
+1           chr12     36270798   36733128       462331             *      7     24     5    26          3            9          1
+2            chr1    147272181  147849072       576892             *      8     32    34    87          3            3          2
+3           chr15     18474541   20730425      2255885             *     54     47    44    94         15           16         14
+4            chr6     32694224   32788048        93825             *      5     23     8    17          2            9          1
+5            chr6     32055573   32124218        68646             *     35     33    17    32         10            6         11
+6            chr9     43515795   44821332      1305538             *     32     49    46    80          8           13          9
+  untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
+1            8          3            7 0.374521                   0.194                   0.161                     0.226
+2           14          3           15 0.890460                   0.261                   0.281                     0.200
+3            9         25           22 0.000644                   0.410                   0.319                     0.535
+4            8          2            6 0.935376                   0.245                   0.320                     0.179
+5           16         14           11 0.052925                   0.444                   0.347                     0.515
+6           14         15           22 0.385996                   0.377                   0.365                     0.395
 ----
 
 Note that a region on chromosome six appears twice in the top six by p-value.  However we see in the six regions with the lowest transmissin rates that there is a region with extremly low transmission rate nearby.  It seems likely that both the chr15 and chr6 signals are spurious and due to false positives in the controls.
@@ -326,86 +344,86 @@ We also include UCSC centromere/telomere locations and R. Scharpfs list of regio
 > #DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
 > DF <- DataFrame(DF, dist.vec)
 > as.data.frame(DF)
-   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con    p.vec transrate.all.testable.
-1             chr1     12769266   13058015       288750             *     23     13    14    12 0.296532                   0.597
-2             chr1    103899238  104126342       227105             *     48     39    39    41 0.249911                   0.521
-3             chr1    147272181  147849072       576892             *      8     32    34    87 0.890460                   0.261
-4             chr1    194976397  195199868       223472             *     13     15    15    21 0.449029                   0.438
-5             chr2     40785003   41129076       344074             *     66     63    57    52 0.619394                   0.517
-6             chr2     89132524   91107283      1974760             *     16     43    28    29 0.995925                   0.379
-7             chr2    242565979  242692820       126842             *     26     32    25    30 0.601028                   0.451
-8             chr3     46765401   46827683        62283             *     12     15    18    14 0.878068                   0.508
-9             chr3     65159939   65187636        27698             *     72     59    50    39 0.623839                   0.555
-10            chr3     75470851   75730577       259727             *     46     54    50    52 0.715792                   0.475
-11            chr4     68997831   69258302       260472             *     33     35    80    67 0.829317                   0.526
-12            chr4    161252445  161314427        61983             *     28     33    35    27 0.911724                   0.512
-13            chr5      8756085    8811041        54957             *     19     26    29    18 0.981446                   0.522
-14            chr5     68871012   70700419      1829408             *     24     32    48    50 0.815949                   0.468
-15            chr5     97073409   97267981       194573             *     35     27    20    30 0.061418                   0.491
-16            chr6     29940311   30032810        92500             *     77     64    73    64 0.459653                   0.540
-17            chr6     31382534   31422222        39689             *     53     50    45    55 0.217781                   0.483
-18            chr6     32055573   32124218        68646             *     35     33    17    32 0.052925                   0.444
-19            chr6     32536895   32684456       147562             *     54     53    45    78 0.023386                   0.430
-20            chr6     32694224   32788048        93825             *      5     23     8    17 0.935376                   0.245
-21            chr6     67065007   67111682        46676             *     72     62    58    44 0.729281                   0.551
-22            chr6     79022244   79098876        76633             *    154    114   108    80 0.536642                   0.575
-23            chr7     57778797   62099233      4320437             *     13     20   102   148 0.630937                   0.406
-24            chr7    101914898  102109692       194795             *     11     18    19    28 0.674996                   0.395
-25            chr7    141380317  141447476        67160             *     69     38    68    78 0.003397                   0.542
-26            chr8     39341981   39548228       206248             *    140    104    32    45 0.010868                   0.536
-27            chr9     43515795   44821332      1305538             *     32     49    46    80 0.385996                   0.377
-28           chr11     48220946   48986763       765818             *     40     32    59    53 0.409198                   0.538
-29           chr11     55116789   55216671        99883             *    137    105    92    75 0.419150                   0.560
-30           chr12     36270798   36733128       462331             *      7     24     5    26 0.374521                   0.194
-31           chr14     18189975   19502504      1312530             *     40     48    72    77 0.712688                   0.473
-32           chr15     18474541   20730425      2255885             *     54     47    44    94 0.000644                   0.410
-33           chr15     32459510   32631865       172356             *     61     64    64    46 0.941827                   0.532
-34           chr16     31931481   33820307      1888827             *    121    104   128   111 0.518116                   0.537
-35           chr17     41755843   42148466       392624             *     93     74    38    48 0.054580                   0.518
-36           chr18     64879175   64906488        27314             *     22     21    26    20 0.764030                   0.539
-37           chr19     20349698   20523385       173688             *     54     43    40    38 0.334945                   0.537
-38           chr19     47939188   48537433       598246             *     29     32    24    27 0.555395                   0.473
-39           chr20     52080333   52094148        13816             *     44     45    40    29 0.890151                   0.532
-   transrate.con.testable. transrate.cleft.testable. dist.vec
-1                    0.538                     0.639        0
-2                    0.487                     0.552        0
-3                    0.281                     0.200        0
-4                    0.417                     0.464        0
-5                    0.523                     0.512 35700002
-6                    0.491                     0.271        0
-7                    0.455                     0.448        0
-8                    0.562                     0.444 19283317
-9                    0.562                     0.550   923364
-10                   0.490                     0.460        0
-11                   0.544                     0.485        0
-12                   0.565                     0.459 15971444
-13                   0.617                     0.422  7892084
-14                   0.490                     0.429        0
-15                   0.400                     0.565  1519019
-16                   0.533                     0.546        0
-17                   0.450                     0.515        0
-18                   0.347                     0.515        0
-19                   0.366                     0.505        0
-20                   0.320                     0.179        0
-21                   0.569                     0.537  4821006
-22                   0.574                     0.575 16628124
-23                   0.408                     0.394        0
-24                   0.404                     0.379        0
-25                   0.466                     0.645  1481524
-26                   0.416                     0.574  4341772
-27                   0.365                     0.395        0
-28                   0.527                     0.556        0
-29                   0.551                     0.566   258788
-30                   0.161                     0.226        0
-31                   0.483                     0.455        0
-32                   0.319                     0.535        0
-33                   0.582                     0.488  1748509
-34                   0.536                     0.538        0
-35                   0.442                     0.557        0
-36                   0.565                     0.512 48088174
-37                   0.513                     0.557  3839615
-38                   0.471                     0.475        0
-39                   0.580                     0.494  8502852
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
+1             chr1     12769266   13058015       288750             *     23     13    14    12          5            3          6
+2             chr1    103899238  104126342       227105             *     48     39    39    41         11           12         18
+3             chr1    147272181  147849072       576892             *      8     32    34    87          3            3          2
+4             chr1    194976397  195199868       223472             *     13     15    15    21          5            5          2
+5             chr2     40785003   41129076       344074             *     66     63    57    52         24           21         19
+6             chr2     89132524   91107283      1974760             *     16     43    28    29          7           14          6
+7             chr2    242565979  242692820       126842             *     26     32    25    30          9            8          8
+8             chr3     46765401   46827683        62283             *     12     15    18    14          2            3          1
+9             chr3     65159939   65187636        27698             *     72     59    50    39         19           14         21
+10            chr3     75470851   75730577       259727             *     46     54    50    52         14           16          7
+11            chr4     68997831   69258302       260472             *     33     35    80    67          5           13          9
+12            chr4    161252445  161314427        61983             *     28     33    35    27          7           10          8
+13            chr5      8756085    8811041        54957             *     19     26    29    18          5            7          3
+14            chr5     68871012   70700419      1829408             *     24     32    48    50          8           10          8
+15            chr5     97073409   97267981       194573             *     35     27    20    30          9            8         11
+16            chr6     29940311   30032810        92500             *     77     64    73    64         24           17         25
+17            chr6     31382534   31422222        39689             *     53     50    45    55         20           17          9
+18            chr6     32055573   32124218        68646             *     35     33    17    32         10            6         11
+19            chr6     32536895   32684456       147562             *     54     53    45    78         17           13         16
+20            chr6     32694224   32788048        93825             *      5     23     8    17          2            9          1
+21            chr6     67065007   67111682        46676             *     72     62    58    44         27           22         15
+22            chr6     79022244   79098876        76633             *    154    114   108    80         49           33         44
+23            chr7     57778797   62099233      4320437             *     13     20   102   148          5            7          2
+24            chr7    101914898  102109692       194795             *     11     18    19    28          2            3          6
+25            chr7    141380317  141447476        67160             *     69     38    68    78         17           13         21
+26            chr8     39341981   39548228       206248             *    140    104    32    45         46           28         38
+27            chr9     43515795   44821332      1305538             *     32     49    46    80          8           13          9
+28           chr11     48220946   48986763       765818             *     40     32    59    53         17            8          7
+29           chr11     55116789   55216671        99883             *    137    105    92    75         47           24         36
+30           chr12     36270798   36733128       462331             *      7     24     5    26          3            9          1
+31           chr14     18189975   19502504      1312530             *     40     48    72    77         12           20         16
+32           chr15     18474541   20730425      2255885             *     54     47    44    94         15           16         14
+33           chr15     32459510   32631865       172356             *     61     64    64    46         17           13         17
+34           chr16     31931481   33820307      1888827             *    121    104   128   111         50           25         25
+35           chr17     41755843   42148466       392624             *     93     74    38    48         30           22         23
+36           chr18     64879175   64906488        27314             *     22     21    26    20          8            4          4
+37           chr19     20349698   20523385       173688             *     54     43    40    38         17           13         17
+38           chr19     47939188   48537433       598246             *     29     32    24    27          6           10          9
+39           chr20     52080333   52094148        13816             *     44     45    40    29         12           16         15
+   untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
+1             3         12            7 0.296532                   0.597                   0.538                     0.639        0
+2            10         19           17 0.249911                   0.521                   0.487                     0.552        0
+3            14          3           15 0.890460                   0.261                   0.281                     0.200        0
+4             5          6            5 0.449029                   0.438                   0.417                     0.464        0
+5            15         23           27 0.619394                   0.517                   0.523                     0.512 35700002
+6             9          3           20 0.995925                   0.379                   0.491                     0.271        0
+7             8          9           16 0.601028                   0.451                   0.455                     0.448        0
+8             3          9            9 0.878068                   0.508                   0.562                     0.444 19283317
+9            19         32           26 0.623839                   0.555                   0.562                     0.550   923364
+10           15         25           23 0.715792                   0.475                   0.490                     0.460        0
+11            5         19           17 0.829317                   0.526                   0.544                     0.485        0
+12            9         13           14 0.911724                   0.512                   0.565                     0.459 15971444
+13            1         11           18 0.981446                   0.522                   0.617                     0.422  7892084
+14            8          8           14 0.815949                   0.468                   0.490                     0.429        0
+15            8         15           11 0.061418                   0.491                   0.400                     0.565  1519019
+16           20         28           27 0.459653                   0.540                   0.533                     0.546        0
+17           13         24           20 0.217781                   0.483                   0.450                     0.515        0
+18           16         14           11 0.052925                   0.444                   0.347                     0.515        0
+19           19         21           21 0.023386                   0.430                   0.366                     0.505        0
+20            8          2            6 0.935376                   0.245                   0.320                     0.179        0
+21           20         30           20 0.729281                   0.551                   0.569                     0.537  4821006
+22           30         61           51 0.536642                   0.575                   0.574                     0.575 16628124
+23            4          6            9 0.630937                   0.406                   0.408                     0.394        0
+24            5          3           10 0.674996                   0.395                   0.404                     0.379        0
+25           10         31           15 0.003397                   0.542                   0.466                     0.645  1481524
+26           33         56           43 0.010868                   0.536                   0.416                     0.574  4341772
+27           14         15           22 0.385996                   0.377                   0.365                     0.395        0
+28            5         16           19 0.409198                   0.538                   0.527                     0.556        0
+29           31         54           50 0.419150                   0.560                   0.551                     0.566   258788
+30            8          3            7 0.374521                   0.194                   0.161                     0.226        0
+31            8         12           20 0.712688                   0.473                   0.483                     0.455        0
+32            9         25           22 0.000644                   0.410                   0.319                     0.535        0
+33           17         27           34 0.941827                   0.532                   0.582                     0.488  1748509
+34           30         46           49 0.518116                   0.537                   0.536                     0.538        0
+35           18         40           34 0.054580                   0.518                   0.442                     0.557        0
+36            6         10           11 0.764030                   0.539                   0.565                     0.512 48088174
+37           11         20           19 0.334945                   0.537                   0.513                     0.557  3839615
+38            8         14           14 0.555395                   0.473                   0.471                     0.475        0
+39           13         17           16 0.890151                   0.532                   0.580                     0.494  8502852
 ----
 
 The filter accounts for 281 MB made up of 325 distinct regions.
@@ -492,34 +510,34 @@ There are 13 tests in this figure.
 ----
 > o <- order(DF$p.vec)
 > as.data.frame(DF[o,])
-   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con  p.vec transrate.all.testable.
-1             chr7    141380317  141447476        67160             *     69     38    68    78 0.0034                   0.542
-2             chr8     39341981   39548228       206248             *    140    104    32    45 0.0109                   0.536
-3             chr5     97073409   97267981       194573             *     35     27    20    30 0.0614                   0.491
-4            chr19     20349698   20523385       173688             *     54     43    40    38 0.3349                   0.537
-5             chr6     79022244   79098876        76633             *    154    114   108    80 0.5366                   0.575
-6             chr2     40785003   41129076       344074             *     66     63    57    52 0.6194                   0.517
-7             chr6     67065007   67111682        46676             *     72     62    58    44 0.7293                   0.551
-8            chr18     64879175   64906488        27314             *     22     21    26    20 0.7640                   0.539
-9             chr3     46765401   46827683        62283             *     12     15    18    14 0.8781                   0.508
-10           chr20     52080333   52094148        13816             *     44     45    40    29 0.8902                   0.532
-11            chr4    161252445  161314427        61983             *     28     33    35    27 0.9117                   0.512
-12           chr15     32459510   32631865       172356             *     61     64    64    46 0.9418                   0.532
-13            chr5      8756085    8811041        54957             *     19     26    29    18 0.9814                   0.522
-   transrate.con.testable. transrate.cleft.testable. dist.vec
-1                    0.466                     0.645  1481524
-2                    0.416                     0.574  4341772
-3                    0.400                     0.565  1519019
-4                    0.513                     0.557  3839615
-5                    0.574                     0.575 16628124
-6                    0.523                     0.512 35700002
-7                    0.569                     0.537  4821006
-8                    0.565                     0.512 48088174
-9                    0.562                     0.444 19283317
-10                   0.580                     0.494  8502852
-11                   0.565                     0.459 15971444
-12                   0.582                     0.488  1748509
-13                   0.617                     0.422  7892084
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
+1             chr7    141380317  141447476        67160             *     69     38    68    78         17           13         21
+2             chr8     39341981   39548228       206248             *    140    104    32    45         46           28         38
+3             chr5     97073409   97267981       194573             *     35     27    20    30          9            8         11
+4            chr19     20349698   20523385       173688             *     54     43    40    38         17           13         17
+5             chr6     79022244   79098876        76633             *    154    114   108    80         49           33         44
+6             chr2     40785003   41129076       344074             *     66     63    57    52         24           21         19
+7             chr6     67065007   67111682        46676             *     72     62    58    44         27           22         15
+8            chr18     64879175   64906488        27314             *     22     21    26    20          8            4          4
+9             chr3     46765401   46827683        62283             *     12     15    18    14          2            3          1
+10           chr20     52080333   52094148        13816             *     44     45    40    29         12           16         15
+11            chr4    161252445  161314427        61983             *     28     33    35    27          7           10          8
+12           chr15     32459510   32631865       172356             *     61     64    64    46         17           13         17
+13            chr5      8756085    8811041        54957             *     19     26    29    18          5            7          3
+   untrans.clp2 trans.clp3 untrans.clp3  p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
+1            10         31           15 0.0034                   0.542                   0.466                     0.645  1481524
+2            33         56           43 0.0109                   0.536                   0.416                     0.574  4341772
+3             8         15           11 0.0614                   0.491                   0.400                     0.565  1519019
+4            11         20           19 0.3349                   0.537                   0.513                     0.557  3839615
+5            30         61           51 0.5366                   0.575                   0.574                     0.575 16628124
+6            15         23           27 0.6194                   0.517                   0.523                     0.512 35700002
+7            20         30           20 0.7293                   0.551                   0.569                     0.537  4821006
+8             6         10           11 0.7640                   0.539                   0.565                     0.512 48088174
+9             3          9            9 0.8781                   0.508                   0.562                     0.444 19283317
+10           13         17           16 0.8902                   0.532                   0.580                     0.494  8502852
+11            9         13           14 0.9117                   0.512                   0.565                     0.459 15971444
+12           17         27           34 0.9418                   0.532                   0.582                     0.488  1748509
+13            1         11           18 0.9814                   0.522                   0.617                     0.422  7892084
 ----
 
 ----
@@ -664,6 +682,9 @@ There are 84 tests in this figure.
 ----
 > fe.beaty <- fe.beaty[queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))]
 > fe.pitt <- fe.pitt[queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))]
+> cD <- DataFrame(colData(fe.beaty)$id)
+> colnames(cD) <- "id"
+> colData(fe.beaty) <- cD
 > fe.all <- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(fe.beaty@pedigree,fe.pitt@pedigree)) )
 ----
 
@@ -709,7 +730,7 @@ And the threshold for niminal p-values is:
 == Session Info ==
 ----
 > date()
-[1] "Wed Aug  7 14:21:34 2013"
+[1] "Mon Aug 12 12:29:48 2013"
 > sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -723,21 +744,24 @@ attached base packages:
  [1] grid      splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Gviz_1.4.0                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.12.0                 
- [4] AnnotationDbi_1.22.2                    CleftCNVAssoc_0.0.2                     MinimumDistance_1.4.0                  
- [7] GWASTools_1.6.0                         sandwich_2.2-10                         zoo_1.7-9                              
-[10] gdsfmt_0.9.12                           ncdf_1.6.6                              Biobase_2.20.0                         
-[13] Trioconductor_1.0.8                     snpStats_1.10.0                         Matrix_1.0-12                          
-[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.12.2                   
-[19] IRanges_1.18.0                          BiocGenerics_0.6.0                      cacheSweave_0.6-1                      
-[22] stashR_0.3-5                            filehash_2.2-1                          ascii_2.1                              
+ [1] Gviz_1.5.3                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                 
+ [4] AnnotationDbi_1.23.11                   CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                  
+ [7] GWASTools_1.7.3                         sandwich_2.2-10                         zoo_1.7-9                              
+[10] gdsfmt_0.9.14                           ncdf_1.6.6                              Biobase_2.21.2                         
+[13] Trioconductor_1.0.8                     snpStats_1.11.0                         Matrix_1.0-12                          
+[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.13.15                  
+[19] XVector_0.1.0                           IRanges_1.19.8                          BiocGenerics_0.7.2                     
+[22] cacheSweave_0.6-1                       stashR_0.3-5                            filehash_2.2-1                         
+[25] ascii_2.1                              
 
 loaded via a namespace (and not attached):
- [1] affyio_1.28.0        BiocInstaller_1.10.0 biomaRt_2.16.0       Biostrings_2.28.0    biovizBase_1.8.0     bit_1.1-10          
- [7] bitops_1.0-5         BSgenome_1.28.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-6           
-[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.34.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
-[19] Hmisc_3.10-1         iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.6.2    msm_1.1.4           
-[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.22.0  plyr_1.8             quantsmooth_1.26.0   RColorBrewer_1.0-5  
-[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.12.2     RSQLite_0.11.3       rtracklayer_1.20.1   scales_0.2.3        
-[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.22.0    XML_3.96-1.1         zlibbioc_1.6.0      
+ [1] affyio_1.29.0        BiocInstaller_1.11.3 biomaRt_2.17.1       Biostrings_2.29.3    biovizBase_1.9.1     bit_1.1-10          
+ [7] bitops_1.0-5         BSgenome_1.29.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-7           
+[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.0       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
+[19] Hmisc_3.10-1.1       iterators_1.0.6      labeling_0.1         lmtest_0.9-31        matrixStats_0.8.1    msm_1.2             
+[25] munsell_0.4          mvtnorm_0.9-9994     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0   RColorBrewer_1.0-5  
+[31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3        
+[37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0      
 ----
+
+Foo!
