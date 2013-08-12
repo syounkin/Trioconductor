@@ -49,7 +49,7 @@ Now we create the FamilyExperiment for the cleft group.
   colData(fe.beaty) <- cD
 @ 
 <<fe-beaty, echo = TRUE, eval = TRUE, cache = FALSE>>=
-fe.beaty
+(fe.beaty.pheno <- fe.beaty)
 @
 The control group.
 <<se-pitt, echo = FALSE, eval = TRUE>>=
@@ -282,6 +282,93 @@ if( length(rowData(fe.beaty.i)) > 1 ){
 colnames(trans.mat) <- c("trans.cleft","untrans.cleft", "trans.con","untrans.con")
 save(trans.mat, file = "./../data/trans.mat.RData")
 @
+
+<<trioStates3, eval = TRUE, echo = FALSE, results = verbatim, cache = FALSE>>=
+trans.mat.clp <- c()
+gr.reduce <- reduce(rowData(fe.beaty))
+n.reg <- length(gr.reduce)
+for( i in 1:n.reg){
+#for( i in 1:10){
+     fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(gr.reduce[i], rowData(fe.beaty)))]
+     trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
+     if( length(rowData(fe.beaty.i)) > 1 ){
+     	trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+     }else{
+	trioStates.beaty <- matrix(with(trioAssay.beaty, paste0(F,M,O)),ncol=1)
+     }
+	dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+    trioStates.beaty.clp1 <- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==1,]
+    trioStates.beaty.clp2 <- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==2,]
+    trioStates.beaty.clp3 <- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==3,]
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    trans.clp1 <- trioStates.beaty.clp1 %in% c("011","101","111","112","122","212")
+    untrans.clp1 <- trioStates.beaty.clp1 %in% c("010","100","111","110","121","211")
+     
+     if( length(trans.clp1 > 0)){
+       trans.beaty.logical.clp1 <- rowSums(matrix(trans.clp1, nrow = nrow(trioStates.beaty.clp1), ncol = ncol(trioStates.beaty.clp1), byrow=FALSE)) > 0
+     }else{
+       trans.beaty.logical.clp1 <- 0
+     }
+     if( length(untrans.clp1 > 0)){
+       untrans.beaty.logical.clp1 <- rowSums(matrix(untrans.clp1, nrow = nrow(trioStates.beaty.clp1), ncol = ncol(trioStates.beaty.clp1), byrow=FALSE)) > 0
+     }else{
+       untrans.beaty.logical.clp1 <- 0
+     }
+     
+    trans.beaty.clp1 <- sum(trans.beaty.logical.clp1)
+    untrans.beaty.clp1 <- sum(untrans.beaty.logical.clp1 & !trans.beaty.logical.clp1)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.clp2 <- trioStates.beaty.clp2 %in% c("011","101","111","112","122","212")
+    untrans.clp2 <- trioStates.beaty.clp2 %in% c("010","100","111","110","121","211")
+     
+     if( length(trans.clp2 > 0)){
+       trans.beaty.logical.clp2 <- rowSums(matrix(trans.clp2, nrow = nrow(trioStates.beaty.clp2), ncol = ncol(trioStates.beaty.clp2), byrow=FALSE)) > 0
+     }else{
+       trans.beaty.logical.clp2 <- 0
+     }
+     if( length(untrans.clp2 > 0)){
+       untrans.beaty.logical.clp2 <- rowSums(matrix(untrans.clp2, nrow = nrow(trioStates.beaty.clp2), ncol = ncol(trioStates.beaty.clp2), byrow=FALSE)) > 0
+     }else{
+       untrans.beaty.logical.clp2 <- 0
+     }
+     
+    trans.beaty.clp2 <- sum(trans.beaty.logical.clp2)
+    untrans.beaty.clp2 <- sum(untrans.beaty.logical.clp2 & !trans.beaty.logical.clp2)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.clp3 <- trioStates.beaty.clp3 %in% c("011","101","111","112","122","212")
+    untrans.clp3 <- trioStates.beaty.clp3 %in% c("010","100","111","110","121","211")
+     
+     if( length(trans.clp3 > 0)){
+       trans.beaty.logical.clp3 <- rowSums(matrix(trans.clp3, nrow = nrow(trioStates.beaty.clp3), ncol = ncol(trioStates.beaty.clp3), byrow=FALSE)) > 0
+     }else{
+       trans.beaty.logical.clp3 <- 0
+     }
+     if( length(untrans.clp3 > 0)){
+       untrans.beaty.logical.clp3 <- rowSums(matrix(untrans.clp3, nrow = nrow(trioStates.beaty.clp3), ncol = ncol(trioStates.beaty.clp3), byrow=FALSE)) > 0
+     }else{
+       untrans.beaty.logical.clp3 <- 0
+     }
+     
+    trans.beaty.clp3 <- sum(trans.beaty.logical.clp3)
+    untrans.beaty.clp3 <- sum(untrans.beaty.logical.clp3 & !trans.beaty.logical.clp3)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.mat.clp <- rbind( trans.mat.clp, c(trans.beaty.clp1, untrans.beaty.clp1, trans.beaty.clp2, untrans.beaty.clp2, trans.beaty.clp3, untrans.beaty.clp3 ) )
+#     trans.mat.clp <- rbind( trans.mat.clp, c(trans.beaty.clp1, untrans.beaty.clp1) )
+}
+colnames(trans.mat.clp) <- c("trans.clp1","untrans.clp1","trans.clp2","untrans.clp2","trans.clp3","untrans.clp3")
+save(trans.mat.clp, file = "./../data/trans.mat.clp.RData")
+head(trans.mat)
+head(trans.mat.clp)
+@
 <<loadtrans, eval = FALSE, echo = FALSE, cache = FALSE>>=
 load(file = "./../data/trans.mat.RData")
 @
@@ -295,12 +382,13 @@ Here we filter out any rare deletions by requiring at least 25 observeable trans
 TU.mat <- trans.mat
 testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 TU.mat <- TU.mat[testable,]
+trans.mat.clp <- trans.mat.clp[testable,]
 @
 <<testable2, echo = FALSE, eval = TRUE, cache = FALSE>>=
 rownames(TU.mat) <- names(table.list.beaty)[testable]
 colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
-DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat)
-colnames(DF) <- c("grange", colnames(TU.mat))
+DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat, trans.mat.clp)
+colnames(DF) <- c("grange", colnames(TU.mat), colnames(trans.mat.clp))
 @
 First we display the function that performs Fisher's exact test.
 <<TUfish, eval = TRUE, echo = TRUE, cache = FALSE>>=
@@ -906,6 +994,11 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 <<perm1>>=
 fe.beaty <- fe.beaty[queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))]
 fe.pitt <- fe.pitt[queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))]
+
+cD <- DataFrame(colData(fe.beaty)$id)
+colnames(cD) <- "id"
+colData(fe.beaty) <- cD
+
 fe.all <- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(fe.beaty@pedigree,fe.pitt@pedigree)) )
 @
 
@@ -953,3 +1046,5 @@ quantile(p.min,probs=0.05)
 date()
 sessionInfo()
 @
+
+Foo!
