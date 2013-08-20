@@ -241,6 +241,7 @@ trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
 for( i in 1:n.reg){
+# for( i in 1:10){
 fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(reduce(rowData(fe.beaty))[i], rowData(fe.beaty)))]
 fe.pitt.i <- fe.pitt[subjectHits(findOverlaps(reduce(rowData(fe.pitt))[i], rowData(fe.pitt)))]
 
@@ -251,35 +252,90 @@ if( length(rowData(fe.beaty.i)) > 1 ){
     trioAssay.pitt <- Trioconductor:::TrioAssay(fe.pitt.i, type = "cnv")
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     trans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
     untrans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
     trans.beaty <- sum(trans.beaty.logical)
     untrans.beaty <- sum(untrans.beaty.logical & !trans.beaty.logical)
+
     trans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
     untrans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
     trans.pitt <- sum(trans.pitt.logical)
     untrans.pitt <- sum(untrans.pitt.logical & !trans.pitt.logical)
-    trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt) )
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.beaty.ma.logical <- rowSums(matrix(trioStates.beaty %in% c("011","112","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    untrans.beaty.ma.logical <- rowSums(matrix(trioStates.beaty %in% c("010","110","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    trans.beaty.ma <- sum(trans.beaty.ma.logical)
+    untrans.beaty.ma <- sum(untrans.beaty.ma.logical & !trans.beaty.ma.logical)
+
+    trans.pitt.ma.logical <- rowSums(matrix(trioStates.pitt %in% c("011","112","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    untrans.pitt.ma.logical <- rowSums(matrix(trioStates.pitt %in% c("010","110","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    trans.pitt.ma <- sum(trans.pitt.ma.logical)
+    untrans.pitt.ma <- sum(untrans.pitt.ma.logical & !trans.pitt.ma.logical)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.beaty.fa.logical <- rowSums(matrix(trioStates.beaty %in% c("101","112","122"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    untrans.beaty.fa.logical <- rowSums(matrix(trioStates.beaty %in% c("100","110","121"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    trans.beaty.fa <- sum(trans.beaty.fa.logical)
+    untrans.beaty.fa <- sum(untrans.beaty.fa.logical & !trans.beaty.fa.logical)
+
+    trans.pitt.fa.logical <- rowSums(matrix(trioStates.pitt %in% c("101","112","122"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    untrans.pitt.fa.logical <- rowSums(matrix(trioStates.pitt %in% c("100","110","121"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    trans.pitt.fa <- sum(trans.pitt.fa.logical)
+    untrans.pitt.fa <- sum(untrans.pitt.fa.logical & !trans.pitt.fa.logical)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt, trans.beaty.ma, untrans.beaty.ma, trans.beaty.fa, untrans.beaty.fa, trans.pitt.ma, untrans.pitt.ma, trans.pitt.fa, untrans.pitt.fa ) )
+
 }else{
     trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
     trioStates.beaty <- matrix(with(trioAssay.beaty, paste0(F,M,O)),ncol=1)
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+    trioAssay.pitt <- Trioconductor:::TrioAssay(fe.pitt.i, type = "cnv")
+    trioStates.pitt <- matrix(with(trioAssay.pitt, paste0(F,M,O)),ncol=1)
+    dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+
+
     trans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
     untrans.beaty.logical <- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
     trans.beaty <- sum(trans.beaty.logical)
     untrans.beaty <- sum(untrans.beaty.logical & !trans.beaty.logical)
-    trioAssay.pitt <- Trioconductor:::TrioAssay(fe.pitt.i, type = "cnv")
-    trioStates.pitt <- matrix(with(trioAssay.pitt, paste0(F,M,O)),ncol=1)
-    dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+
     trans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
     untrans.pitt.logical <- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
     trans.pitt <- sum(trans.pitt.logical)
     untrans.pitt <- sum(untrans.pitt.logical & !trans.pitt.logical)
-    trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt) )
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.beaty.ma.logical <- rowSums(matrix(trioStates.beaty %in% c("011","112","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    untrans.beaty.ma.logical <- rowSums(matrix(trioStates.beaty %in% c("010","110","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    trans.beaty.ma <- sum(trans.beaty.ma.logical)
+    untrans.beaty.ma <- sum(untrans.beaty.ma.logical & !trans.beaty.ma.logical)
+
+    trans.pitt.ma.logical <- rowSums(matrix(trioStates.pitt %in% c("011","112","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    untrans.pitt.ma.logical <- rowSums(matrix(trioStates.pitt %in% c("010","110","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    trans.pitt.ma <- sum(trans.pitt.ma.logical)
+    untrans.pitt.ma <- sum(untrans.pitt.ma.logical & !trans.pitt.ma.logical)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    trans.beaty.fa.logical <- rowSums(matrix(trioStates.beaty %in% c("101","112","122"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    untrans.beaty.fa.logical <- rowSums(matrix(trioStates.beaty %in% c("100","110","121"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) > 0
+    trans.beaty.fa <- sum(trans.beaty.fa.logical)
+    untrans.beaty.fa <- sum(untrans.beaty.fa.logical & !trans.beaty.fa.logical)
+
+    trans.pitt.fa.logical <- rowSums(matrix(trioStates.pitt %in% c("101","112","122"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    untrans.pitt.fa.logical <- rowSums(matrix(trioStates.pitt %in% c("100","110","121"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) > 0
+    trans.pitt.fa <- sum(trans.pitt.fa.logical)
+    untrans.pitt.fa <- sum(untrans.pitt.fa.logical & !trans.pitt.fa.logical)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    trans.mat <- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt, trans.beaty.ma, untrans.beaty.ma, trans.beaty.fa, untrans.beaty.fa, trans.pitt.ma, untrans.pitt.ma, trans.pitt.fa, untrans.pitt.fa ) )
+
 }
 }
 )
-colnames(trans.mat) <- c("trans.cleft","untrans.cleft", "trans.con","untrans.con")
+colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
 save(trans.mat, file = "./../data/trans.mat.RData")
 @
 
@@ -288,7 +344,7 @@ trans.mat.clp <- c()
 gr.reduce <- reduce(rowData(fe.beaty))
 n.reg <- length(gr.reduce)
 for( i in 1:n.reg){
-#for( i in 1:10){
+# for( i in 1:10){
      fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(gr.reduce[i], rowData(fe.beaty)))]
      trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
      if( length(rowData(fe.beaty.i)) > 1 ){
