@@ -827,6 +827,8 @@ complete trios(391):</tt></pre>
 &gt; rownames(TU.mat) &lt;- names(table.list.beaty)
 &gt; gr.cmp &lt;- rowData(fe.beaty)
 &gt; testable &lt;- which(   (rowSums(TU.mat[,1:2])&gt;=25) &amp; (rowSums(TU.mat[,3:4])&gt;=25) )
+&gt; length(testable)
+[1] 632
 &gt; TU.mat &lt;- TU.mat[testable,]
 &gt; TU.mat.cmp &lt;- TU.mat
 &gt; DF &lt;- DataFrame(rowData(fe.beaty)[testable],TU.mat)
@@ -2596,20 +2598,193 @@ GRanges with 2237 ranges and 0 metadata columns:
 <div class="paragraph"><p>But many of these are rare.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>     trans.cleft untrans.cleft trans.con untrans.con
-[1,]           0             0         0           4
-[2,]          15            17         0           6
-[3,]           0             1         0           0
-[4,]           5            18         1           2
-[5,]           1             0         0           0
-[6,]           0             0         0           0
-     trans.clp1 untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3
-[1,]          0            0          0            0          0            0
-[2,]          7           10          1            2          7            5
-[3,]          0            0          0            0          0            0
-[4,]          1           10          1            0          3            8
-[5,]          0            0          0            0          0            0
-[6,]          0            0          0            0          0            0</tt></pre>
+<pre><tt>&gt; trans.mat &lt;- c()
+&gt; n.reg &lt;- length(reduce(rowData(fe.beaty)))
+&gt; system.time(
+ for( i in 1:n.reg){
+ # for( i in 1:10){
+ fe.beaty.i &lt;- fe.beaty[subjectHits(findOverlaps(reduce(rowData(fe.beaty))[i], rowData(fe.beaty)))]
+ fe.pitt.i &lt;- fe.pitt[subjectHits(findOverlaps(reduce(rowData(fe.pitt))[i], rowData(fe.pitt)))]
+
+ if( length(rowData(fe.beaty.i)) &gt; 1 ){
+     trioAssay.beaty &lt;- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
+     trioStates.beaty &lt;- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+     dimnames(trioStates.beaty) &lt;- dimnames(trioAssay.beaty$O)
+     trioAssay.pitt &lt;- Trioconductor:::TrioAssay(fe.pitt.i, type = "cnv")
+     trioStates.pitt &lt;- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+     dimnames(trioStates.pitt) &lt;- dimnames(trioAssay.pitt$O)
+
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.beaty.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     untrans.beaty.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     trans.beaty &lt;- sum(trans.beaty.logical)
+     untrans.beaty &lt;- sum(untrans.beaty.logical &amp; !trans.beaty.logical)
+
+     trans.pitt.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     untrans.pitt.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     trans.pitt &lt;- sum(trans.pitt.logical)
+     untrans.pitt &lt;- sum(untrans.pitt.logical &amp; !trans.pitt.logical)
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.beaty.ma.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("011","112","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     untrans.beaty.ma.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("010","110","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     trans.beaty.ma &lt;- sum(trans.beaty.ma.logical)
+     untrans.beaty.ma &lt;- sum(untrans.beaty.ma.logical &amp; !trans.beaty.ma.logical)
+
+     trans.pitt.ma.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("011","112","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     untrans.pitt.ma.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("010","110","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     trans.pitt.ma &lt;- sum(trans.pitt.ma.logical)
+     untrans.pitt.ma &lt;- sum(untrans.pitt.ma.logical &amp; !trans.pitt.ma.logical)
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.beaty.fa.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("101","112","122"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     untrans.beaty.fa.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("100","110","121"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     trans.beaty.fa &lt;- sum(trans.beaty.fa.logical)
+     untrans.beaty.fa &lt;- sum(untrans.beaty.fa.logical &amp; !trans.beaty.fa.logical)
+
+     trans.pitt.fa.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("101","112","122"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     untrans.pitt.fa.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("100","110","121"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     trans.pitt.fa &lt;- sum(trans.pitt.fa.logical)
+     untrans.pitt.fa &lt;- sum(untrans.pitt.fa.logical &amp; !trans.pitt.fa.logical)
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+     trans.mat &lt;- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt, trans.beaty.ma, untrans.beaty.ma, trans.beaty.fa, untrans.beaty.fa, trans.pitt.ma, untrans.pitt.ma, trans.pitt.fa, untrans.pitt.fa ) )
+
+ }else{
+     trioAssay.beaty &lt;- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
+     trioStates.beaty &lt;- matrix(with(trioAssay.beaty, paste0(F,M,O)),ncol=1)
+     dimnames(trioStates.beaty) &lt;- dimnames(trioAssay.beaty$O)
+     trioAssay.pitt &lt;- Trioconductor:::TrioAssay(fe.pitt.i, type = "cnv")
+     trioStates.pitt &lt;- matrix(with(trioAssay.pitt, paste0(F,M,O)),ncol=1)
+     dimnames(trioStates.pitt) &lt;- dimnames(trioAssay.pitt$O)
+
+
+     trans.beaty.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     untrans.beaty.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     trans.beaty &lt;- sum(trans.beaty.logical)
+     untrans.beaty &lt;- sum(untrans.beaty.logical &amp; !trans.beaty.logical)
+
+     trans.pitt.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("011","101","111","112","122","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     untrans.pitt.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("010","100","111","110","121","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     trans.pitt &lt;- sum(trans.pitt.logical)
+     untrans.pitt &lt;- sum(untrans.pitt.logical &amp; !trans.pitt.logical)
+
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.beaty.ma.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("011","112","212"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     untrans.beaty.ma.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("010","110","211"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     trans.beaty.ma &lt;- sum(trans.beaty.ma.logical)
+     untrans.beaty.ma &lt;- sum(untrans.beaty.ma.logical &amp; !trans.beaty.ma.logical)
+
+     trans.pitt.ma.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("011","112","212"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     untrans.pitt.ma.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("010","110","211"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     trans.pitt.ma &lt;- sum(trans.pitt.ma.logical)
+     untrans.pitt.ma &lt;- sum(untrans.pitt.ma.logical &amp; !trans.pitt.ma.logical)
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.beaty.fa.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("101","112","122"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     untrans.beaty.fa.logical &lt;- rowSums(matrix(trioStates.beaty %in% c("100","110","121"), nrow = nrow(trioStates.beaty), ncol = ncol(trioStates.beaty), byrow=FALSE)) &gt; 0
+     trans.beaty.fa &lt;- sum(trans.beaty.fa.logical)
+     untrans.beaty.fa &lt;- sum(untrans.beaty.fa.logical &amp; !trans.beaty.fa.logical)
+
+     trans.pitt.fa.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("101","112","122"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     untrans.pitt.fa.logical &lt;- rowSums(matrix(trioStates.pitt %in% c("100","110","121"), nrow = nrow(trioStates.pitt), ncol = ncol(trioStates.pitt), byrow=FALSE)) &gt; 0
+     trans.pitt.fa &lt;- sum(trans.pitt.fa.logical)
+     untrans.pitt.fa &lt;- sum(untrans.pitt.fa.logical &amp; !trans.pitt.fa.logical)
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+     trans.mat &lt;- rbind( trans.mat, c(trans.beaty, untrans.beaty, trans.pitt, untrans.pitt, trans.beaty.ma, untrans.beaty.ma, trans.beaty.fa, untrans.beaty.fa, trans.pitt.ma, untrans.pitt.ma, trans.pitt.fa, untrans.pitt.fa ) )
+
+ }
+ }
+ )
+&gt; colnames(trans.mat) &lt;- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
+&gt; save(trans.mat, file = "./../data/trans.mat.RData")</tt></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&gt; trans.mat.clp &lt;- c()
+&gt; gr.reduce &lt;- reduce(rowData(fe.beaty))
+&gt; n.reg &lt;- length(gr.reduce)
+&gt; for( i in 1:n.reg){
+ # for( i in 1:10){
+      fe.beaty.i &lt;- fe.beaty[subjectHits(findOverlaps(gr.reduce[i], rowData(fe.beaty)))]
+      trioAssay.beaty &lt;- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
+      if( length(rowData(fe.beaty.i)) &gt; 1 ){
+        trioStates.beaty &lt;- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+      }else{
+        trioStates.beaty &lt;- matrix(with(trioAssay.beaty, paste0(F,M,O)),ncol=1)
+      }
+        dimnames(trioStates.beaty) &lt;- dimnames(trioAssay.beaty$O)
+     trioStates.beaty.clp1 &lt;- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==1,]
+     trioStates.beaty.clp2 &lt;- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==2,]
+     trioStates.beaty.clp3 &lt;- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==3,]
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+     trans.clp1 &lt;- trioStates.beaty.clp1 %in% c("011","101","111","112","122","212")
+     untrans.clp1 &lt;- trioStates.beaty.clp1 %in% c("010","100","111","110","121","211")
+
+      if( length(trans.clp1 &gt; 0)){
+        trans.beaty.logical.clp1 &lt;- rowSums(matrix(trans.clp1, nrow = nrow(trioStates.beaty.clp1), ncol = ncol(trioStates.beaty.clp1), byrow=FALSE)) &gt; 0
+      }else{
+        trans.beaty.logical.clp1 &lt;- 0
+      }
+      if( length(untrans.clp1 &gt; 0)){
+        untrans.beaty.logical.clp1 &lt;- rowSums(matrix(untrans.clp1, nrow = nrow(trioStates.beaty.clp1), ncol = ncol(trioStates.beaty.clp1), byrow=FALSE)) &gt; 0
+      }else{
+        untrans.beaty.logical.clp1 &lt;- 0
+      }
+
+     trans.beaty.clp1 &lt;- sum(trans.beaty.logical.clp1)
+     untrans.beaty.clp1 &lt;- sum(untrans.beaty.logical.clp1 &amp; !trans.beaty.logical.clp1)
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.clp2 &lt;- trioStates.beaty.clp2 %in% c("011","101","111","112","122","212")
+     untrans.clp2 &lt;- trioStates.beaty.clp2 %in% c("010","100","111","110","121","211")
+
+      if( length(trans.clp2 &gt; 0)){
+        trans.beaty.logical.clp2 &lt;- rowSums(matrix(trans.clp2, nrow = nrow(trioStates.beaty.clp2), ncol = ncol(trioStates.beaty.clp2), byrow=FALSE)) &gt; 0
+      }else{
+        trans.beaty.logical.clp2 &lt;- 0
+      }
+      if( length(untrans.clp2 &gt; 0)){
+        untrans.beaty.logical.clp2 &lt;- rowSums(matrix(untrans.clp2, nrow = nrow(trioStates.beaty.clp2), ncol = ncol(trioStates.beaty.clp2), byrow=FALSE)) &gt; 0
+      }else{
+        untrans.beaty.logical.clp2 &lt;- 0
+      }
+
+     trans.beaty.clp2 &lt;- sum(trans.beaty.logical.clp2)
+     untrans.beaty.clp2 &lt;- sum(untrans.beaty.logical.clp2 &amp; !trans.beaty.logical.clp2)
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.clp3 &lt;- trioStates.beaty.clp3 %in% c("011","101","111","112","122","212")
+     untrans.clp3 &lt;- trioStates.beaty.clp3 %in% c("010","100","111","110","121","211")
+
+      if( length(trans.clp3 &gt; 0)){
+        trans.beaty.logical.clp3 &lt;- rowSums(matrix(trans.clp3, nrow = nrow(trioStates.beaty.clp3), ncol = ncol(trioStates.beaty.clp3), byrow=FALSE)) &gt; 0
+      }else{
+        trans.beaty.logical.clp3 &lt;- 0
+      }
+      if( length(untrans.clp3 &gt; 0)){
+        untrans.beaty.logical.clp3 &lt;- rowSums(matrix(untrans.clp3, nrow = nrow(trioStates.beaty.clp3), ncol = ncol(trioStates.beaty.clp3), byrow=FALSE)) &gt; 0
+      }else{
+        untrans.beaty.logical.clp3 &lt;- 0
+      }
+
+     trans.beaty.clp3 &lt;- sum(trans.beaty.logical.clp3)
+     untrans.beaty.clp3 &lt;- sum(untrans.beaty.logical.clp3 &amp; !trans.beaty.logical.clp3)
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.mat.clp &lt;- rbind( trans.mat.clp, c(trans.beaty.clp1, untrans.beaty.clp1, trans.beaty.clp2, untrans.beaty.clp2, trans.beaty.clp3, untrans.beaty.clp3 ) )
+ #     trans.mat.clp &lt;- rbind( trans.mat.clp, c(trans.beaty.clp1, untrans.beaty.clp1) )
+ }
+&gt; colnames(trans.mat.clp) &lt;- c("trans.clp1","untrans.clp1","trans.clp2","untrans.clp2","trans.clp3","untrans.clp3")
+&gt; save(trans.mat.clp, file = "./../data/trans.mat.clp.RData")
+&gt; head(trans.mat)
+&gt; head(trans.mat.clp)</tt></pre>
 </div></div>
 <div class="paragraph"><p>Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.</p></div>
 <div class="listingblock">
@@ -2636,17 +2811,26 @@ function (TU.vec)
 <div class="paragraph"><p>Then we apply it to each region after filtering out regions that did not have enough observations.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt; fish.list &lt;- apply(TU.mat,1,Trioconductor:::TU.fish)
+<pre><tt>&gt; TU.mat.test &lt;- TU.mat[,1:4]
+&gt; colnames(TU.mat.test) &lt;- c("T.case", "U.case", "T.con", "U.con")
+&gt; fish.list &lt;- apply(TU.mat.test,1,Trioconductor:::TU.fish)
 &gt; p.vec &lt;- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 &gt; DF &lt;- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transrate.cleft[testable])
 &gt; head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
-  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
-1           chr15     18474541   20730425      2255885             *     54     47    44    94         15           16         14
-2            chr7    141380317  141447476        67160             *     69     38    68    78         17           13         21
-3            chr8     39341981   39548228       206248             *    140    104    32    45         46           28         38
-4            chr6     32536895   32684456       147562             *     54     53    45    78         17           13         16
-5            chr6     32055573   32124218        68646             *     35     33    17    32         10            6         11
-6           chr17     41755843   42148466       392624             *     93     74    38    48         30           22         23
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+2            chr7    141380317  141447476        67160             *     69     38    68    78             40               23
+3            chr8     39341981   39548228       206248             *    140    104    32    45             86               58
+4            chr6     32536895   32684456       147562             *     54     53    45    78             18               33
+5            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+6           chr17     41755843   42148466       392624             *     93     74    38    48             48               37
+  trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1             30               26           21             61           25             44         15           16         14
+2             38               19           35             45           37             42         17           13         21
+3             76               62           10             17           21             30         46           28         38
+4             37               30           25             56           19             38         17           13         16
+5             19               16            9             15            8             17         10            6         11
+6             45               43           17             27           18             29         30           22         23
   untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
 1            9         25           22 0.000644                   0.410                   0.319                     0.535
 2           10         31           15 0.003397                   0.542                   0.466                     0.645
@@ -2659,13 +2843,20 @@ function (TU.vec)
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
-  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
-1           chr12     36270798   36733128       462331             *      7     24     5    26          3            9          1
-2            chr1    147272181  147849072       576892             *      8     32    34    87          3            3          2
-3           chr15     18474541   20730425      2255885             *     54     47    44    94         15           16         14
-4            chr6     32694224   32788048        93825             *      5     23     8    17          2            9          1
-5            chr6     32055573   32124218        68646             *     35     33    17    32         10            6         11
-6            chr9     43515795   44821332      1305538             *     32     49    46    80          8           13          9
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1           chr12     36270798   36733128       462331             *      7     24     5    26              6               19
+2            chr1    147272181  147849072       576892             *      8     32    34    87              3               18
+3           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+4            chr6     32694224   32788048        93825             *      5     23     8    17              5               13
+5            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+6            chr9     43515795   44821332      1305538             *     32     49    46    80             20               32
+  trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              1                7            2             12            3             16          3            9          1
+2              5               15           14             38           15             63          3            3          2
+3             30               26           21             61           25             44         15           16         14
+4              0               11            1              9            5              8          2            9          1
+5             19               16            9             15            8             17         10            6         11
+6             12               18           20             45           25             43          8           13          9
   untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
 1            8          3            7 0.374521                   0.194                   0.161                     0.226
 2           14          3           15 0.890460                   0.261                   0.281                     0.200
@@ -5390,46 +5581,86 @@ eS4+1SaJ9njZWk83zSPMI3eWX52+/Wu9oooAKKKKACiiigAooooAKKKKACiiigD/2Q==" />
 &gt; #DF &lt;- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
 &gt; DF &lt;- DataFrame(DF, dist.vec)
 &gt; as.data.frame(DF)
-   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
-1             chr1     12769266   13058015       288750             *     23     13    14    12          5            3          6
-2             chr1    103899238  104126342       227105             *     48     39    39    41         11           12         18
-3             chr1    147272181  147849072       576892             *      8     32    34    87          3            3          2
-4             chr1    194976397  195199868       223472             *     13     15    15    21          5            5          2
-5             chr2     40785003   41129076       344074             *     66     63    57    52         24           21         19
-6             chr2     89132524   91107283      1974760             *     16     43    28    29          7           14          6
-7             chr2    242565979  242692820       126842             *     26     32    25    30          9            8          8
-8             chr3     46765401   46827683        62283             *     12     15    18    14          2            3          1
-9             chr3     65159939   65187636        27698             *     72     59    50    39         19           14         21
-10            chr3     75470851   75730577       259727             *     46     54    50    52         14           16          7
-11            chr4     68997831   69258302       260472             *     33     35    80    67          5           13          9
-12            chr4    161252445  161314427        61983             *     28     33    35    27          7           10          8
-13            chr5      8756085    8811041        54957             *     19     26    29    18          5            7          3
-14            chr5     68871012   70700419      1829408             *     24     32    48    50          8           10          8
-15            chr5     97073409   97267981       194573             *     35     27    20    30          9            8         11
-16            chr6     29940311   30032810        92500             *     77     64    73    64         24           17         25
-17            chr6     31382534   31422222        39689             *     53     50    45    55         20           17          9
-18            chr6     32055573   32124218        68646             *     35     33    17    32         10            6         11
-19            chr6     32536895   32684456       147562             *     54     53    45    78         17           13         16
-20            chr6     32694224   32788048        93825             *      5     23     8    17          2            9          1
-21            chr6     67065007   67111682        46676             *     72     62    58    44         27           22         15
-22            chr6     79022244   79098876        76633             *    154    114   108    80         49           33         44
-23            chr7     57778797   62099233      4320437             *     13     20   102   148          5            7          2
-24            chr7    101914898  102109692       194795             *     11     18    19    28          2            3          6
-25            chr7    141380317  141447476        67160             *     69     38    68    78         17           13         21
-26            chr8     39341981   39548228       206248             *    140    104    32    45         46           28         38
-27            chr9     43515795   44821332      1305538             *     32     49    46    80          8           13          9
-28           chr11     48220946   48986763       765818             *     40     32    59    53         17            8          7
-29           chr11     55116789   55216671        99883             *    137    105    92    75         47           24         36
-30           chr12     36270798   36733128       462331             *      7     24     5    26          3            9          1
-31           chr14     18189975   19502504      1312530             *     40     48    72    77         12           20         16
-32           chr15     18474541   20730425      2255885             *     54     47    44    94         15           16         14
-33           chr15     32459510   32631865       172356             *     61     64    64    46         17           13         17
-34           chr16     31931481   33820307      1888827             *    121    104   128   111         50           25         25
-35           chr17     41755843   42148466       392624             *     93     74    38    48         30           22         23
-36           chr18     64879175   64906488        27314             *     22     21    26    20          8            4          4
-37           chr19     20349698   20523385       173688             *     54     43    40    38         17           13         17
-38           chr19     47939188   48537433       598246             *     29     32    24    27          6           10          9
-39           chr20     52080333   52094148        13816             *     44     45    40    29         12           16         15
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1             chr1     12769266   13058015       288750             *     23     13    14    12             13                6
+2             chr1    103899238  104126342       227105             *     48     39    39    41             23               23
+3             chr1    147272181  147849072       576892             *      8     32    34    87              3               18
+4             chr1    194976397  195199868       223472             *     13     15    15    21              6                8
+5             chr2     40785003   41129076       344074             *     66     63    57    52             35               32
+6             chr2     89132524   91107283      1974760             *     16     43    28    29             12               20
+7             chr2    242565979  242692820       126842             *     26     32    25    30             11               20
+8             chr3     46765401   46827683        62283             *     12     15    18    14              8               10
+9             chr3     65159939   65187636        27698             *     72     59    50    39             34               27
+10            chr3     75470851   75730577       259727             *     46     54    50    52             23               37
+11            chr4     68997831   69258302       260472             *     33     35    80    67             23               19
+12            chr4    161252445  161314427        61983             *     28     33    35    27             14               17
+13            chr5      8756085    8811041        54957             *     19     26    29    18              7               14
+14            chr5     68871012   70700419      1829408             *     24     32    48    50             12               21
+15            chr5     97073409   97267981       194573             *     35     27    20    30             19               15
+16            chr6     29940311   30032810        92500             *     77     64    73    64             43               40
+17            chr6     31382534   31422222        39689             *     53     50    45    55             31               26
+18            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+19            chr6     32536895   32684456       147562             *     54     53    45    78             18               33
+20            chr6     32694224   32788048        93825             *      5     23     8    17              5               13
+21            chr6     67065007   67111682        46676             *     72     62    58    44             31               33
+22            chr6     79022244   79098876        76633             *    154    114   108    80             69               74
+23            chr7     57778797   62099233      4320437             *     13     20   102   148              8               15
+24            chr7    101914898  102109692       194795             *     11     18    19    28              6               11
+25            chr7    141380317  141447476        67160             *     69     38    68    78             40               23
+26            chr8     39341981   39548228       206248             *    140    104    32    45             86               58
+27            chr9     43515795   44821332      1305538             *     32     49    46    80             20               32
+28           chr11     48220946   48986763       765818             *     40     32    59    53             25               23
+29           chr11     55116789   55216671        99883             *    137    105    92    75             84               61
+30           chr12     36270798   36733128       462331             *      7     24     5    26              6               19
+31           chr14     18189975   19502504      1312530             *     40     48    72    77             23               31
+32           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+33           chr15     32459510   32631865       172356             *     61     64    64    46             35               35
+34           chr16     31931481   33820307      1888827             *    121    104   128   111             75               77
+35           chr17     41755843   42148466       392624             *     93     74    38    48             48               37
+36           chr18     64879175   64906488        27314             *     22     21    26    20             14               12
+37           chr19     20349698   20523385       173688             *     54     43    40    38             25               25
+38           chr19     47939188   48537433       598246             *     29     32    24    27             18               17
+39           chr20     52080333   52094148        13816             *     44     45    40    29             20               21
+   trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              11                7           11              7            3              5          5            3          6
+2              21               18           17             22           20             25         11           12         18
+3               5               15           14             38           15             63          3            3          2
+4               7                8            8             17            5              6          5            5          2
+5              31               31           24             18           35             38         24           21         19
+6               4               24           11             13           18             16          7           14          6
+7              15               12           11             19           15             13          9            8          8
+8               5                5            7              8           11              6          2            3          1
+9              37               34           21             22           28             20         19           14         21
+10             20               19           26             29           21             36         14           16          7
+11             10               17           39             46           41             43          5           13          9
+12             12               18           13              9           22             18          7           10          8
+13             11               13           19              7           10             11          5            7          3
+14             13               11           32             36           13             28          8           10          8
+15             13               13            9             14           11             17          9            8         11
+16             33               28           34             40           40             34         24           17         25
+17             22               28           22             29           25             29         20           17          9
+18             19               16            9             15            8             17         10            6         11
+19             37               30           25             56           19             38         17           13         16
+20              0               11            1              9            5              8          2            9          1
+21             39               34           26             21           33             24         27           22         15
+22             70               64           57             40           48             51         49           33         44
+23              5                7           51            132           24             86          5            7          2
+24              4                8            9             10           10             18          2            3          6
+25             38               19           35             45           37             42         17           13         21
+26             76               62           10             17           21             30         46           28         38
+27             12               18           20             45           25             43          8           13          9
+28             15               16           28             44           29             22         17            8          7
+29             64               64           51             32           46             51         47           24         36
+30              1                7            2             12            3             16          3            9          1
+31             14               24           33             49           33             48         12           20         16
+32             30               26           21             61           25             44         15           16         14
+33             28               32           33             26           29             20         17           13         17
+34             31               71           69             79           55             73         50           25         25
+35             45               43           17             27           18             29         30           22         23
+36              9               10           13             12           11              9          8            4          4
+37             29               24           22             18           15             23         17           13         17
+38             12               16            9             17           15             10          6           10          9
+39             25               25           13              8           28             21         12           16         15
    untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
 1             3         12            7 0.296532                   0.597                   0.538                     0.639        0
 2            10         19           17 0.249911                   0.521                   0.487                     0.552        0
@@ -9571,20 +9802,34 @@ pdf
 <div class="content">
 <pre><tt>&gt; o &lt;- order(DF$p.vec)
 &gt; as.data.frame(DF[o,])
-   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.clp1 untrans.clp1 trans.clp2
-1             chr7    141380317  141447476        67160             *     69     38    68    78         17           13         21
-2             chr8     39341981   39548228       206248             *    140    104    32    45         46           28         38
-3             chr5     97073409   97267981       194573             *     35     27    20    30          9            8         11
-4            chr19     20349698   20523385       173688             *     54     43    40    38         17           13         17
-5             chr6     79022244   79098876        76633             *    154    114   108    80         49           33         44
-6             chr2     40785003   41129076       344074             *     66     63    57    52         24           21         19
-7             chr6     67065007   67111682        46676             *     72     62    58    44         27           22         15
-8            chr18     64879175   64906488        27314             *     22     21    26    20          8            4          4
-9             chr3     46765401   46827683        62283             *     12     15    18    14          2            3          1
-10           chr20     52080333   52094148        13816             *     44     45    40    29         12           16         15
-11            chr4    161252445  161314427        61983             *     28     33    35    27          7           10          8
-12           chr15     32459510   32631865       172356             *     61     64    64    46         17           13         17
-13            chr5      8756085    8811041        54957             *     19     26    29    18          5            7          3
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1             chr7    141380317  141447476        67160             *     69     38    68    78             40               23
+2             chr8     39341981   39548228       206248             *    140    104    32    45             86               58
+3             chr5     97073409   97267981       194573             *     35     27    20    30             19               15
+4            chr19     20349698   20523385       173688             *     54     43    40    38             25               25
+5             chr6     79022244   79098876        76633             *    154    114   108    80             69               74
+6             chr2     40785003   41129076       344074             *     66     63    57    52             35               32
+7             chr6     67065007   67111682        46676             *     72     62    58    44             31               33
+8            chr18     64879175   64906488        27314             *     22     21    26    20             14               12
+9             chr3     46765401   46827683        62283             *     12     15    18    14              8               10
+10           chr20     52080333   52094148        13816             *     44     45    40    29             20               21
+11            chr4    161252445  161314427        61983             *     28     33    35    27             14               17
+12           chr15     32459510   32631865       172356             *     61     64    64    46             35               35
+13            chr5      8756085    8811041        54957             *     19     26    29    18              7               14
+   trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              38               19           35             45           37             42         17           13         21
+2              76               62           10             17           21             30         46           28         38
+3              13               13            9             14           11             17          9            8         11
+4              29               24           22             18           15             23         17           13         17
+5              70               64           57             40           48             51         49           33         44
+6              31               31           24             18           35             38         24           21         19
+7              39               34           26             21           33             24         27           22         15
+8               9               10           13             12           11              9          8            4          4
+9               5                5            7              8           11              6          2            3          1
+10             25               25           13              8           28             21         12           16         15
+11             12               18           13              9           22             18          7           10          8
+12             28               32           33             26           29             20         17           13         17
+13             11               13           19              7           10             11          5            7          3
    untrans.clp2 trans.clp3 untrans.clp3  p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
 1            10         31           15 0.0034                   0.542                   0.466                     0.645  1481524
 2            33         56           43 0.0109                   0.536                   0.416                     0.574  4341772
@@ -10117,12 +10362,15 @@ pdf
 <h3 id="_permutation_test">4.9. Permutation Test</h3>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt; fe.beaty &lt;- fe.beaty[queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))]
-&gt; fe.pitt &lt;- fe.pitt[queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))]
-&gt; cD &lt;- DataFrame(colData(fe.beaty)$id)
+<pre><tt>&gt; index.beaty &lt;- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
+&gt; fe.beaty.2 &lt;- fe.beaty[index.beaty,]
+&gt; index.pitt &lt;- queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))
+&gt; fe.pitt.2 &lt;- fe.pitt[index.pitt,]
+&gt; cD &lt;- DataFrame(colData(fe.beaty.2)$id)
 &gt; colnames(cD) &lt;- "id"
-&gt; colData(fe.beaty) &lt;- cD
-&gt; fe.all &lt;- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(fe.beaty@pedigree,fe.pitt@pedigree)) )</tt></pre>
+&gt; colData(fe.beaty.2) &lt;- cD
+&gt; colnames(fe.beaty.2) &lt;- colnames(fe.beaty)
+&gt; fe.all &lt;- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )</tt></pre>
 </div></div>
 <div class="listingblock">
 <div class="content">
@@ -10130,7 +10378,7 @@ pdf
 &gt; p.mat &lt;- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 &gt; set.seed(1)
 &gt; for( i in 1:n.perm ){
-      cleft.index &lt;- sample(nrow(completeTrios(fe.all)),nrow(completeTrios(fe.beaty)), replace = FALSE )
+      cleft.index &lt;- sample(nrow(completeTrios(fe.all)),nrow(completeTrios(fe.beaty.2)), replace = FALSE )
       cleft.ids &lt;- unique(c(as.matrix(completeTrios(fe.all))[cleft.index,]))
       con.ids   &lt;- unique(c(as.matrix(completeTrios(fe.all))[-cleft.index,]))
       fe.beaty.perm &lt;- fe.all[,colnames(fe.all) %in% cleft.ids]
@@ -10158,13 +10406,110 @@ pdf
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; p.min &lt;- apply(p.mat,1,"min")
-&gt; c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))</tt></pre>
+&gt; c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+   chr7    chr8
+0.00201 0.04030</tt></pre>
 </div></div>
-<div class="paragraph"><p>And the threshold for niminal p-values is:</p></div>
+<div class="paragraph"><p>And the threshold for nominal p-values is:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt; quantile(p.min,probs=0.05)</tt></pre>
+<pre><tt>&gt; quantile(p.min,probs=0.05)
+     5%
+0.00285</tt></pre>
 </div></div>
+</div>
+<div class="sect2">
+<h3 id="_parent_of_origin_and_cleft_type_tables">4.10. Parent of Origin and Cleft Type Tables</h3>
+<div class="tableblock">
+<table rules="rows"
+width="40%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 3. Chromosome 7</caption>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<thead>
+<tr>
+<th align="left" valign="top"></th>
+<th align="left" valign="top">T case (clp=1,2,3)</th>
+<th align="left" valign="top"> U case</th>
+<th align="left" valign="top"> T con</th>
+<th align="left" valign="top">U con</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">Total</p></td>
+<td align="left" valign="top"><p class="table">69 (17,21,31)</p></td>
+<td align="left" valign="top"><p class="table">38 (13,10,15)</p></td>
+<td align="left" valign="top"><p class="table">68</p></td>
+<td align="left" valign="top"><p class="table">78</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Maternal</p></td>
+<td align="left" valign="top"><p class="table">40</p></td>
+<td align="left" valign="top"><p class="table">23</p></td>
+<td align="left" valign="top"><p class="table">35</p></td>
+<td align="left" valign="top"><p class="table">45</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Paternal</p></td>
+<td align="left" valign="top"><p class="table">38</p></td>
+<td align="left" valign="top"><p class="table">19</p></td>
+<td align="left" valign="top"><p class="table">37</p></td>
+<td align="left" valign="top"><p class="table">42</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="rows"
+width="40%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 4. Chromosome 8</caption>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<thead>
+<tr>
+<th align="left" valign="top"></th>
+<th align="left" valign="top">T case (clp=1,2,3)</th>
+<th align="left" valign="top"> U case</th>
+<th align="left" valign="top"> T con</th>
+<th align="left" valign="top">U con</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">Total</p></td>
+<td align="left" valign="top"><p class="table">140 (46,38,56)</p></td>
+<td align="left" valign="top"><p class="table">104 (28,33,43)</p></td>
+<td align="left" valign="top"><p class="table">32</p></td>
+<td align="left" valign="top"><p class="table">45</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Maternal</p></td>
+<td align="left" valign="top"><p class="table">86</p></td>
+<td align="left" valign="top"><p class="table">58</p></td>
+<td align="left" valign="top"><p class="table">10</p></td>
+<td align="left" valign="top"><p class="table">17</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Paternal</p></td>
+<td align="left" valign="top"><p class="table">76</p></td>
+<td align="left" valign="top"><p class="table">62</p></td>
+<td align="left" valign="top"><p class="table">21</p></td>
+<td align="left" valign="top"><p class="table">30</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -10174,7 +10519,7 @@ pdf
 <div class="listingblock">
 <div class="content">
 <pre><tt>&gt; date()
-[1] "Mon Aug 12 12:29:48 2013"
+[1] "Wed Aug 21 05:31:09 2013"
 &gt; sessionInfo()
 R version 3.0.0 (2013-04-03)
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -10207,14 +10552,13 @@ loaded via a namespace (and not attached):
 [31] RCurl_1.95-4.1       R.methodsS3_1.4.2    Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5   scales_0.2.3
 [37] stats4_3.0.0         stringr_0.6.2        tools_3.0.0          VanillaICE_1.23.0    XML_3.96-1.1         zlibbioc_1.7.0</tt></pre>
 </div></div>
-<div class="paragraph"><p>Foo!</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-12 12:29:49 EDT
+Last updated 2013-08-21 05:31:09 EDT
 </div>
 </div>
 </body>
