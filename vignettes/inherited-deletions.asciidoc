@@ -109,6 +109,7 @@ colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 rownames(TU.mat) <- names(table.list.beaty)
 gr.cmp <- rowData(fe.beaty)
 testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+length(testable)
 TU.mat <- TU.mat[testable,]
 TU.mat.cmp <- TU.mat
 DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
@@ -236,7 +237,7 @@ First we see how many regions there are to begin with.
 reduce(rowData(fe.beaty))
 @
 But many of these are rare.
-<<trioStates2, eval = TRUE, echo = FALSE, results = verbatim, cache = TRUE>>=
+<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
 trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
@@ -339,7 +340,7 @@ colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.c
 save(trans.mat, file = "./../data/trans.mat.RData")
 @
 
-<<trioStates3, eval = TRUE, echo = FALSE, results = verbatim, cache = FALSE>>=
+<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
 trans.mat.clp <- c()
 gr.reduce <- reduce(rowData(fe.beaty))
 n.reg <- length(gr.reduce)
@@ -442,7 +443,7 @@ trans.mat.clp <- trans.mat.clp[testable,]
 @
 <<testable2, echo = FALSE, eval = TRUE, cache = FALSE>>=
 rownames(TU.mat) <- names(table.list.beaty)[testable]
-colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+colnames(TU.mat) <- c("T.case", "U.case", "T.con", "U.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
 DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat, trans.mat.clp)
 colnames(DF) <- c("grange", colnames(TU.mat), colnames(trans.mat.clp))
 @
@@ -452,7 +453,9 @@ Trioconductor:::TU.fish
 @
 Then we apply it to each region after filtering out regions that did not have enough observations.
 <<fish2, eval = TRUE, echo = TRUE, cache = FALSE>>=
-fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
+TU.mat.test <- TU.mat[,1:4]
+colnames(TU.mat.test) <- c("T.case", "U.case", "T.con", "U.con")
+fish.list <- apply(TU.mat.test,1,Trioconductor:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transrate.cleft[testable])
 head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
@@ -1048,22 +1051,26 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 === Permutation Test ===
 
 <<perm1>>=
-fe.beaty <- fe.beaty[queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))]
-fe.pitt <- fe.pitt[queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))]
+index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
+fe.beaty.2 <- fe.beaty[index.beaty,]
 
-cD <- DataFrame(colData(fe.beaty)$id)
+index.pitt <- queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))
+fe.pitt.2 <- fe.pitt[index.pitt,]
+
+cD <- DataFrame(colData(fe.beaty.2)$id)
 colnames(cD) <- "id"
-colData(fe.beaty) <- cD
+colData(fe.beaty.2) <- cD
+colnames(fe.beaty.2) <- colnames(fe.beaty)
 
-fe.all <- FamilyExperiment( cbind(fe.beaty,fe.pitt), pedigree = PedClass(rbind(fe.beaty@pedigree,fe.pitt@pedigree)) )
+fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = TRUE, eval = FALSE>>=
+<<perm2, cache = TRUE, eval = TRUE>>=
 n.perm <- 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
 for( i in 1:n.perm ){
-     cleft.index <- sample(nrow(completeTrios(fe.all)),nrow(completeTrios(fe.beaty)), replace = FALSE )
+     cleft.index <- sample(nrow(completeTrios(fe.all)),nrow(completeTrios(fe.beaty.2)), replace = FALSE )
      cleft.ids <- unique(c(as.matrix(completeTrios(fe.all))[cleft.index,]))
      con.ids   <- unique(c(as.matrix(completeTrios(fe.all))[-cleft.index,]))
      fe.beaty.perm <- fe.all[,colnames(fe.all) %in% cleft.ids]
@@ -1088,14 +1095,36 @@ for( i in 1:n.perm ){
 }
 @
 These are the adjusted component-wise p-values:
-<<pmin, eval = FALSE>>=
+<<pmin, eval = TRUE>>=
 p.min <- apply(p.mat,1,"min")
 c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
 @
-And the threshold for niminal p-values is:
-<<padj, eval = FALSE>>=
+And the threshold for nominal p-values is:
+<<padj, eval = TRUE>>=
 quantile(p.min,probs=0.05)
 @
+
+=== Parent of Origin and Cleft Type Tables ===
+
+.Chromosome 7
+[width="40%",cols="5"]
+[options="header",grid="rows"]
+|======
+||T case (clp=1,2,3)| U case| T con|U con|
+Total|69 (17,21,31)|38 (13,10,15)|68|78|
+Maternal|40|23|35|45|
+Paternal|38|19|37|42|
+|======
+
+.Chromosome 8
+[width="40%",cols="5"]
+[options="header",grid="rows"]
+|======
+||T case (clp=1,2,3)| U case| T con|U con|
+Total|140 (46,38,56)|104 (28,33,43)|32|45|
+Maternal|86|58|10|17|
+Paternal|76|62|21|30|
+|======
 
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
@@ -1103,4 +1132,3 @@ date()
 sessionInfo()
 @
 
-Foo!
