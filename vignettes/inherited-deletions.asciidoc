@@ -1126,6 +1126,23 @@ Maternal|86|58|10|17|
 Paternal|76|62|21|30|
 |======
 
+== Subject IDs for Jeff ==
+
+<<idschr7>>=
+index <- findOverlaps(rowData(fe.beaty), chr7.region)
+fe.beaty.chr7.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
+(ids.chr7 <- unique(colnames(fe.beaty.chr7.inherited)))
+(unique(substr(ids.chr7, start = 1, stop = 5)))
+@
+
+<<idschr8>>=
+chr8.region <- GRanges( seqnames = "chr8", ranges = IRanges( start = 39341981, end = 39548228) )
+index <- findOverlaps(rowData(fe.beaty), chr8.region)
+fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
+(ids.chr8 <- unique(colnames(fe.beaty.chr8.inherited)))
+(unique(substr(ids.chr8, start = 1, stop = 5)))
+@
+
 == Session Info ==
 <<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
 date()
