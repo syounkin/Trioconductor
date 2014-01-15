@@ -1064,7 +1064,7 @@ colnames(fe.beaty.2) <- colnames(fe.beaty)
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = TRUE, eval = TRUE>>=
+<<perm2, cache = TRUE, eval = FALSE>>=
 n.perm <- 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
@@ -1094,12 +1094,12 @@ for( i in 1:n.perm ){
 }
 @
 These are the adjusted component-wise p-values:
-<<pmin, eval = TRUE>>=
+<<pmin, eval = FALSE>>=
 p.min <- apply(p.mat,1,"min")
 c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
 @
 And the threshold for nominal p-values is:
-<<padj, eval = TRUE>>=
+<<padj, eval = FALSE>>=
 quantile(p.min,probs=0.05)
 @
 
