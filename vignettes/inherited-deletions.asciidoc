@@ -32,10 +32,9 @@ save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
 <<options, echo=TRUE, eval = TRUE >>=
-  library("CleftCNVAssoc")
-  data("pedigrees", package="CleftCNVAssoc")
-  data(cleansamples, package="CleftCNVAssoc")
   data("cnv", package = "Trioconductor")
+  data("pedigrees", package = "CleftCNVAssoc")
+  data("clean-samples", package = "CleftCNVAssoc")
 @ 
 Now we create the FamilyExperiment for the cleft group.
 <<se-beaty, echo = FALSE, eval = TRUE>>=
