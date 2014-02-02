@@ -13,7 +13,7 @@ Before any analysis begins we construct the CNV matrix.  This matrix is a matrix
 <<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
 library("Trioconductor")
 @
-<<makedata, eval = FALSE>>=
+<<makedata, eval = TRUE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
 homos.beaty <- with(values(gr.deletion.beaty),cn==0)
@@ -23,10 +23,12 @@ gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.d
 gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
 @ 
 Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
-<<cnvmatrix, echo = TRUE, eval = FALSE, cache = TRUE>>=
+<<cnvmatrix, echo = TRUE, eval = TRUE, cache = FALSE>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
+source("./../R/reload.R")
+reload("Trioconductor")
 @ 
 
 == Make Data ==
@@ -87,7 +89,7 @@ library(Trioconductor)
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 // The above must have been written before the MAF method was implemented.
-<<trioStates, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<trioStates, eval = TRUE, echo = FALSE, cache = FALSE>>=
     trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -95,7 +97,7 @@ library(Trioconductor)
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
-<<table-list, eval = TRUE, echo = FALSE, cache = TRUE>>=
+<<table-list, eval = TRUE, echo = FALSE, cache = FALSE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
@@ -236,7 +238,7 @@ First we see how many regions there are to begin with.
 reduce(rowData(fe.beaty))
 @
 But many of these are rare.
-<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
+<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
 trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
@@ -339,7 +341,7 @@ colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.c
 save(trans.mat, file = "./../data/trans.mat.RData")
 @
 
-<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
+<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
 trans.mat.clp <- c()
 gr.reduce <- reduce(rowData(fe.beaty))
 n.reg <- length(gr.reduce)
@@ -1064,7 +1066,7 @@ colnames(fe.beaty.2) <- colnames(fe.beaty)
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = TRUE, eval = FALSE>>=
+<<perm2, cache = FALSE, eval = TRUE>>=
 n.perm <- 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)

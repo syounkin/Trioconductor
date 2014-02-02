@@ -20,40 +20,45 @@ Before any analysis begins we construct the CNV matrix.  This matrix is a matrix
 Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
 ----
 > system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
+   user  system elapsed 
+961.661   0.092 961.934 
 > system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
+   user  system elapsed 
+653.901   0.052 654.075 
 > save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
+> source("./../R/reload.R")
+> reload("Trioconductor")
 ----
 
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
 ----
->   library("CleftCNVAssoc")
->   data("pedigrees", package="CleftCNVAssoc")
->   data(cleansamples, package="CleftCNVAssoc")
 >   data("cnv", package = "Trioconductor")
+>   data("pedigrees", package = "CleftCNVAssoc")
+>   data("clean-samples", package = "CleftCNVAssoc")
 ----
 Now we create the FamilyExperiment for the cleft group.
 ----
 > (fe.beaty.pheno <- fe.beaty)
 class: FamilyExperiment 
-dim: 7256 1339 
+dim: 7245 1330 
 exptData(0):
 assays(1): cnv
-rownames(7256): comp1 comp2 ... comp7255 comp7256
+rownames(7245): comp1 comp2 ... comp7244 comp7245
 rowData metadata column names(0):
-colnames(1339): 11005_01@1008472480 11005_02@1008472482 ... 18117_02@0070298660 18117_03@0070298657
+colnames(1330): 11005_01@1008472480 11005_02@1008472482 ... 18117_02@0070298660 18117_03@0070298657
 colData names(99): id mads ... site X_merge
 pedigree(2082): famid id fid mid sex dx
-complete trios(445):
+complete trios(442):
 ----
 The control group.
 ----
 > fe.pitt
 class: FamilyExperiment 
-dim: 7256 902 
+dim: 7245 902 
 exptData(0):
 assays(1): cnv
-rownames(7256): comp1 comp2 ... comp7255 comp7256
+rownames(7245): comp1 comp2 ... comp7244 comp7245
 rowData metadata column names(0):
 colnames(902): 173000367@0070353602 173000562@0070278291 ... 175198958@0070318441 175199696@0072922513
 colData names(1): id
@@ -90,19 +95,19 @@ image::figures/fig-hist.jpg[]
 Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
 ----
 DataFrame with 632 rows and 7 columns
-                                grange    T.case    U.case     T.con     U.con     p.vec trans.vec
-                             <GRanges> <integer> <integer> <integer> <integer> <numeric> <numeric>
-comp198  chr1:*:[103941535, 103954622]        28        30        13        26     0.105     0.423
-comp199  chr1:*:[103954623, 103961237]        28        31        17        28     0.216     0.433
-comp200  chr1:*:[103961238, 103966747]        29        31        17        28     0.190     0.438
-comp201  chr1:*:[103966748, 103969300]        35        32        23        33     0.146     0.472
-comp202  chr1:*:[103969301, 103977611]        43        33        29        35     0.123     0.514
-...                                ...       ...       ...       ...       ...       ...       ...
-comp6725  chr19:*:[48146459, 48150402]        19        19        12        15     0.425     0.477
-comp6726  chr19:*:[48150403, 48156721]        19        19        13        17     0.382     0.471
-comp6727  chr19:*:[48156722, 48157656]        17        18        13        17     0.432     0.462
-comp6904  chr20:*:[52081230, 52081774]        46        44        40        28     0.870     0.544
-comp6905  chr20:*:[52081775, 52088118]        47        47        41        29     0.894     0.537
+       grange    T.case    U.case     T.con     U.con     p.vec trans.vec
+    <GRanges> <integer> <integer> <integer> <integer> <numeric> <numeric>
+1    ########        28        30        13        26     0.105     0.423
+2    ########        28        31        17        28     0.216     0.433
+3    ########        29        31        17        28     0.190     0.438
+4    ########        35        32        23        33     0.146     0.472
+5    ########        43        33        29        35     0.123     0.514
+...       ...       ...       ...       ...       ...       ...       ...
+628  ########        19        19        12        15     0.425     0.477
+629  ########        19        19        13        17     0.382     0.471
+630  ########        17        18        13        17     0.432     0.462
+631  ########        46        44        40        28     0.870     0.544
+632  ########        47        47        41        29     0.894     0.537
 ----
 Number of components and number of regions is given below.
 ----
@@ -287,6 +292,8 @@ But many of these are rare.
  }
  }
  )
+    user   system  elapsed 
+4106.735    0.084 4107.449 
 > colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
 > save(trans.mat, file = "./../data/trans.mat.RData")
 ----
@@ -375,7 +382,28 @@ But many of these are rare.
 > colnames(trans.mat.clp) <- c("trans.clp1","untrans.clp1","trans.clp2","untrans.clp2","trans.clp3","untrans.clp3")
 > save(trans.mat.clp, file = "./../data/trans.mat.clp.RData")
 > head(trans.mat)
+     trans.cleft untrans.cleft trans.con untrans.con trans.cleft.ma untrans.cleft.ma trans.cleft.fa untrans.cleft.fa trans.con.ma
+[1,]           0             0         0           4              0                0              0                0            0
+[2,]          15            17         0           6              1                5             14               13            0
+[3,]           0             1         0           0              0                0              0                1            0
+[4,]           5            18         1           2              1                4              4               14            1
+[5,]           1             0         0           0              0                0              1                0            0
+[6,]           0             0         0           0              0                0              0                0            0
+     untrans.con.ma trans.con.fa untrans.con.fa
+[1,]              4            0              0
+[2,]              4            0              3
+[3,]              0            0              0
+[4,]              2            0              0
+[5,]              0            0              0
+[6,]              0            0              0
 > head(trans.mat.clp)
+     trans.clp1 untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3
+[1,]          0            0          0            0          0            0
+[2,]          7           10          1            2          7            5
+[3,]          0            0          0            0          0            0
+[4,]          1           10          1            0          3            8
+[5,]          0            0          0            0          0            0
+[6,]          0            0          0            0          0            0
 ----
 Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.
 ----
@@ -405,66 +433,52 @@ Then we apply it to each region after filtering out regions that did not have en
 > p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 > DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transrate.cleft[testable])
 > head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
-         grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma
-comp1755           chr15     18474541   20730425      2255885             *     54     47    44    94             27
-comp1045            chr7    141380317  141447476        67160             *     69     38    68    78             40
-comp1124            chr8     39341981   39548228       206248             *    140    104    32    45             86
-comp831             chr6     32536895   32684456       147562             *     54     53    45    78             18
-comp826             chr6     32055573   32124218        68646             *     35     33    17    32             16
-comp1946           chr17     41755843   42148466       392624             *     93     74    38    48             48
-         untrans.cleft.ma trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1
-comp1755               24             30               26           21             61           25             44         15
-comp1045               23             38               19           35             45           37             42         17
-comp1124               58             76               62           10             17           21             30         46
-comp831                33             37               30           25             56           19             38         17
-comp826                18             19               16            9             15            8             17         10
-comp1946               37             45               43           17             27           18             29         30
-         untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable.
-comp1755           16         14            9         25           22 0.000644                   0.410                   0.319
-comp1045           13         21           10         31           15 0.003397                   0.542                   0.466
-comp1124           28         38           33         56           43 0.010868                   0.536                   0.416
-comp831            13         16           19         21           21 0.023386                   0.430                   0.366
-comp826             6         11           16         14           11 0.052925                   0.444                   0.347
-comp1946           22         23           18         40           34 0.054580                   0.518                   0.442
-         transrate.cleft.testable.
-comp1755                     0.535
-comp1045                     0.645
-comp1124                     0.574
-comp831                      0.505
-comp826                      0.515
-comp1946                     0.557
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+2            chr7    141380317  141447476        67160             *     69     38    68    78             40               23
+3            chr8     39341981   39548228       206248             *    140    104    32    45             86               58
+4            chr6     32536895   32684456       147562             *     54     53    45    78             18               33
+5            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+6           chr17     41755843   42148466       392624             *     93     74    38    48             48               37
+  trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1             30               26           21             61           25             44         15           16         14
+2             38               19           35             45           37             42         16           13         21
+3             76               62           10             17           21             30         46           27         38
+4             37               30           25             56           19             38         17           12         16
+5             19               16            9             15            8             17         10            6         11
+6             45               43           17             27           18             29         30           22         23
+  untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
+1            9         25           22 0.000644                   0.410                   0.319                     0.535
+2           10         31           15 0.003397                   0.542                   0.466                     0.645
+3           33         56           43 0.010868                   0.536                   0.416                     0.574
+4           19         20           21 0.023386                   0.430                   0.366                     0.505
+5           16         14           11 0.052925                   0.444                   0.347                     0.515
+6           18         40           34 0.054580                   0.518                   0.442                     0.557
 ----
 There are 39 regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
 ----
 > head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
-         grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma
-comp1531           chr12     36270798   36733128       462331             *      7     24     5    26              6
-comp78              chr1    147272181  147849072       576892             *      8     32    34    87              3
-comp1755           chr15     18474541   20730425      2255885             *     54     47    44    94             27
-comp832             chr6     32694224   32788048        93825             *      5     23     8    17              5
-comp826             chr6     32055573   32124218        68646             *     35     33    17    32             16
-comp1234            chr9     43515795   44821332      1305538             *     32     49    46    80             20
-         untrans.cleft.ma trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1
-comp1531               19              1                7            2             12            3             16          3
-comp78                 18              5               15           14             38           15             63          3
-comp1755               24             30               26           21             61           25             44         15
-comp832                13              0               11            1              9            5              8          2
-comp826                18             19               16            9             15            8             17         10
-comp1234               32             12               18           20             45           25             43          8
-         untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable.
-comp1531            9          1            8          3            7 0.374521                   0.194                   0.161
-comp78              3          2           14          3           15 0.890460                   0.261                   0.281
-comp1755           16         14            9         25           22 0.000644                   0.410                   0.319
-comp832             9          1            8          2            6 0.935376                   0.245                   0.320
-comp826             6         11           16         14           11 0.052925                   0.444                   0.347
-comp1234           13          9           14         15           22 0.385996                   0.377                   0.365
-         transrate.cleft.testable.
-comp1531                     0.226
-comp78                       0.200
-comp1755                     0.535
-comp832                      0.179
-comp826                      0.515
-comp1234                     0.395
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1           chr12     36270798   36733128       462331             *      7     24     5    26              6               19
+2            chr1    147272181  147849072       576892             *      8     32    34    87              3               18
+3           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+4            chr6     32694224   32788048        93825             *      5     23     8    17              5               13
+5            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+6            chr9     43515795   44821332      1305538             *     32     49    46    80             20               32
+  trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              1                7            2             12            3             16          3            8          1
+2              5               15           14             38           15             63          3            3          2
+3             30               26           21             61           25             44         15           16         14
+4              0               11            1              9            5              8          1            9          1
+5             19               16            9             15            8             17         10            6         11
+6             12               18           20             45           25             43          8           11          9
+  untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
+1            8          3            7 0.374521                   0.194                   0.161                     0.226
+2           14          3           14 0.890460                   0.261                   0.281                     0.200
+3            9         25           22 0.000644                   0.410                   0.319                     0.535
+4            8          2            6 0.935376                   0.245                   0.320                     0.179
+5           16         14           11 0.052925                   0.444                   0.347                     0.515
+6           14         15           21 0.385996                   0.377                   0.365                     0.395
 ----
 
 Note that a region on chromosome six appears twice in the top six by p-value.  However we see in the six regions with the lowest transmissin rates that there is a region with extremly low transmission rate nearby.  It seems likely that both the chr15 and chr6 signals are spurious and due to false positives in the controls.
@@ -548,166 +562,126 @@ We also include UCSC centromere/telomere locations and R. Scharpfs list of regio
 > #DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
 > DF <- DataFrame(DF, dist.vec)
 > as.data.frame(DF)
-         grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma
-comp16              chr1     12769266   13058015       288750             *     23     13    14    12             13
-comp60              chr1    103899238  104126342       227105             *     48     39    39    41             23
-comp78              chr1    147272181  147849072       576892             *      8     32    34    87              3
-comp120             chr1    194976397  195199868       223472             *     13     15    15    21              6
-comp188             chr2     40785003   41129076       344074             *     66     63    57    52             35
-comp245             chr2     89132524   91107283      1974760             *     16     43    28    29             12
-comp351             chr2    242565979  242692820       126842             *     26     32    25    30             11
-comp386             chr3     46765401   46827683        62283             *     12     15    18    14              8
-comp395             chr3     65159939   65187636        27698             *     72     59    50    39             34
-comp398             chr3     75470851   75730577       259727             *     46     54    50    52             23
-comp532             chr4     68997831   69258302       260472             *     33     35    80    67             23
-comp600             chr4    161252445  161314427        61983             *     28     33    35    27             14
-comp640             chr5      8756085    8811041        54957             *     19     26    29    18              7
-comp699             chr5     68871012   70700419      1829408             *     24     32    48    50             12
-comp716             chr5     97073409   97267981       194573             *     35     27    20    30             19
-comp800             chr6     29940311   30032810        92500             *     77     64    73    64             43
-comp818             chr6     31382534   31422222        39689             *     53     50    45    55             31
-comp826             chr6     32055573   32124218        68646             *     35     33    17    32             16
-comp831             chr6     32536895   32684456       147562             *     54     53    45    78             18
-comp832             chr6     32694224   32788048        93825             *      5     23     8    17              5
-comp861             chr6     67065007   67111682        46676             *     72     62    58    44             31
-comp869             chr6     79022244   79098876        76633             *    154    114   108    80             69
-comp985             chr7     57778797   62099233      4320437             *     13     20   102   148              8
-comp1021            chr7    101914898  102109692       194795             *     11     18    19    28              6
-comp1045            chr7    141380317  141447476        67160             *     69     38    68    78             40
-comp1124            chr8     39341981   39548228       206248             *    140    104    32    45             86
-comp1234            chr9     43515795   44821332      1305538             *     32     49    46    80             20
-comp1430           chr11     48220946   48986763       765818             *     40     32    59    53             25
-comp1433           chr11     55116789   55216671        99883             *    137    105    92    75             84
-comp1531           chr12     36270798   36733128       462331             *      7     24     5    26              6
-comp1668           chr14     18189975   19502504      1312530             *     40     48    72    77             23
-comp1755           chr15     18474541   20730425      2255885             *     54     47    44    94             27
-comp1767           chr15     32459510   32631865       172356             *     61     64    64    46             35
-comp1868           chr16     31931481   33820307      1888827             *    121    104   128   111             75
-comp1946           chr17     41755843   42148466       392624             *     93     74    38    48             48
-comp2019           chr18     64879175   64906488        27314             *     22     21    26    20             14
-comp2070           chr19     20349698   20523385       173688             *     54     43    40    38             25
-comp2092           chr19     47939188   48537433       598246             *     29     32    24    27             18
-comp2146           chr20     52080333   52094148        13816             *     44     45    40    29             20
-         untrans.cleft.ma trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1
-comp16                  6             11                7           11              7            3              5          5
-comp60                 23             21               18           17             22           20             25         11
-comp78                 18              5               15           14             38           15             63          3
-comp120                 8              7                8            8             17            5              6          5
-comp188                32             31               31           24             18           35             38         24
-comp245                20              4               24           11             13           18             16          7
-comp351                20             15               12           11             19           15             13          9
-comp386                10              5                5            7              8           11              6          2
-comp395                27             37               34           21             22           28             20         19
-comp398                37             20               19           26             29           21             36         14
-comp532                19             10               17           39             46           41             43          5
-comp600                17             12               18           13              9           22             18          7
-comp640                14             11               13           19              7           10             11          5
-comp699                21             13               11           32             36           13             28          8
-comp716                15             13               13            9             14           11             17          9
-comp800                40             33               28           34             40           40             34         24
-comp818                26             22               28           22             29           25             29         20
-comp826                18             19               16            9             15            8             17         10
-comp831                33             37               30           25             56           19             38         17
-comp832                13              0               11            1              9            5              8          2
-comp861                33             39               34           26             21           33             24         27
-comp869                74             70               64           57             40           48             51         49
-comp985                15              5                7           51            132           24             86          5
-comp1021               11              4                8            9             10           10             18          2
-comp1045               23             38               19           35             45           37             42         17
-comp1124               58             76               62           10             17           21             30         46
-comp1234               32             12               18           20             45           25             43          8
-comp1430               23             15               16           28             44           29             22         17
-comp1433               61             64               64           51             32           46             51         47
-comp1531               19              1                7            2             12            3             16          3
-comp1668               31             14               24           33             49           33             48         12
-comp1755               24             30               26           21             61           25             44         15
-comp1767               35             28               32           33             26           29             20         17
-comp1868               77             31               71           69             79           55             73         50
-comp1946               37             45               43           17             27           18             29         30
-comp2019               12              9               10           13             12           11              9          8
-comp2070               25             29               24           22             18           15             23         17
-comp2092               17             12               16            9             17           15             10          6
-comp2146               21             25               25           13              8           28             21         12
-         untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable.
-comp16              3          6            3         12            7 0.296532                   0.597                   0.538
-comp60             12         18           10         19           17 0.249911                   0.521                   0.487
-comp78              3          2           14          3           15 0.890460                   0.261                   0.281
-comp120             5          2            5          6            5 0.449029                   0.438                   0.417
-comp188            21         19           15         23           27 0.619394                   0.517                   0.523
-comp245            14          6            9          3           20 0.995925                   0.379                   0.491
-comp351             8          8            8          9           16 0.601028                   0.451                   0.455
-comp386             3          1            3          9            9 0.878068                   0.508                   0.562
-comp395            14         21           19         32           26 0.623839                   0.555                   0.562
-comp398            16          7           15         25           23 0.715792                   0.475                   0.490
-comp532            13          9            5         19           17 0.829317                   0.526                   0.544
-comp600            10          8            9         13           14 0.911724                   0.512                   0.565
-comp640             7          3            1         11           18 0.981446                   0.522                   0.617
-comp699            10          8            8          8           14 0.815949                   0.468                   0.490
-comp716             8         11            8         15           11 0.061418                   0.491                   0.400
-comp800            17         25           20         28           27 0.459653                   0.540                   0.533
-comp818            17          9           13         24           20 0.217781                   0.483                   0.450
-comp826             6         11           16         14           11 0.052925                   0.444                   0.347
-comp831            13         16           19         21           21 0.023386                   0.430                   0.366
-comp832             9          1            8          2            6 0.935376                   0.245                   0.320
-comp861            22         15           20         30           20 0.729281                   0.551                   0.569
-comp869            33         44           30         61           51 0.536642                   0.575                   0.574
-comp985             7          2            4          6            9 0.630937                   0.406                   0.408
-comp1021            3          6            5          3           10 0.674996                   0.395                   0.404
-comp1045           13         21           10         31           15 0.003397                   0.542                   0.466
-comp1124           28         38           33         56           43 0.010868                   0.536                   0.416
-comp1234           13          9           14         15           22 0.385996                   0.377                   0.365
-comp1430            8          7            5         16           19 0.409198                   0.538                   0.527
-comp1433           24         36           31         54           50 0.419150                   0.560                   0.551
-comp1531            9          1            8          3            7 0.374521                   0.194                   0.161
-comp1668           20         16            8         12           20 0.712688                   0.473                   0.483
-comp1755           16         14            9         25           22 0.000644                   0.410                   0.319
-comp1767           13         17           17         27           34 0.941827                   0.532                   0.582
-comp1868           25         25           30         46           49 0.518116                   0.537                   0.536
-comp1946           22         23           18         40           34 0.054580                   0.518                   0.442
-comp2019            4          4            6         10           11 0.764030                   0.539                   0.565
-comp2070           13         17           11         20           19 0.334945                   0.537                   0.513
-comp2092           10          9            8         14           14 0.555395                   0.473                   0.471
-comp2146           16         15           13         17           16 0.890151                   0.532                   0.580
-         transrate.cleft.testable. dist.vec
-comp16                       0.639        0
-comp60                       0.552        0
-comp78                       0.200        0
-comp120                      0.464        0
-comp188                      0.512 35700002
-comp245                      0.271        0
-comp351                      0.448        0
-comp386                      0.444 19283317
-comp395                      0.550   923364
-comp398                      0.460        0
-comp532                      0.485        0
-comp600                      0.459 15971444
-comp640                      0.422  7892084
-comp699                      0.429        0
-comp716                      0.565  1519019
-comp800                      0.546        0
-comp818                      0.515        0
-comp826                      0.515        0
-comp831                      0.505        0
-comp832                      0.179        0
-comp861                      0.537  4821006
-comp869                      0.575 16628124
-comp985                      0.394        0
-comp1021                     0.379        0
-comp1045                     0.645  1481524
-comp1124                     0.574  4341772
-comp1234                     0.395        0
-comp1430                     0.556        0
-comp1433                     0.566   258788
-comp1531                     0.226        0
-comp1668                     0.455        0
-comp1755                     0.535        0
-comp1767                     0.488  1748509
-comp1868                     0.538        0
-comp1946                     0.557        0
-comp2019                     0.512 48088174
-comp2070                     0.557  3839615
-comp2092                     0.475        0
-comp2146                     0.494  8502852
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1             chr1     12769266   13058015       288750             *     23     13    14    12             13                6
+2             chr1    103899238  104126342       227105             *     48     39    39    41             23               23
+3             chr1    147272181  147849072       576892             *      8     32    34    87              3               18
+4             chr1    194976397  195199868       223472             *     13     15    15    21              6                8
+5             chr2     40785003   41129076       344074             *     66     63    57    52             35               32
+6             chr2     89132524   91107283      1974760             *     16     43    28    29             12               20
+7             chr2    242565979  242692820       126842             *     26     32    25    30             11               20
+8             chr3     46765401   46827683        62283             *     12     15    18    14              8               10
+9             chr3     65159939   65187636        27698             *     72     59    50    39             34               27
+10            chr3     75470851   75730577       259727             *     46     54    50    52             23               37
+11            chr4     68997831   69258302       260472             *     33     35    80    67             23               19
+12            chr4    161252445  161314427        61983             *     28     33    35    27             14               17
+13            chr5      8756085    8811041        54957             *     19     26    29    18              7               14
+14            chr5     68871012   70700419      1829408             *     24     32    48    50             12               21
+15            chr5     97073409   97267981       194573             *     35     27    20    30             19               15
+16            chr6     29940311   30032810        92500             *     77     64    73    64             43               40
+17            chr6     31382534   31422222        39689             *     53     50    45    55             31               26
+18            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+19            chr6     32536895   32684456       147562             *     54     53    45    78             18               33
+20            chr6     32694224   32788048        93825             *      5     23     8    17              5               13
+21            chr6     67065007   67111682        46676             *     72     62    58    44             31               33
+22            chr6     79022244   79098876        76633             *    154    114   108    80             69               74
+23            chr7     57778797   62099233      4320437             *     13     20   102   148              8               15
+24            chr7    101914898  102109692       194795             *     11     18    19    28              6               11
+25            chr7    141380317  141447476        67160             *     69     38    68    78             40               23
+26            chr8     39341981   39548228       206248             *    140    104    32    45             86               58
+27            chr9     43515795   44821332      1305538             *     32     49    46    80             20               32
+28           chr11     48220946   48986763       765818             *     40     32    59    53             25               23
+29           chr11     55116789   55216671        99883             *    137    105    92    75             84               61
+30           chr12     36270798   36733128       462331             *      7     24     5    26              6               19
+31           chr14     18189975   19502504      1312530             *     40     48    72    77             23               31
+32           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+33           chr15     32459510   32631865       172356             *     61     64    64    46             35               35
+34           chr16     31931481   33820307      1888827             *    121    104   128   111             75               77
+35           chr17     41755843   42148466       392624             *     93     74    38    48             48               37
+36           chr18     64879175   64906488        27314             *     22     21    26    20             14               12
+37           chr19     20349698   20523385       173688             *     54     43    40    38             25               25
+38           chr19     47939188   48537433       598246             *     29     32    24    27             18               17
+39           chr20     52080333   52094148        13816             *     44     45    40    29             20               21
+   trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              11                7           11              7            3              5          5            3          6
+2              21               18           17             22           20             25         11           12         18
+3               5               15           14             38           15             63          3            3          2
+4               7                8            8             17            5              6          5            5          2
+5              31               31           24             18           35             38         24           21         19
+6               4               24           11             13           18             16          7           14          6
+7              15               12           11             19           15             13          9            8          8
+8               5                5            7              8           11              6          2            3          1
+9              37               34           21             22           28             20         19           14         21
+10             20               19           26             29           21             36         13           16          7
+11             10               17           39             46           41             43          5           13          9
+12             12               18           13              9           22             18          6           10          8
+13             11               13           19              7           10             11          5            7          3
+14             13               11           32             36           13             28          7           10          8
+15             13               13            9             14           11             17          9            8         11
+16             33               28           34             40           40             34         23           17         25
+17             22               28           22             29           25             29         19           17          9
+18             19               16            9             15            8             17         10            6         11
+19             37               30           25             56           19             38         17           12         16
+20              0               11            1              9            5              8          1            9          1
+21             39               34           26             21           33             24         27           21         15
+22             70               64           57             40           48             51         49           33         44
+23              5                7           51            132           24             86          5            7          2
+24              4                8            9             10           10             18          2            3          6
+25             38               19           35             45           37             42         16           13         21
+26             76               62           10             17           21             30         46           27         38
+27             12               18           20             45           25             43          8           11          9
+28             15               16           28             44           29             22         17            7          7
+29             64               64           51             32           46             51         47           24         36
+30              1                7            2             12            3             16          3            8          1
+31             14               24           33             49           33             48         11           20         16
+32             30               26           21             61           25             44         15           16         14
+33             28               32           33             26           29             20         17           13         17
+34             31               71           69             79           55             73         49           25         25
+35             45               43           17             27           18             29         30           22         23
+36              9               10           13             12           11              9          8            3          4
+37             29               24           22             18           15             23         17           13         17
+38             12               16            9             17           15             10          6           10          9
+39             25               25           13              8           28             21         12           16         15
+   untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
+1             3         12            7 0.296532                   0.597                   0.538                     0.639        0
+2            10         19           17 0.249911                   0.521                   0.487                     0.552        0
+3            14          3           14 0.890460                   0.261                   0.281                     0.200        0
+4             5          6            5 0.449029                   0.438                   0.417                     0.464        0
+5            15         23           27 0.619394                   0.517                   0.523                     0.512 35700002
+6             9          3           20 0.995925                   0.379                   0.491                     0.271        0
+7             8          9           16 0.601028                   0.451                   0.455                     0.448        0
+8             3          9            9 0.878068                   0.508                   0.562                     0.444 19283317
+9            19         32           26 0.623839                   0.555                   0.562                     0.550   923364
+10           15         25           23 0.715792                   0.475                   0.490                     0.460        0
+11            5         18           17 0.829317                   0.526                   0.544                     0.485        0
+12            9         13           14 0.911724                   0.512                   0.565                     0.459 15971444
+13            1         11           18 0.981446                   0.522                   0.617                     0.422  7892084
+14            8          8           14 0.815949                   0.468                   0.490                     0.429        0
+15            8         15           11 0.061418                   0.491                   0.400                     0.565  1519019
+16           20         28           27 0.459653                   0.540                   0.533                     0.546        0
+17           13         23           20 0.217781                   0.483                   0.450                     0.515        0
+18           16         14           11 0.052925                   0.444                   0.347                     0.515        0
+19           19         20           21 0.023386                   0.430                   0.366                     0.505        0
+20            8          2            6 0.935376                   0.245                   0.320                     0.179        0
+21           20         30           20 0.729281                   0.551                   0.569                     0.537  4821006
+22           30         61           51 0.536642                   0.575                   0.574                     0.575 16628124
+23            4          6            9 0.630937                   0.406                   0.408                     0.394        0
+24            5          2           10 0.674996                   0.395                   0.404                     0.379        0
+25           10         31           15 0.003397                   0.542                   0.466                     0.645  1481524
+26           33         56           43 0.010868                   0.536                   0.416                     0.574  4341772
+27           14         15           21 0.385996                   0.377                   0.365                     0.395        0
+28            5         16           19 0.409198                   0.538                   0.527                     0.556        0
+29           31         54           50 0.419150                   0.560                   0.551                     0.566   258788
+30            8          3            7 0.374521                   0.194                   0.161                     0.226        0
+31            8         12           20 0.712688                   0.473                   0.483                     0.455        0
+32            9         25           22 0.000644                   0.410                   0.319                     0.535        0
+33           17         26           34 0.941827                   0.532                   0.582                     0.488  1748509
+34           30         45           49 0.518116                   0.537                   0.536                     0.538        0
+35           18         40           34 0.054580                   0.518                   0.442                     0.557        0
+36            6         10           11 0.764030                   0.539                   0.565                     0.512 48088174
+37           11         20           18 0.334945                   0.537                   0.513                     0.557  3839615
+38            8         14           14 0.555395                   0.473                   0.471                     0.475        0
+39           13         17           16 0.890151                   0.532                   0.580                     0.494  8502852
 ----
 
 The filter accounts for 281 MB made up of 325 distinct regions.
@@ -794,62 +768,48 @@ There are 13 tests in this figure.
 ----
 > o <- order(DF$p.vec)
 > as.data.frame(DF[o,])
-         grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma
-comp1045            chr7    141380317  141447476        67160             *     69     38    68    78             40
-comp1124            chr8     39341981   39548228       206248             *    140    104    32    45             86
-comp716             chr5     97073409   97267981       194573             *     35     27    20    30             19
-comp2070           chr19     20349698   20523385       173688             *     54     43    40    38             25
-comp869             chr6     79022244   79098876        76633             *    154    114   108    80             69
-comp188             chr2     40785003   41129076       344074             *     66     63    57    52             35
-comp861             chr6     67065007   67111682        46676             *     72     62    58    44             31
-comp2019           chr18     64879175   64906488        27314             *     22     21    26    20             14
-comp386             chr3     46765401   46827683        62283             *     12     15    18    14              8
-comp2146           chr20     52080333   52094148        13816             *     44     45    40    29             20
-comp600             chr4    161252445  161314427        61983             *     28     33    35    27             14
-comp1767           chr15     32459510   32631865       172356             *     61     64    64    46             35
-comp640             chr5      8756085    8811041        54957             *     19     26    29    18              7
-         untrans.cleft.ma trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1
-comp1045               23             38               19           35             45           37             42         17
-comp1124               58             76               62           10             17           21             30         46
-comp716                15             13               13            9             14           11             17          9
-comp2070               25             29               24           22             18           15             23         17
-comp869                74             70               64           57             40           48             51         49
-comp188                32             31               31           24             18           35             38         24
-comp861                33             39               34           26             21           33             24         27
-comp2019               12              9               10           13             12           11              9          8
-comp386                10              5                5            7              8           11              6          2
-comp2146               21             25               25           13              8           28             21         12
-comp600                17             12               18           13              9           22             18          7
-comp1767               35             28               32           33             26           29             20         17
-comp640                14             11               13           19              7           10             11          5
-         untrans.clp1 trans.clp2 untrans.clp2 trans.clp3 untrans.clp3  p.vec transrate.all.testable. transrate.con.testable.
-comp1045           13         21           10         31           15 0.0034                   0.542                   0.466
-comp1124           28         38           33         56           43 0.0109                   0.536                   0.416
-comp716             8         11            8         15           11 0.0614                   0.491                   0.400
-comp2070           13         17           11         20           19 0.3349                   0.537                   0.513
-comp869            33         44           30         61           51 0.5366                   0.575                   0.574
-comp188            21         19           15         23           27 0.6194                   0.517                   0.523
-comp861            22         15           20         30           20 0.7293                   0.551                   0.569
-comp2019            4          4            6         10           11 0.7640                   0.539                   0.565
-comp386             3          1            3          9            9 0.8781                   0.508                   0.562
-comp2146           16         15           13         17           16 0.8902                   0.532                   0.580
-comp600            10          8            9         13           14 0.9117                   0.512                   0.565
-comp1767           13         17           17         27           34 0.9418                   0.532                   0.582
-comp640             7          3            1         11           18 0.9814                   0.522                   0.617
-         transrate.cleft.testable. dist.vec
-comp1045                     0.645  1481524
-comp1124                     0.574  4341772
-comp716                      0.565  1519019
-comp2070                     0.557  3839615
-comp869                      0.575 16628124
-comp188                      0.512 35700002
-comp861                      0.537  4821006
-comp2019                     0.512 48088174
-comp386                      0.444 19283317
-comp2146                     0.494  8502852
-comp600                      0.459 15971444
-comp1767                     0.488  1748509
-comp640                      0.422  7892084
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1             chr7    141380317  141447476        67160             *     69     38    68    78             40               23
+2             chr8     39341981   39548228       206248             *    140    104    32    45             86               58
+3             chr5     97073409   97267981       194573             *     35     27    20    30             19               15
+4            chr19     20349698   20523385       173688             *     54     43    40    38             25               25
+5             chr6     79022244   79098876        76633             *    154    114   108    80             69               74
+6             chr2     40785003   41129076       344074             *     66     63    57    52             35               32
+7             chr6     67065007   67111682        46676             *     72     62    58    44             31               33
+8            chr18     64879175   64906488        27314             *     22     21    26    20             14               12
+9             chr3     46765401   46827683        62283             *     12     15    18    14              8               10
+10           chr20     52080333   52094148        13816             *     44     45    40    29             20               21
+11            chr4    161252445  161314427        61983             *     28     33    35    27             14               17
+12           chr15     32459510   32631865       172356             *     61     64    64    46             35               35
+13            chr5      8756085    8811041        54957             *     19     26    29    18              7               14
+   trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              38               19           35             45           37             42         16           13         21
+2              76               62           10             17           21             30         46           27         38
+3              13               13            9             14           11             17          9            8         11
+4              29               24           22             18           15             23         17           13         17
+5              70               64           57             40           48             51         49           33         44
+6              31               31           24             18           35             38         24           21         19
+7              39               34           26             21           33             24         27           21         15
+8               9               10           13             12           11              9          8            3          4
+9               5                5            7              8           11              6          2            3          1
+10             25               25           13              8           28             21         12           16         15
+11             12               18           13              9           22             18          6           10          8
+12             28               32           33             26           29             20         17           13         17
+13             11               13           19              7           10             11          5            7          3
+   untrans.clp2 trans.clp3 untrans.clp3  p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
+1            10         31           15 0.0034                   0.542                   0.466                     0.645  1481524
+2            33         56           43 0.0109                   0.536                   0.416                     0.574  4341772
+3             8         15           11 0.0614                   0.491                   0.400                     0.565  1519019
+4            11         20           18 0.3349                   0.537                   0.513                     0.557  3839615
+5            30         61           51 0.5366                   0.575                   0.574                     0.575 16628124
+6            15         23           27 0.6194                   0.517                   0.523                     0.512 35700002
+7            20         30           20 0.7293                   0.551                   0.569                     0.537  4821006
+8             6         10           11 0.7640                   0.539                   0.565                     0.512 48088174
+9             3          9            9 0.8781                   0.508                   0.562                     0.444 19283317
+10           13         17           16 0.8902                   0.532                   0.580                     0.494  8502852
+11            9         13           14 0.9117                   0.512                   0.565                     0.459 15971444
+12           17         26           34 0.9418                   0.532                   0.582                     0.488  1748509
+13            1         11           18 0.9814                   0.522                   0.617                     0.422  7892084
 ----
 
 ----
@@ -878,176 +838,91 @@ There are 84 tests in this figure.
 ----
 > o <- order(DF.cmp$p.vec)
 > as.data.frame(DF.cmp[o,])
-         grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con     p.vec trans.vec
-comp3092            chr7    141435189  141439888         4700             *     77     31    67    75 0.0000983     0.576
-comp3086            chr7    141419097  141420758         1662             *     83     43    74    91 0.0002667     0.540
-comp3087            chr7    141420759  141423760         3002             *     83     44    75    90 0.0005212     0.541
-comp3090            chr7    141429472  141433796         4325             *     83     44    75    89 0.0006241     0.543
-comp3088            chr7    141423761  141427767         4007             *     83     45    75    90 0.0006938     0.539
-comp3089            chr7    141427768  141429471         1704             *     83     45    75    89 0.0008276     0.541
-comp3091            chr7    141433797  141435188         1392             *     82     42    74    82 0.0012667     0.557
-comp3330            chr8     39356825   39370186        13362             *    147     86    27    37 0.0022040     0.586
-comp3331            chr8     39370187   39379683         9497             *    161    112    31    45 0.0036342     0.550
-comp3332            chr8     39379684   39393417        13734             *    163    117    31    45 0.0050418     0.545
-comp3346            chr8     39476659   39497557        20899             *    139     74    21    26 0.0074682     0.615
-comp3337            chr8     39428327   39442543        14217             *    165    131    34    50 0.0093737     0.524
-comp3343            chr8     39460088   39469612         9525             *    153    111    30    42 0.0100639     0.545
-comp3338            chr8     39442544   39449313         6770             *    165    132    34    50 0.0101454     0.522
-comp3339            chr8     39449314   39449314            1             *    165    134    34    50 0.0118388     0.520
-comp3333            chr8     39393418   39401865         8448             *    164    125    32    45 0.0123764     0.536
-comp3340            chr8     39449315   39450167          853             *    164    132    34    49 0.0137356     0.522
-comp3345            chr8     39473098   39476658         3561             *    152    108    27    37 0.0138689     0.552
-comp3336            chr8     39421344   39428326         6983             *    165    130    34    48 0.0140152     0.528
-comp3334            chr8     39401866   39408899         7034             *    164    125    33    45 0.0161666     0.537
-comp3335            chr8     39408900   39421343        12444             *    164    127    33    45 0.0187519     0.534
-comp3342            chr8     39457082   39460087         3006             *    161    124    31    42 0.0221473     0.536
-comp3344            chr8     39469613   39473097         3485             *    152    108    28    36 0.0240164     0.556
-comp3341            chr8     39450168   39457081         6914             *    162    128    31    42 0.0275342     0.532
-comp1824            chr5     97076368   97087516        11149             *     35     29    20    31 0.0716268     0.478
-comp1825            chr5     97087517   97121798        34282             *     35     30    20    31 0.0837526     0.474
-comp1823            chr5     97075236   97076367         1132             *     35     29    20    30 0.0854169     0.482
-comp1826            chr5     97121799   97125076         3278             *     35     30    20    30 0.0992070     0.478
-comp1822            chr5     97074222   97075235         1014             *     31     27    18    28 0.1045871     0.471
-comp3093            chr7    141439889  141441259         1371             *     12     17    13    38 0.1112185     0.312
-comp6634           chr19     20404485   20413667         9183             *     42     34    22    28 0.1456802     0.508
-comp6635           chr19     20413668   20418018         4351             *     45     44    26    38 0.1465092     0.464
-comp6637           chr19     20422200   20482954        60755             *     56     52    40    43 0.3611987     0.503
-comp2526            chr6     79031111   79031808          698             *    166    150    89    87 0.3730067     0.518
-comp6636           chr19     20418019   20422199         4181             *     55     52    40    43 0.3849891     0.500
-comp6638           chr19     20482955   20493452        10498             *     56     52    40    42 0.3924808     0.505
-comp2527            chr6     79031809   79034385         2577             *    167    153    93    90 0.4196297     0.517
-comp6639           chr19     20493453   20507068        13616             *     51     51    38    41 0.4588383     0.492
-comp6415           chr18     64897188   64898547         1360             *     23     19    26    23 0.5195573     0.538
-comp2524            chr6     79029649   79029919          271             *    144    136    80    76 0.5280326     0.514
-comp2525            chr6     79029920   79031110         1191             *    144    136    80    76 0.5280326     0.514
-comp530             chr2     41092148   41101972         9825             *     69     66    61    58 0.5593940     0.512
-comp5539           chr15     32505886   32518049        12164             *     45     44    37    36 0.5688152     0.506
-comp6419           chr18     64904657   64905087          431             *     23     21    25    23 0.5756155     0.522
-comp6420           chr18     64905088   64905367          280             *     23     21    25    23 0.5756155     0.522
-comp6421           chr18     64905368   64906488         1121             *     22     21    25    23 0.6170188     0.516
-comp6417           chr18     64903149   64904521         1373             *     23     22    25    23 0.6183544     0.516
-comp6418           chr18     64904522   64904656          135             *     23     22    25    23 0.6183544     0.516
-comp6416           chr18     64898548   64903148         4601             *     23     22    26    23 0.6537661     0.521
-comp2540            chr6     79083327   79086086         2760             *    166    155   112    96 0.7152100     0.526
-comp2528            chr6     79034386   79036116         1731             *    167    160   105    92 0.7206161     0.519
-comp2541            chr6     79086087   79088461         2375             *    166    155   112    95 0.7345443     0.527
-comp2529            chr6     79036117   79039486         3370             *    167    161   107    92 0.7659317     0.520
-comp2539            chr6     79081010   79083326         2317             *    166    162   114    99 0.7733706     0.518
-comp2531            chr6     79042356   79056616        14261             *    167    163   110    95 0.7810535     0.518
-comp2537            chr6     79075016   79077157         2142             *    167    164   114    99 0.7842597     0.517
-comp2542            chr6     79088462   79090197         1736             *    162    154   111    93 0.7855776     0.525
-comp2536            chr6     79070426   79075015         4590             *    167    164   113    98 0.7859630     0.517
-comp2530            chr6     79039487   79042355         2869             *    167    162   110    94 0.7878992     0.520
-comp2538            chr6     79077158   79081009         3852             *    167    164   115    99 0.7987471     0.517
-comp2535            chr6     79069278   79070425         1148             *    167    164   114    98 0.8004684     0.517
-comp2533            chr6     79063712   79065998         2287             *    167    164   113    97 0.8022055     0.518
-comp2501            chr6     67075448   67079426         3979             *     76     72    60    47 0.8086951     0.533
-comp2534            chr6     79065999   79069277         3279             *    167    164   114    97 0.8160258     0.518
-comp2532            chr6     79056617   79063711         7095             *    167    164   112    95 0.8195597     0.519
-comp2503            chr6     67101258   67104015         2758             *     75     71    61    47 0.8250148     0.535
-comp2502            chr6     67079427   67101257        21831             *     76     72    61    47 0.8262660     0.535
-comp2504            chr6     67104016   67105019         1004             *     74     71    61    47 0.8380277     0.534
-comp923             chr3     46771354   46825614        54261             *     13     15    18    14 0.8457294     0.517
-comp5541           chr15     32530025   32530130          106             *     64     67    64    52 0.8685106     0.518
-comp6904           chr20     52081230   52081774          545             *     46     44    40    28 0.8697929     0.544
-comp1417            chr4    161271979  161276892         4914             *     27     32    34    28 0.8810465     0.504
-comp5546           chr15     32587888   32595161         7274             *     62     67    61    50 0.8839336     0.512
-comp5540           chr15     32518050   32530024        11975             *     62     62    60    45 0.8873822     0.533
-comp5543           chr15     32538343   32549650        11308             *     64     68    65    52 0.8928386     0.518
-comp6905           chr20     52081775   52088118         6344             *     47     47    41    29 0.8939390     0.537
-comp5542           chr15     32530131   32538342         8212             *     64     67    65    51 0.8953165     0.522
-comp5545           chr15     32569801   32587887        18087             *     63     68    64    51 0.9052699     0.516
-comp5544           chr15     32549651   32569800        20150             *     63     68    65    51 0.9154210     0.518
-comp1419            chr4    161290510  161291569         1060             *     28     36    35    28 0.9343645     0.496
-comp1418            chr4    161276893  161290509        13617             *     28     36    36    28 0.9443671     0.500
-comp1493            chr5      8756148    8756614          467             *     19     27    29    18 0.9854716     0.516
-comp1494            chr5      8756615    8800106        43492             *     19     28    29    18 0.9886375     0.511
-comp1492            chr5      8756085    8756147           63             *     18     27    29    18 0.9892454     0.511
-         dist.vec.cmp
-comp3092      1489112
-comp3086      1508242
-comp3087      1505240
-comp3090      1495204
-comp3088      1501233
-comp3089      1499529
-comp3091      1493812
-comp3330      4519814
-comp3331      4510317
-comp3332      4496583
-comp3346      4392443
-comp3337      4447457
-comp3343      4420388
-comp3338      4440687
-comp3339      4440686
-comp3333      4488135
-comp3340      4439833
-comp3345      4413342
-comp3336      4461674
-comp3334      4481101
-comp3335      4468657
-comp3342      4429913
-comp3344      4416903
-comp3341      4432919
-comp1824      1699484
-comp1825      1665202
-comp1823      1710633
-comp1826      1661924
-comp1822      1711765
-comp3093      1487741
-comp6634      3949333
-comp6635      3944982
-comp6637      3880046
-comp2526     16695192
-comp6636      3940801
-comp6638      3869548
-comp2527     16692615
-comp6639      3855932
-comp6415     48106187
-comp2524     16697081
-comp2525     16695890
-comp530      36007147
-comp5539      1794885
-comp6419     48113656
-comp6420     48114087
-comp6421     48114367
-comp6417     48112148
-comp6418     48113521
-comp6416     48107547
-comp2540     16640914
-comp2528     16690884
-comp2541     16638539
-comp2529     16687514
-comp2539     16643674
-comp2531     16670384
-comp2537     16649843
-comp2542     16636803
-comp2536     16651985
-comp2530     16684645
-comp2538     16645991
-comp2535     16656575
-comp2533     16661002
-comp2501      4831447
-comp2534     16657723
-comp2532     16663289
-comp2503      4857257
-comp2502      4835426
-comp2504      4860015
-comp923      19285386
-comp5541      1819024
-comp6904      8515226
-comp1417     15990978
-comp5546      1876887
-comp5540      1807049
-comp5543      1827342
-comp6905      8508882
-comp5542      1819130
-comp5545      1858800
-comp5544      1838650
-comp1419     16009509
-comp1418     15995892
-comp1493      7892147
-comp1494      7892614
-comp1492      7892084
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con     p.vec trans.vec dist.vec.cmp
+1             chr7    141435189  141439888         4700             *     77     31    67    75 0.0000983     0.576      1489112
+2             chr7    141419097  141420758         1662             *     83     43    74    91 0.0002667     0.540      1508242
+3             chr7    141420759  141423760         3002             *     83     44    75    90 0.0005212     0.541      1505240
+4             chr7    141429472  141433796         4325             *     83     44    75    89 0.0006241     0.543      1495204
+5             chr7    141423761  141427767         4007             *     83     45    75    90 0.0006938     0.539      1501233
+6             chr7    141427768  141429471         1704             *     83     45    75    89 0.0008276     0.541      1499529
+7             chr7    141433797  141435188         1392             *     82     42    74    82 0.0012667     0.557      1493812
+8             chr8     39356825   39370186        13362             *    147     86    27    37 0.0022040     0.586      4519814
+9             chr8     39370187   39379683         9497             *    161    112    31    45 0.0036342     0.550      4510317
+10            chr8     39379684   39393417        13734             *    163    117    31    45 0.0050418     0.545      4496583
+11            chr8     39476659   39497557        20899             *    139     74    21    26 0.0074682     0.615      4392443
+12            chr8     39428327   39442543        14217             *    165    131    34    50 0.0093737     0.524      4447457
+13            chr8     39460088   39469612         9525             *    153    111    30    42 0.0100639     0.545      4420388
+14            chr8     39442544   39449313         6770             *    165    132    34    50 0.0101454     0.522      4440687
+15            chr8     39449314   39449314            1             *    165    134    34    50 0.0118388     0.520      4440686
+16            chr8     39393418   39401865         8448             *    164    125    32    45 0.0123764     0.536      4488135
+17            chr8     39449315   39450167          853             *    164    132    34    49 0.0137356     0.522      4439833
+18            chr8     39473098   39476658         3561             *    152    108    27    37 0.0138689     0.552      4413342
+19            chr8     39421344   39428326         6983             *    165    130    34    48 0.0140152     0.528      4461674
+20            chr8     39401866   39408899         7034             *    164    125    33    45 0.0161666     0.537      4481101
+21            chr8     39408900   39421343        12444             *    164    127    33    45 0.0187519     0.534      4468657
+22            chr8     39457082   39460087         3006             *    161    124    31    42 0.0221473     0.536      4429913
+23            chr8     39469613   39473097         3485             *    152    108    28    36 0.0240164     0.556      4416903
+24            chr8     39450168   39457081         6914             *    162    128    31    42 0.0275342     0.532      4432919
+25            chr5     97076368   97087516        11149             *     35     29    20    31 0.0716268     0.478      1699484
+26            chr5     97087517   97121798        34282             *     35     30    20    31 0.0837526     0.474      1665202
+27            chr5     97075236   97076367         1132             *     35     29    20    30 0.0854169     0.482      1710633
+28            chr5     97121799   97125076         3278             *     35     30    20    30 0.0992070     0.478      1661924
+29            chr5     97074222   97075235         1014             *     31     27    18    28 0.1045871     0.471      1711765
+30            chr7    141439889  141441259         1371             *     12     17    13    38 0.1112185     0.312      1487741
+31           chr19     20404485   20413667         9183             *     42     34    22    28 0.1456802     0.508      3949333
+32           chr19     20413668   20418018         4351             *     45     44    26    38 0.1465092     0.464      3944982
+33           chr19     20422200   20482954        60755             *     56     52    40    43 0.3611987     0.503      3880046
+34            chr6     79031111   79031808          698             *    166    150    89    87 0.3730067     0.518     16695192
+35           chr19     20418019   20422199         4181             *     55     52    40    43 0.3849891     0.500      3940801
+36           chr19     20482955   20493452        10498             *     56     52    40    42 0.3924808     0.505      3869548
+37            chr6     79031809   79034385         2577             *    167    153    93    90 0.4196297     0.517     16692615
+38           chr19     20493453   20507068        13616             *     51     51    38    41 0.4588383     0.492      3855932
+39           chr18     64897188   64898547         1360             *     23     19    26    23 0.5195573     0.538     48106187
+40            chr6     79029649   79029919          271             *    144    136    80    76 0.5280326     0.514     16697081
+41            chr6     79029920   79031110         1191             *    144    136    80    76 0.5280326     0.514     16695890
+42            chr2     41092148   41101972         9825             *     69     66    61    58 0.5593940     0.512     36007147
+43           chr15     32505886   32518049        12164             *     45     44    37    36 0.5688152     0.506      1794885
+44           chr18     64904657   64905087          431             *     23     21    25    23 0.5756155     0.522     48113656
+45           chr18     64905088   64905367          280             *     23     21    25    23 0.5756155     0.522     48114087
+46           chr18     64905368   64906488         1121             *     22     21    25    23 0.6170188     0.516     48114367
+47           chr18     64903149   64904521         1373             *     23     22    25    23 0.6183544     0.516     48112148
+48           chr18     64904522   64904656          135             *     23     22    25    23 0.6183544     0.516     48113521
+49           chr18     64898548   64903148         4601             *     23     22    26    23 0.6537661     0.521     48107547
+50            chr6     79083327   79086086         2760             *    166    155   112    96 0.7152100     0.526     16640914
+51            chr6     79034386   79036116         1731             *    167    160   105    92 0.7206161     0.519     16690884
+52            chr6     79086087   79088461         2375             *    166    155   112    95 0.7345443     0.527     16638539
+53            chr6     79036117   79039486         3370             *    167    161   107    92 0.7659317     0.520     16687514
+54            chr6     79081010   79083326         2317             *    166    162   114    99 0.7733706     0.518     16643674
+55            chr6     79042356   79056616        14261             *    167    163   110    95 0.7810535     0.518     16670384
+56            chr6     79075016   79077157         2142             *    167    164   114    99 0.7842597     0.517     16649843
+57            chr6     79088462   79090197         1736             *    162    154   111    93 0.7855776     0.525     16636803
+58            chr6     79070426   79075015         4590             *    167    164   113    98 0.7859630     0.517     16651985
+59            chr6     79039487   79042355         2869             *    167    162   110    94 0.7878992     0.520     16684645
+60            chr6     79077158   79081009         3852             *    167    164   115    99 0.7987471     0.517     16645991
+61            chr6     79069278   79070425         1148             *    167    164   114    98 0.8004684     0.517     16656575
+62            chr6     79063712   79065998         2287             *    167    164   113    97 0.8022055     0.518     16661002
+63            chr6     67075448   67079426         3979             *     76     72    60    47 0.8086951     0.533      4831447
+64            chr6     79065999   79069277         3279             *    167    164   114    97 0.8160258     0.518     16657723
+65            chr6     79056617   79063711         7095             *    167    164   112    95 0.8195597     0.519     16663289
+66            chr6     67101258   67104015         2758             *     75     71    61    47 0.8250148     0.535      4857257
+67            chr6     67079427   67101257        21831             *     76     72    61    47 0.8262660     0.535      4835426
+68            chr6     67104016   67105019         1004             *     74     71    61    47 0.8380277     0.534      4860015
+69            chr3     46771354   46825614        54261             *     13     15    18    14 0.8457294     0.517     19285386
+70           chr15     32530025   32530130          106             *     64     67    64    52 0.8685106     0.518      1819024
+71           chr20     52081230   52081774          545             *     46     44    40    28 0.8697929     0.544      8515226
+72            chr4    161271979  161276892         4914             *     27     32    34    28 0.8810465     0.504     15990978
+73           chr15     32587888   32595161         7274             *     62     67    61    50 0.8839336     0.512      1876887
+74           chr15     32518050   32530024        11975             *     62     62    60    45 0.8873822     0.533      1807049
+75           chr15     32538343   32549650        11308             *     64     68    65    52 0.8928386     0.518      1827342
+76           chr20     52081775   52088118         6344             *     47     47    41    29 0.8939390     0.537      8508882
+77           chr15     32530131   32538342         8212             *     64     67    65    51 0.8953165     0.522      1819130
+78           chr15     32569801   32587887        18087             *     63     68    64    51 0.9052699     0.516      1858800
+79           chr15     32549651   32569800        20150             *     63     68    65    51 0.9154210     0.518      1838650
+80            chr4    161290510  161291569         1060             *     28     36    35    28 0.9343645     0.496     16009509
+81            chr4    161276893  161290509        13617             *     28     36    36    28 0.9443671     0.500     15995892
+82            chr5      8756148    8756614          467             *     19     27    29    18 0.9854716     0.516      7892147
+83            chr5      8756615    8800106        43492             *     19     28    29    18 0.9886375     0.511      7892614
+84            chr5      8756085    8756147           63             *     18     27    29    18 0.9892454     0.511      7892084
 ----
 
 
@@ -1121,14 +996,10 @@ These are the adjusted component-wise p-values:
 ----
 > p.min <- apply(p.mat,1,"min")
 > c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
-   chr7    chr8 
-0.00201 0.04030 
 ----
 And the threshold for nominal p-values is:
 ----
 > quantile(p.min,probs=0.05)
-     5% 
-0.00285 
 ----
 
 === Parent of Origin and Cleft Type Tables ===
@@ -1403,10 +1274,10 @@ Paternal|76|62|21|30|
 == Session Info ==
 ----
 > date()
-[1] "Mon Sep 30 10:57:15 2013"
+[1] "Fri Jan 17 11:12:32 2014"
 > sessionInfo()
 R version 3.0.1 (2013-05-16)
-Platform: x86_64-redhat-linux-gnu (64-bit)
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
@@ -1417,24 +1288,24 @@ attached base packages:
  [1] grid      splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Gviz_1.5.13                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.10.1 GenomicFeatures_1.13.42                 
- [4] AnnotationDbi_1.23.25                    CleftCNVAssoc_0.0.2                      MinimumDistance_1.5.0                   
- [7] GWASTools_1.7.7                          sandwich_2.2-10                          zoo_1.7-9                               
-[10] gdsfmt_1.0.0                             ncdf_1.6.6                               Biobase_2.21.7                          
-[13] Trioconductor_1.0.8                      snpStats_1.11.0                          Matrix_1.0-12                           
-[16] lattice_0.20-15                          survival_2.37-4                          GenomicRanges_1.13.45                   
-[19] XVector_0.1.4                            IRanges_1.19.38                          BiocGenerics_0.7.5                      
-[22] cacheSweave_0.6-1                        stashR_0.3-5                             filehash_2.2-1                          
-[25] ascii_2.1                               
+ [1] Gviz_1.5.3                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                 
+ [4] AnnotationDbi_1.23.20                   Trioconductor_1.0.8                     CleftCNVAssoc_0.0.2                    
+ [7] MinimumDistance_1.5.0                   GWASTools_1.7.3                         sandwich_2.2-10                        
+[10] zoo_1.7-10                              gdsfmt_0.9.15                           ncdf_1.6.6                             
+[13] Biobase_2.21.2                          snpStats_1.11.0                         Matrix_1.0-12                          
+[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.13.15                  
+[19] XVector_0.1.0                           IRanges_1.19.8                          BiocGenerics_0.7.2                     
+[22] cacheSweave_0.6-1                       stashR_0.3-5                            filehash_2.2-1                         
+[25] ascii_2.1                              
 
 loaded via a namespace (and not attached):
- [1] affyio_1.29.4        BiocInstaller_1.11.4 biomaRt_2.17.3       Biostrings_2.29.19   biovizBase_1.9.3     bit_1.1-10          
- [7] bitops_1.0-6         BSgenome_1.29.1      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-3     DBI_0.2-5           
-[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.1       ff_2.2-11            foreach_1.4.1        GWASExactHW_1.01    
-[19] Hmisc_3.12-2         iterators_1.0.6      labeling_0.2         latticeExtra_0.6-26  lmtest_0.9-30        matrixStats_0.8.12  
-[25] msm_1.1.4            munsell_0.4.2        mvtnorm_0.9-9994     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0  
-[31] R.methodsS3_1.5.1    RColorBrewer_1.0-5   RCurl_1.95-4.1       rpart_4.1-1          Rsamtools_1.13.44    RSQLite_0.11.4      
-[37] rtracklayer_1.21.12  scales_0.2.3         stats4_3.0.1         stringr_0.6.2        tools_3.0.1          VanillaICE_1.23.0   
-[43] XML_3.98-1.1         zlibbioc_1.7.0      
+ [1] affyio_1.29.0        BiocInstaller_1.11.4 biomaRt_2.17.1       Biostrings_2.29.3    biovizBase_1.9.2     bit_1.1-10          
+ [7] bitops_1.0-5         BSgenome_1.29.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     DBI_0.2-7           
+[13] dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.1       ff_2.2-11            foreach_1.4.0        GWASExactHW_1.01    
+[19] Hmisc_3.12-2         iterators_1.0.6      labeling_0.2         lmtest_0.9-31        matrixStats_0.8.5    msm_1.2             
+[25] munsell_0.4.2        mvtnorm_0.9-9995     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0   RColorBrewer_1.0-5  
+[31] RCurl_1.95-4.1       R.methodsS3_1.4.4    rpart_4.1-1          Rsamtools_1.13.16    RSQLite_0.11.4       rtracklayer_1.21.5  
+[37] scales_0.2.3         stats4_3.0.1         stringr_0.6.2        tools_3.0.1          VanillaICE_1.23.0    XML_3.96-1.1        
+[43] zlibbioc_1.7.0      
 ----
 
