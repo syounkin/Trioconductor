@@ -407,3 +407,1348 @@ GRanges with 2235 ranges and 0 metadata columns:
  }
  }
  )
+> colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
+> save(trans.mat, file = "./../data/trans.mat.RData")
+----
+
+----
+> trans.mat.clp <- c()
+> gr.reduce <- reduce(rowData(fe.beaty))
+> n.reg <- length(gr.reduce)
+> for( i in 1:n.reg){
+ # for( i in 1:10){
+      fe.beaty.i <- fe.beaty[subjectHits(findOverlaps(gr.reduce[i], rowData(fe.beaty)))]
+      trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty.i, type = "cnv")
+      if( length(rowData(fe.beaty.i)) > 1 ){
+      	trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+      }else{
+ 	trioStates.beaty <- matrix(with(trioAssay.beaty, paste0(F,M,O)),ncol=1)
+      }
+ 	dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+     trioStates.beaty.clp1 <- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==1,]
+     trioStates.beaty.clp2 <- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==2,]
+     trioStates.beaty.clp3 <- trioStates.beaty[colData(fe.beaty.pheno)[rownames(trioStates.beaty),]$clp==3,]
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     
+     trans.clp1 <- trioStates.beaty.clp1 %in% c("011","101","111","112","122","212")
+     untrans.clp1 <- trioStates.beaty.clp1 %in% c("010","100","111","110","121","211")
+      
+      if( length(trans.clp1 > 0)){
+        trans.beaty.logical.clp1 <- rowSums(matrix(trans.clp1, nrow = nrow(trioStates.beaty.clp1), ncol = ncol(trioStates.beaty.clp1), byrow=FALSE)) > 0
+      }else{
+        trans.beaty.logical.clp1 <- 0
+      }
+      if( length(untrans.clp1 > 0)){
+        untrans.beaty.logical.clp1 <- rowSums(matrix(untrans.clp1, nrow = nrow(trioStates.beaty.clp1), ncol = ncol(trioStates.beaty.clp1), byrow=FALSE)) > 0
+      }else{
+        untrans.beaty.logical.clp1 <- 0
+      }
+      
+     trans.beaty.clp1 <- sum(trans.beaty.logical.clp1)
+     untrans.beaty.clp1 <- sum(untrans.beaty.logical.clp1 & !trans.beaty.logical.clp1)
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.clp2 <- trioStates.beaty.clp2 %in% c("011","101","111","112","122","212")
+     untrans.clp2 <- trioStates.beaty.clp2 %in% c("010","100","111","110","121","211")
+      
+      if( length(trans.clp2 > 0)){
+        trans.beaty.logical.clp2 <- rowSums(matrix(trans.clp2, nrow = nrow(trioStates.beaty.clp2), ncol = ncol(trioStates.beaty.clp2), byrow=FALSE)) > 0
+      }else{
+        trans.beaty.logical.clp2 <- 0
+      }
+      if( length(untrans.clp2 > 0)){
+        untrans.beaty.logical.clp2 <- rowSums(matrix(untrans.clp2, nrow = nrow(trioStates.beaty.clp2), ncol = ncol(trioStates.beaty.clp2), byrow=FALSE)) > 0
+      }else{
+        untrans.beaty.logical.clp2 <- 0
+      }
+      
+     trans.beaty.clp2 <- sum(trans.beaty.logical.clp2)
+     untrans.beaty.clp2 <- sum(untrans.beaty.logical.clp2 & !trans.beaty.logical.clp2)
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.clp3 <- trioStates.beaty.clp3 %in% c("011","101","111","112","122","212")
+     untrans.clp3 <- trioStates.beaty.clp3 %in% c("010","100","111","110","121","211")
+      
+      if( length(trans.clp3 > 0)){
+        trans.beaty.logical.clp3 <- rowSums(matrix(trans.clp3, nrow = nrow(trioStates.beaty.clp3), ncol = ncol(trioStates.beaty.clp3), byrow=FALSE)) > 0
+      }else{
+        trans.beaty.logical.clp3 <- 0
+      }
+      if( length(untrans.clp3 > 0)){
+        untrans.beaty.logical.clp3 <- rowSums(matrix(untrans.clp3, nrow = nrow(trioStates.beaty.clp3), ncol = ncol(trioStates.beaty.clp3), byrow=FALSE)) > 0
+      }else{
+        untrans.beaty.logical.clp3 <- 0
+      }
+      
+     trans.beaty.clp3 <- sum(trans.beaty.logical.clp3)
+     untrans.beaty.clp3 <- sum(untrans.beaty.logical.clp3 & !trans.beaty.logical.clp3)
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     trans.mat.clp <- rbind( trans.mat.clp, c(trans.beaty.clp1, untrans.beaty.clp1, trans.beaty.clp2, untrans.beaty.clp2, trans.beaty.clp3, untrans.beaty.clp3 ) )
+ #     trans.mat.clp <- rbind( trans.mat.clp, c(trans.beaty.clp1, untrans.beaty.clp1) )
+ }
+> colnames(trans.mat.clp) <- c("trans.clp1","untrans.clp1","trans.clp2","untrans.clp2","trans.clp3","untrans.clp3")
+> save(trans.mat.clp, file = "./../data/trans.mat.clp.RData")
+> head(trans.mat)
+> head(trans.mat.clp)
+----
+
+
+----
+> transrate.cleft <- trans.mat[,"trans.cleft"]/rowSums(trans.mat[,c("trans.cleft","untrans.cleft")])
+> transrate.con <- trans.mat[,"trans.con"]/rowSums(trans.mat[,c("trans.con","untrans.con")])
+> transrate.all <- rowSums(trans.mat[,c("trans.cleft","trans.con")])/rowSums(trans.mat[,c("trans.cleft","untrans.cleft","trans.con","untrans.con")])
+----
+Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.
+----
+> TU.mat <- trans.mat
+> testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+> TU.mat <- TU.mat[testable,]
+> trans.mat.clp <- trans.mat.clp[testable,]
+----
+----
+> rownames(TU.mat) <- names(table.list.beaty)[testable]
+> colnames(TU.mat) <- c("T.case", "U.case", "T.con", "U.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
+> DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat, trans.mat.clp)
+> colnames(DF) <- c("grange", colnames(TU.mat), colnames(trans.mat.clp))
+----
+First we display the function that performs Fisher's exact test.
+----
+> Trioconductor:::TU.fish
+function (TU.vec) 
+{
+    if (!identical(c("T.case", "U.case", "T.con", "U.con"), names(TU.vec))) 
+        return("TU vector must have the correct names.")
+    fish <- fisher.test(matrix(TU.vec, nrow = 2, ncol = 2, byrow = TRUE), 
+        alternative = "greater")
+    return(fish)
+}
+<environment: namespace:Trioconductor>
+----
+Then we apply it to each region after filtering out regions that did not have enough observations.
+----
+> TU.mat.test <- TU.mat[,1:4]
+> colnames(TU.mat.test) <- c("T.case", "U.case", "T.con", "U.con")
+> fish.list <- apply(TU.mat.test,1,Trioconductor:::TU.fish)
+> p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
+> DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transrate.cleft[testable])
+> head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+2            chr7    141380317  141447476        67160             *     68     38    68    78             40               23
+3            chr8     39341981   39548228       206248             *    140    103    32    45             86               58
+4            chr6     32536895   32684456       147562             *     53     52    45    78             18               33
+5            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+6           chr17     41755843   42148466       392624             *     93     74    38    48             48               37
+  trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1             30               26           21             61           25             44         15           16         14
+2             38               19           35             45           37             42         16           13         21
+3             76               61           10             17           21             30         46           27         38
+4             37               28           25             56           19             38         17           12         16
+5             19               16            9             15            8             17         10            6         11
+6             45               43           17             27           18             29         30           22         23
+  untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
+1            9         25           22 0.000644                   0.410                   0.319                     0.535
+2           10         31           15 0.004090                   0.540                   0.466                     0.642
+3           33         56           43 0.009898                   0.537                   0.416                     0.576
+4           19         20           21 0.023937                   0.430                   0.366                     0.505
+5           16         14           11 0.052925                   0.444                   0.347                     0.515
+6           18         40           34 0.054580                   0.518                   0.442                     0.557
+----
+There are 39 regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
+----
+> head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
+  grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1           chr12     36270798   36733128       462331             *      7     23     5    26              6               18
+2            chr1    147272181  147849072       576892             *      8     31    34    87              3               18
+3           chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+4            chr6     32694224   32788048        93825             *      4     23     8    17              4               13
+5            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+6            chr9     43515795   44821332      1305538             *     32     46    46    80             20               29
+  trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              1                7            2             12            3             16          3            8          1
+2              5               14           14             38           15             63          3            3          2
+3             30               26           21             61           25             44         15           16         14
+4              0               11            1              9            5              8          1            9          1
+5             19               16            9             15            8             17         10            6         11
+6             12               18           20             45           25             43          8           11          9
+  untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable.
+1            8          3            7 0.350234                   0.197                   0.161                     0.233
+2           14          3           14 0.875368                   0.263                   0.281                     0.205
+3            9         25           22 0.000644                   0.410                   0.319                     0.535
+4            8          2            6 0.964877                   0.231                   0.320                     0.148
+5           16         14           11 0.052925                   0.444                   0.347                     0.515
+6           14         15           21 0.308935                   0.382                   0.365                     0.410
+----
+
+Note that a region on chromosome six appears twice in the top six by p-value.  However we see in the six regions with the lowest transmissin rates that there is a region with extremly low transmission rate nearby.  It seems likely that both the chr15 and chr6 signals are spurious and due to false positives in the controls.
+
+=== Figures ===
+
+----
+> par(bg="white")
+> hist(DF$transrate.con.testable., col = "gray", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
+----
+image::figures/fig-transhist.jpg[]
+
+
+----
+> htest.list.cleft <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+ }
+> ci.list.cleft <- lapply(htest.list.cleft, Trioconductor:::get.ci)
+> ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+> o <- order(DF$transrate.con.testable.)
+> plot(1, type = "n", xlim = c(1,nrow(ci.mat.cleft)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Cleft Transmission Rate", main = "" )
+> polygon( x = c(x <- 1:nrow(ci.mat.cleft), rev(x)), y = c(ci.mat.cleft[o,1],rev(ci.mat.cleft[o,2])),col = "orange", border = "black")
+> lines( c(1,nrow(ci.mat.cleft)), rep(0.5,2), lty = 3 )
+> lines( rep(28,2), c(0,1), lty = 3 )
+> lines( rep(34,2), c(0,1), lty = 3 )
+> lines( rep(8,2), c(0,1), lty = 3 )
+----
+image::figures/fig-cifigcleft.jpg[]
+
+----
+> htest.list.con <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+ }
+> ci.list.con <- lapply(htest.list.con, Trioconductor:::get.ci)
+> ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+> o <- order(DF$transrate.con.testable.)
+> plot(1, type = "n", xlim = c(1,nrow(ci.mat.con)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "Con Transmission Rate", main = "" )
+> polygon( x = c(x <- 1:nrow(ci.mat.con), rev(x)), y = c(ci.mat.con[o,1],rev(ci.mat.con[o,2])),col = "blue", border = "black")
+> lines( c(1,nrow(ci.mat.con)), rep(0.5,2), lty = 3 )
+> lines( rep(28,2), c(0,1), lty = 3 )
+> lines( rep(34,2), c(0,1), lty = 3 )
+> lines( rep(8,2), c(0,1), lty = 3 )
+----
+image::figures/fig-cifigcon.jpg[]
+
+----
+> htest.list.all <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
+ }
+> ci.list.all <- lapply(htest.list.all, Trioconductor:::get.ci)
+> ci.mat.all <- matrix(unlist(ci.list.all),nrow = length(htest.list.all), ncol = 2, byrow = TRUE )
+> o <- order(DF$transrate.con.testable.)
+> plot(1, type = "n", xlim = c(1,nrow(ci.mat.all)), ylim = c(0,1), xlab = "Deleted Regions", ylab = "All Transmission Rate", main = "" )
+> polygon( x = c(x <- 1:nrow(ci.mat.all), rev(x)), y = c(ci.mat.all[o,1],rev(ci.mat.all[o,2])),col = "green", border = "black")
+> lines( c(1,nrow(ci.mat.all)), rep(0.5,2), lty = 3 )
+> lines( rep(28,2), c(0,1), lty = 3 )
+> lines( rep(34,2), c(0,1), lty = 3 )
+> lines( rep(8,2), c(0,1), lty = 3 )
+----
+image::figures/fig-cifigall.jpg[]
+
+----
+> as(reduce(rowData(fe.beaty))[testable,],"data.frame")
+> ci.mat.cleft[25,]
+> ci.mat.con[25,]
+> ci.mat.all[25,]
+> ci.mat.cleft[26,]
+> ci.mat.con[26,]
+> ci.mat.all[26,]
+> ci.mat.cleft[32,]
+> ci.mat.con[32,]
+> ci.mat.all[32,]
+> which(o==25)
+> which(o==26)
+> which(o==32)
+----
+----
+> eps <- 0.05
+> plot(1,type = "n", xlim = c(0,1), ylim = c(0,1), xlab = "Transmission Rate", ylab = "", main = "95% Confidence Interval", axes = FALSE)
+> lines(x = ci.mat.cleft[25,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
+> lines(x = ci.mat.con[25,], y = rep(0.75,2), lwd = 2, col = "blue")
+> lines(x = ci.mat.all[25,], y = rep(0.75+eps,2), lwd = 2, col = "green")
+> lines(x = ci.mat.cleft[26,], y = rep(0.5-eps,2), lwd = 2, col = "orange")
+> lines(x = ci.mat.con[26,], y = rep(0.5,2), lwd = 2, col = "blue")
+> lines(x = ci.mat.all[26,], y = rep(0.5+eps,2), lwd = 2, col = "green")
+> lines(x = ci.mat.cleft[32,], y = rep(0.25-eps,2), lwd = 2, col = "orange")
+> lines(x = ci.mat.con[32,], y = rep(0.25,2), lwd = 2, col = "blue")
+> lines(x = ci.mat.all[32,], y = rep(0.25+eps,2), lwd = 2, col = "green")
+> lines(rep(0.5,2), c(0,1), lty = 3 )
+> axis(1, at = at <- c(0.25, 0.5, 0.75), labels = at )
+> text( x = 0.1, y = 0.75, labels = "Chr. 7 (34)" )
+> text( x = 0.1, y = 0.5, labels = "Chr. 8 (28)" )
+> text( x = 0.1, y = 0.25, labels = "Chr. 15 (8)" )
+> legend(x = 0.8, y = 1, legend = c("All","Control", "Cleft"), pch = 19, col = c("green", "blue","orange"), cex = 0.75)
+----
+image::figures/fig-cifig1.jpg[]
+
+
+=== Tables ===
+
+.Transmission Counts
+[width="60%",cols="8"]
+[options="header",grid="rows"]
+|======
+|pos|width|p-value|nearest gene|cleft transmitted|cleft untransmitted|control transmitted|control untransmitted
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=Chr7:141380317-141447476[chr7:141380317-141447476]|67,160|0.003397|link:http://genome.ucsc.edu/cgi-bin/hgGene?hgg_gene=uc003vwy.1&hgg_prot=NP_004659&hgg_chrom=chr7&hgg_start=141342147&hgg_end=141453016&hgg_type=knownGene&db=hg18&hgsid=340436443[MGAM]|69 (0.645)|38|68 (0.466)|78
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=Chr8:39341981-39548228[chr8:39,341,981-39,548,228]|206,248 |0.010868|link:http://genome.ucsc.edu/cgi-bin/hgc?hgsid=340437289&c=chr8&o=39427720&t=39499665&g=refGene&i=NR_073423[ADAM3A], link:http://genome.ucsc.edu/cgi-bin/hgc?hgsid=340437289&c=chr8&o=39291338&t=39379532&g=refGene&i=NR_001448[ADAM5]|140 (0.574)|104|32 (0.416)|45
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr15:18474541-20730425[chr15:18,474,541-20,730,425]|2,255,885|0.000644|too many, centromere|54 (0.535)|47|44 (0.319)|94
+|======
+
+=== MGAM & ADAM9 ===
+
+.MGAM
+[quote, Vincent-Chong et al., PLoS One 2013]
+____
+This study has identified a novel genomic amplification on chromosome 7q34 which was present in 34 out of 46 OSCC samples. The MGAM gene at this locus was significantly over expressed (6.6 fold) in 29 out of 30 samples analysed. It has been previously suggested that MGAM is a carbohydrate active enzyme that is involved in cell metabolism by breaking down the dietary starches and sugars into glucose [67]. The involvement of this gene in carcinogenesis could be explained by the Warburg effect which implies that during tumor progression, alterations are observed in glucose metabolism including glycolysis and oxidative phosphorylation process in cancer cells [68]. It could be hypothesized that over expression of MGAM may promote tumor growth by altering cell metabolism. Further investigation of this gene is required to elucidate its function, regulation and role in oral carcinogenesis.
+____
+
+See link:http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0054705[Vincent-Chong et al.] in Plos One -  "Genome Wide Analysis of Chromosomal Alterations in Oral Squamous Cell Carcinomas Revealed over Expression of MGAM and ADAM9." link:http://www.ncbi.nlm.nih.gov/pubmed/?term=23405089[PMID:23405089]
+
+=== Filter ===
+
+==== HLA Super-Locus ====
+
+Five distinct but nearby regions on chromosome 6 appear between 29,940,311 and 32,788,048 (hg18) with transmission rates of 0.533, 0.450, 0.347, 0.366, 0.320.  The exceptionally low transmission rates for the last three of these regions raised eyebrows and upon inspection of the genomic location we immediately observed that 4 of 5 of these regions contain a gene in the HLA family.  The HLA family of genes are known to be...
+
+// control: 0.533, 0.450, 0.347, 0.366, 0.320
+// cleft: 0.546, 0.515, 0.515, 0.505, 0.179
+
+.Chromosome 6 Regions & HLA
+[width="60%",cols="4"]
+[options="header",grid="rows"]
+|======
+|UCSC Genome Browser (hg18)|band|Trans. (control)
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:29940311-30032810[chr6:29940311-30032810]|6p21.33|0.533
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:31382534-31422222[chr6:31382534-31422222]|6p21.33|0.450
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32055573-32124218[chr6:32055573-32124218]|6p21.32|0.347
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32536895-32684456[chr6:32536895-32684456]|6p21.32|0.366
+|link:http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg18&omimGene=full&decipher=full&position=chr6:32694224-32788048[chr6:32694224-32788048]|6p21.32|0.320
+|======
+
+image:figures/HLA.jpg[link="https://en.wikipedia.org/wiki/Human_leukocyte_antigen"]
+
+We choose to remove these due to the unusually high amount of known variability in this region.  We believe the noisy control data, coupled with the highly variable HLA region results in deflated transmission rates in the controls, and therefore testing against the controls will result in false positive detection.
+
+----
+> hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788048))
+----
+
+==== Centromeres, Telomeres & Low Mapability ====
+
+We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
+
+----
+> data("centromere")
+> lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
+> seqlevels(lowmap.gr) <- seqlevels(DF$grange)
+> seqlengths(lowmap.gr) <- seqlengths(DF$grange)
+> filter.gr <- reduce(c(lowmap.gr,centromere.gr,hla.gr))
+> dist.vec <- as.data.frame(distanceToNearest(DF$grange,filter.gr))$distance
+> #DF <- DataFrame(DF[order(dist.vec),],dist.vec[order(dist.vec)])
+> DF <- DataFrame(DF, dist.vec)
+> as.data.frame(DF)
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1             chr1     12769266   13058015       288750             *     23     13    14    12             13                6
+2             chr1    103899238  104126342       227105             *     48     39    39    41             23               23
+3             chr1    147272181  147849072       576892             *      8     31    34    87              3               18
+4             chr1    194976397  195199868       223472             *     13     15    15    21              6                8
+5            chr11     48220946   48986763       765818             *     40     31    59    53             25               22
+6            chr11     55116789   55216671        99883             *    137    105    92    75             84               61
+7            chr12     36270798   36733128       462331             *      7     23     5    26              6               18
+8            chr14     18189975   19502504      1312530             *     39     48    72    77             22               31
+9            chr15     18474541   20730425      2255885             *     54     47    44    94             27               24
+10           chr15     32459510   32631865       172356             *     60     64    64    46             34               35
+11           chr16     31931481   33820307      1888827             *    119    104   128   111             75               76
+12           chr17     41755843   42148466       392624             *     93     74    38    48             48               37
+13           chr18     64879175   64906488        27314             *     22     20    26    20             14               11
+14           chr19     20349698   20523385       173688             *     54     42    40    38             25               25
+15           chr19     47939188   48537433       598246             *     29     32    24    27             18               17
+16            chr2     40785003   41129076       344074             *     66     63    57    52             35               32
+17            chr2     89132524   91107283      1974760             *     16     43    28    29             12               20
+18            chr2    242565979  242692820       126842             *     26     32    25    30             11               20
+19           chr20     52080333   52094148        13816             *     44     45    40    29             20               21
+20            chr3     46765401   46827683        62283             *     12     15    18    14              8               10
+21            chr3     65159939   65187636        27698             *     72     59    50    39             34               27
+22            chr3     75470851   75730577       259727             *     45     54    50    52             23               37
+23            chr4     68997831   69258302       260472             *     32     35    80    67             23               19
+24            chr4    161252445  161314427        61983             *     27     33    35    27             14               17
+25            chr5      8756085    8811041        54957             *     19     26    29    18              7               14
+26            chr5     68871012   70700419      1829408             *     23     32    48    50             11               21
+27            chr5     97073409   97267981       194573             *     35     27    20    30             19               15
+28            chr6     29940311   30032810        92500             *     76     64    73    64             42               40
+29            chr6     31382534   31422222        39689             *     51     50    45    55             29               26
+30            chr6     32055573   32124218        68646             *     35     33    17    32             16               18
+31            chr6     32536895   32684456       147562             *     53     52    45    78             18               33
+32            chr6     32694224   32788048        93825             *      4     23     8    17              4               13
+33            chr6     67065007   67111682        46676             *     72     61    58    44             31               33
+34            chr6     79022244   79098876        76633             *    154    114   108    80             69               74
+35            chr7     57778797   62099233      4320437             *     13     20   102   148              8               15
+36            chr7    101914898  102109692       194795             *     10     18    19    28              5               11
+37            chr7    141380317  141447476        67160             *     68     38    68    78             40               23
+38            chr8     39341981   39548228       206248             *    140    103    32    45             86               58
+39            chr9     43515795   44821332      1305538             *     32     46    46    80             20               29
+   trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              11                7           11              7            3              5          5            3          6
+2              21               18           17             22           20             25         11           12         18
+3               5               14           14             38           15             63          3            3          2
+4               7                8            8             17            5              6          5            5          2
+5              15               16           28             44           29             22         17            7          7
+6              64               64           51             32           46             51         47           24         36
+7               1                7            2             12            3             16          3            8          1
+8              14               24           33             49           33             48         11           20         16
+9              30               26           21             61           25             44         15           16         14
+10             28               32           33             26           29             20         17           13         17
+11             31               70           69             79           55             73         49           25         25
+12             45               43           17             27           18             29         30           22         23
+13              9               10           13             12           11              9          8            3          4
+14             29               23           22             18           15             23         17           13         17
+15             12               16            9             17           15             10          6           10          9
+16             31               31           24             18           35             38         24           21         19
+17              4               24           11             13           18             16          7           14          6
+18             15               12           11             19           15             13          9            8          8
+19             25               25           13              8           28             21         12           16         15
+20              5                5            7              8           11              6          2            3          1
+21             37               34           21             22           28             20         19           14         21
+22             19               19           26             29           21             36         13           16          7
+23              9               17           39             46           41             43          5           13          9
+24             11               18           13              9           22             18          6           10          8
+25             11               13           19              7           10             11          5            7          3
+26             12               11           32             36           13             28          7           10          8
+27             13               13            9             14           11             17          9            8         11
+28             33               28           34             40           40             34         23           17         25
+29             21               28           22             29           25             29         19           17          9
+30             19               16            9             15            8             17         10            6         11
+31             37               28           25             56           19             38         17           12         16
+32              0               11            1              9            5              8          1            9          1
+33             39               33           26             21           33             24         27           21         15
+34             70               64           57             40           48             51         49           33         44
+35              5                7           51            132           24             86          5            7          2
+36              4                8            9             10           10             18          2            3          6
+37             38               19           35             45           37             42         16           13         21
+38             76               61           10             17           21             30         46           27         38
+39             12               18           20             45           25             43          8           11          9
+   untrans.clp2 trans.clp3 untrans.clp3    p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
+1             3         12            7 0.296532                   0.597                   0.538                     0.639        0
+2            10         19           17 0.249911                   0.521                   0.487                     0.552        0
+3            14          3           14 0.875368                   0.263                   0.281                     0.205        0
+4             5          6            5 0.449029                   0.438                   0.417                     0.464        0
+5             5         16           19 0.370375                   0.541                   0.527                     0.563        0
+6            31         54           50 0.419150                   0.560                   0.551                     0.566   258788
+7             8          3            7 0.350234                   0.197                   0.161                     0.233        0
+8             8         12           20 0.743276                   0.470                   0.483                     0.448        0
+9             9         25           22 0.000644                   0.410                   0.319                     0.535        0
+10           17         26           34 0.948529                   0.530                   0.582                     0.484  1748509
+11           30         45           49 0.553691                   0.535                   0.536                     0.534        0
+12           18         40           34 0.054580                   0.518                   0.442                     0.557        0
+13            6         10           11 0.726987                   0.545                   0.565                     0.524 48088174
+14           11         20           18 0.308148                   0.540                   0.513                     0.562  3839615
+15            8         14           14 0.555395                   0.473                   0.471                     0.475        0
+16           15         23           27 0.619394                   0.517                   0.523                     0.512 35700002
+17            9          3           20 0.995925                   0.379                   0.491                     0.271        0
+18            8          9           16 0.601028                   0.451                   0.455                     0.448        0
+19           13         17           16 0.890151                   0.532                   0.580                     0.494  8502852
+20            3          9            9 0.878068                   0.508                   0.562                     0.444 19283317
+21           19         32           26 0.623839                   0.555                   0.562                     0.550   923364
+22           15         25           23 0.741263                   0.473                   0.490                     0.455        0
+23            5         18           17 0.853653                   0.523                   0.544                     0.478        0
+24            9         13           14 0.926052                   0.508                   0.565                     0.450 15971444
+25            1         11           18 0.981446                   0.522                   0.617                     0.422  7892084
+26            8          8           14 0.846438                   0.464                   0.490                     0.418        0
+27            8         15           11 0.061418                   0.491                   0.400                     0.565  1519019
+28           20         28           27 0.481426                   0.538                   0.533                     0.543        0
+29           13         23           20 0.261593                   0.478                   0.450                     0.505        0
+30           16         14           11 0.052925                   0.444                   0.347                     0.515        0
+31           19         20           21 0.023937                   0.430                   0.366                     0.505        0
+32            8          2            6 0.964877                   0.231                   0.320                     0.148        0
+33           20         30           20 0.708355                   0.553                   0.569                     0.541  4821006
+34           30         61           51 0.536642                   0.575                   0.574                     0.575 16628124
+35            4          6            9 0.630937                   0.406                   0.408                     0.394        0
+36            5          2           10 0.741112                   0.387                   0.404                     0.357        0
+37           10         31           15 0.004090                   0.540                   0.466                     0.642  1481524
+38           33         56           43 0.009898                   0.537                   0.416                     0.576  4341772
+39           14         15           21 0.308935                   0.382                   0.365                     0.410        0
+----
+
+The filter accounts for 281 MB made up of 325 distinct regions.
+
+----
+> dist.vec.cmp <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
+> DF.cmp <- DataFrame(DF.cmp, dist.vec.cmp)
+----
+
+
+----
+> plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
+> axis(2)
+> lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
+----
+image::figures/fig-disthist.jpg[]
+
+
+----
+> pdf(file = "./figures/disthist.pdf")
+> par(bg="white")
+> plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
+> axis(2)
+> lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
+> dev.off()
+----
+
+In the figure above a horizontal line is drawn at 1 MB.  26 regions are within 1 MB of a bad region, which is 67% of all regions! Note that 24 regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
+
+----
+> plot(DF$dist.vec, DF$transrate.con.testable., pch = 20, col = ifelse(DF$dist.vec<=1e6,"red","black"))
+> lines(c(0,max(DF$dist.vec)), rep(1/2,2), lty = 3 )
+----
+image::figures/fig-disttrans.jpg[]
+
+
+----
+> boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
+----
+image::figures/fig-filterout.jpg[]
+
+
+----
+> pdf(file = "./figures/filterout.pdf")
+> par(bg="white")
+> boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
+> dev.off()
+----
+
+==== Region-wise ====
+
+----
+> TU.mat <- TU.mat[DF$dist.vec > 1e6,]
+> ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
+> ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
+> DF <- DF[DF$dist.vec > 1e6,]
+----
+
+==== Component-wise ====
+
+----
+> TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
+> DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
+----
+
+=== Chromosome 7 ===
+
+----
+> library("Gviz")
+> library("TxDb.Hsapiens.UCSC.hg18.knownGene")
+> txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
+----
+
+----
+> chr <- 7
+> wd <- 100e3
+> chr7.region <- DF$grange[8]
+> chr7.index <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
+> chr7.index2 <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
+> gtrack <- GenomeAxisTrack()
+> grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID", )
+> dtrack <- DataTrack( range = DF.cmp$grange[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+> dtrack2 <- DataTrack( range = DF.cmp$grange[chr7.index2], data = -log10(DF.cmp$p.vec[chr7.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
+> itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+> plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+----
+image::figures/fig-chr7.jpg[]
+
+
+----
+> pdf(file = "./figures/chr7.pdf")
+> plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+> dev.off()
+----
+
+=== Chromosome 8 ===
+
+----
+> chr <- 8
+> chr8.region <- DF$grange[9]
+> chr8.index <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
+> chr8.index2 <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
+> gtrack <- GenomeAxisTrack()
+> grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID")
+> dtrack <- DataTrack( range = DF.cmp$grange[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
+> dtrack2 <- DataTrack( range = DF.cmp$grange[chr8.index2], data = -log10(DF.cmp$p.vec[chr8.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
+> itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+> plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+----
+image::figures/fig-chr8.jpg[]
+
+
+----
+> pdf(file = "./figures/chr8.pdf")
+> plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+> dev.off()
+----
+
+=== Figure 1 ===
+
+----
+> layout(matrix(1:2,nrow=1,ncol=2))
+> par(mai=c(1,2.5,0,0), bg = "white")
+> o <- order(DF$p.vec)
+> # o <- 1:nrow(ci.mat.cleft)
+> 
+> plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)), xlim = c(0,1), ylab = "", xlab = "Transmission Rate", main = "", axes = FALSE, cex.lab = 0.5, cex.axis = 0.5 )
+> lines( y = c(1,length(o)), x = rep(0.5,2), lty = 3, lwd = 1 )
+> htest.list.cleft <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+ }
+> ci.list.cleft <- lapply(htest.list.cleft, Trioconductor:::get.ci)
+> ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+> eps <- 1/8
+> for( i in 1:nrow(ci.mat.cleft) ){
+ 
+      lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1+eps,2), lwd = 2, col = "black")
+      points( x = DF$transrate.cleft.testable.[o][i], y = nrow(ci.mat.cleft)-i+1+eps, pch = 19)
+ 
+ }
+> htest.list.con <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+ }
+> ci.list.con <- lapply(htest.list.con, Trioconductor:::get.ci)
+> ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+> for( i in 1:nrow(ci.mat.con) ){
+ 
+      lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1-eps,2), lwd = 2, col = "black")
+      points( x = DF$transrate.con.testable.[o][i], y = nrow(ci.mat.con)-i+1-eps, pch = 1 )
+ 
+ 
+ }
+> axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at )
+> axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2 )
+> #legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
+> 
+> par(mai=c(1,0,0,0), bg = "white")
+> plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4), cex.lab = 0.5, cex.axis = 0.5 )
+> lines(rep(-log10(0.05/sum(DF$dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
+> lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
+> axis(1)
+----
+image::figures/fig-cifigcleftnew.jpg[]
+
+
+----
+> pdf(file = "./figures/cifigcleftnew.pdf", width = 6, height = 4)
+> par(bg="white")
+> layout(matrix(1:2,nrow=1,ncol=2))
+> par(mai=c(1,2.5,0,0)/2, bg = "white", cex = 0.5)
+> o <- order(DF$p.vec)
+> # o <- 1:nrow(ci.mat.cleft)
+> 
+> plot(1, type = "n", ylim = c(1,nrow(ci.mat.cleft)+1), xlim = c(0,1), ylab = "", xlab = "Transmission Rate", main = "", axes = FALSE)
+> lines( y = c(1,length(o)), x = rep(0.5,2), lty = 3, lwd = 1 )
+> htest.list.cleft <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
+ }
+> ci.list.cleft <- lapply(htest.list.cleft, Trioconductor:::get.ci)
+> ci.mat.cleft <- matrix(unlist(ci.list.cleft),nrow = length(htest.list.cleft), ncol = 2, byrow = TRUE )
+> eps <- 1/8
+> for( i in 1:nrow(ci.mat.cleft) ){
+ 
+      lines( x = c(ci.mat.cleft[o,1][i],ci.mat.cleft[o,2][i]), y = rep(nrow(ci.mat.cleft)-i+1+eps,2), lwd = 0.5, col = "black")
+      points( x = DF$transrate.cleft.testable.[o][i], y = nrow(ci.mat.cleft)-i+1+eps, pch = 19)
+ 
+ }
+> htest.list.con <- list(NA, length = nrow(TU.mat))
+> for( i in 1:nrow(TU.mat) ){
+      htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
+ }
+> ci.list.con <- lapply(htest.list.con, Trioconductor:::get.ci)
+> ci.mat.con <- matrix(unlist(ci.list.con),nrow = length(htest.list.con), ncol = 2, byrow = TRUE )
+> for( i in 1:nrow(ci.mat.con) ){
+ 
+      lines( x = c(ci.mat.con[o,1][i],ci.mat.con[o,2][i]), y = rep(nrow(ci.mat.con)-i+1-eps,2), lwd = 0.5, col = "black")
+      points( x = DF$transrate.con.testable.[o][i], y = nrow(ci.mat.con)-i+1-eps, pch = 1)
+ 
+ 
+ }
+> axis(1, at = at <- c(0,0.25,0.5,0.75,1), labels = at  )
+> axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$grange[o]),":",start(DF$grange[o]),"-",end(DF$grange[o])), las = 2  )
+> text(x = 0.5, y = length(o)+1, labels = "Transmission (95% CI)\n Cases (solid circles), Controls (open circles)", adj = 0.5)
+> par(mai=c(1,0,0,0)/2)
+> plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black" , axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,3), ylim = c(1,length(o)+1) )
+> lines(rep(-log10(0.05/sum(dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
+> lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
+> axis(1)
+> text(x = -log10(0.05/sum(dist.vec > 1e6)), y = length(o)+1, labels = "Corrected\n 0.05 significance", adj = 0.5)
+> text(x = -log10(0.05), y = length(o)+1, labels = "Nominal\n 0.05 significance", adj = 0.5)
+----
+
+
+=== QQ Plot ===
+
+----
+> my.qq.func=function(p,f,pval=TRUE,gc=FALSE,tn,hc=0.99,hm=100,...){
+   if(missing(f)) f=rep(0,length(p))
+   wh=which(is.na(p)|is.na(f))
+   if(length(wh)>0){
+     p=p[-wh]
+     f=f[-wh]
+   }
+   wh=order(p)
+   p=p[wh]
+   f=f[wh]
+   if(gc){
+     z=qchisq(p,1,lower=F)
+     gcp=median(z)/qchisq(0.5,1)
+     cat("The genomic control parameter is ",gcp,"\n")
+     z=z/gcp
+     pchisq(z,1,lower=F)
+   }
+   n=length(p)
+   x1=1:n
+   x2=n+1-x1
+   x=x1/(n+1)
+   up=qbeta(0.975,x1,x2)
+   lo=qbeta(0.025,x1,x2)
+   if(pval==TRUE){
+     uu=up
+     up=-log10(lo)
+     lo=-log10(uu)
+     x=-log10(x)
+     z=-log10(p)
+   }
+   else{
+     up=qchisq(up,1)
+     lo=qchisq(lo,1)
+     x=qchisq(x,1)
+     z=qchisq(p,1,lower=F)
+   }
+   z=rev(z)
+   f=rev(f)
+   x=rev(x)
+   up=rev(up)
+   lo=rev(lo)
+   tt=NULL
+   if(!missing(tn)){
+     mx=10^tn
+     tt=list(tn=mx,k=rev(x)[mx])
+   }
+   if(hm>1){
+     nc=round(n*hc)
+     wh=seq(1,nc,hm)
+     wh=c(wh,(nc+1):n)
+     z=z[wh]
+     f=f[wh]
+     x=x[wh]
+     up=up[wh]
+     lo=lo[wh]
+   }
+   return(list(z=z,f=f,x=x,up=up,lo=lo,tt=tt))
+ }
+> my.qq.plot=function(zz,cut,rmx=0,mt="",mt.cex=1,mt.line=NA,mgp=c(3,1,0),tn.cex=1,plab=T,xr,yr,...){
+   if(!missing(cut)) zz$z[zz$z>cut]=cut
+   if(missing(xr)) xr=c(0,1.02*max(zz$x))
+   if(missing(yr)) yr=c(0,1.02*max(c(zz$up,zz$z,rmx)))
+   if(plab){
+     xl=expression(paste("expected  ",-log[10]," (p-value)",sep="")) 
+     yl=expression(paste("observed  ",-log[10]," (p-value)",sep="")) 
+   }
+   else{
+     xl=""
+     yl=""
+   }
+   par(las=1)
+   print(xr)
+   plot(range(zz$x),range(c(0,zz$up)),type="n",xlim=xr,ylim=yr,xlab=xl,ylab=yl,...)
+   axis(2,0:ceiling(yr)[2],...)
+   polygon(c(zz$x,rev(zz$x)),c(zz$lo,rev(zz$up)),col="lightgrey",border=F)
+   lines(c(0,max(zz$x)),c(0,max(zz$x)))
+   cls=c("blue","red")
+   cls=cls[zz$f+1]
+   points(zz$x,zz$z,pch=20,col=cls,cex=0.5)
+   par(mgp=mgp)
+   if(length(zz$tt)==2){
+     options(scipen=7)
+     axis(3,zz$tt$k,zz$tt$tn,cex.axis=tn.cex)
+     options(scipen=0)
+   }
+   title(mt,cex.main=mt.cex,line=mt.line)
+   par(mgp=c(3,1,0))
+ }
+> 
+----
+
+----
+> o <- order(-log10(DF$p.vec), decreasing = TRUE)
+> plot( -log10((1:length(DF$p.vec))/length(DF$p.vec)), -log10(DF$p.vec)[o], xlim = xlim <- c(0,max(-log10(DF$p.vec))), ylim = xlim, xlab = "Expected -log10p", ylab = "Observed -log10p", main = "")
+> lines( x = c(0,4), y = c(0,4), lty = 3)
+----
+
+----
+> library("snpStats")
+> par(bg="white")
+> qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+ 13.000   0.000   0.378 
+> 
+----
+image::figures/fig-qqPlotregion.jpg[]
+
+
+----
+> pdf(file="figures/qqplotregion.pdf")
+> par(bg="white")
+> qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+ 13.000   0.000   0.378 
+> dev.off()
+X11 
+  2 
+----
+
+There are 13 tests in this figure.
+
+----
+> o <- order(DF$p.vec)
+> as.data.frame(DF[o,])
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con trans.cleft.ma untrans.cleft.ma
+1             chr7    141380317  141447476        67160             *     68     38    68    78             40               23
+2             chr8     39341981   39548228       206248             *    140    103    32    45             86               58
+3             chr5     97073409   97267981       194573             *     35     27    20    30             19               15
+4            chr19     20349698   20523385       173688             *     54     42    40    38             25               25
+5             chr6     79022244   79098876        76633             *    154    114   108    80             69               74
+6             chr2     40785003   41129076       344074             *     66     63    57    52             35               32
+7             chr6     67065007   67111682        46676             *     72     61    58    44             31               33
+8            chr18     64879175   64906488        27314             *     22     20    26    20             14               11
+9             chr3     46765401   46827683        62283             *     12     15    18    14              8               10
+10           chr20     52080333   52094148        13816             *     44     45    40    29             20               21
+11            chr4    161252445  161314427        61983             *     27     33    35    27             14               17
+12           chr15     32459510   32631865       172356             *     60     64    64    46             34               35
+13            chr5      8756085    8811041        54957             *     19     26    29    18              7               14
+   trans.cleft.fa untrans.cleft.fa trans.con.ma untrans.con.ma trans.con.fa untrans.con.fa trans.clp1 untrans.clp1 trans.clp2
+1              38               19           35             45           37             42         16           13         21
+2              76               61           10             17           21             30         46           27         38
+3              13               13            9             14           11             17          9            8         11
+4              29               23           22             18           15             23         17           13         17
+5              70               64           57             40           48             51         49           33         44
+6              31               31           24             18           35             38         24           21         19
+7              39               33           26             21           33             24         27           21         15
+8               9               10           13             12           11              9          8            3          4
+9               5                5            7              8           11              6          2            3          1
+10             25               25           13              8           28             21         12           16         15
+11             11               18           13              9           22             18          6           10          8
+12             28               32           33             26           29             20         17           13         17
+13             11               13           19              7           10             11          5            7          3
+   untrans.clp2 trans.clp3 untrans.clp3   p.vec transrate.all.testable. transrate.con.testable. transrate.cleft.testable. dist.vec
+1            10         31           15 0.00409                   0.540                   0.466                     0.642  1481524
+2            33         56           43 0.00990                   0.537                   0.416                     0.576  4341772
+3             8         15           11 0.06142                   0.491                   0.400                     0.565  1519019
+4            11         20           18 0.30815                   0.540                   0.513                     0.562  3839615
+5            30         61           51 0.53664                   0.575                   0.574                     0.575 16628124
+6            15         23           27 0.61939                   0.517                   0.523                     0.512 35700002
+7            20         30           20 0.70836                   0.553                   0.569                     0.541  4821006
+8             6         10           11 0.72699                   0.545                   0.565                     0.524 48088174
+9             3          9            9 0.87807                   0.508                   0.562                     0.444 19283317
+10           13         17           16 0.89015                   0.532                   0.580                     0.494  8502852
+11            9         13           14 0.92605                   0.508                   0.565                     0.450 15971444
+12           17         26           34 0.94853                   0.530                   0.582                     0.484  1748509
+13            1         11           18 0.98145                   0.522                   0.617                     0.422  7892084
+----
+
+----
+> par(bg="white")
+> qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+ 84.000   0.000   0.752 
+> 
+----
+image::figures/fig-qqPlotcmp.jpg[]
+
+
+----
+> pdf(file="figures/qqplotcmp.pdf")
+> par(bg="white")
+> qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
+      N omitted  lambda 
+ 84.000   0.000   0.752 
+> dev.off()
+X11 
+  2 
+----
+
+There are 84 tests in this figure.
+
+----
+> o <- order(DF.cmp$p.vec)
+> as.data.frame(DF.cmp[o,])
+   grange.seqnames grange.start grange.end grange.width grange.strand T.case U.case T.con U.con    p.vec trans.vec dist.vec.cmp
+1             chr7    141435189  141439888         4700             *     76     30    67    75 0.000082     0.577      1489112
+2             chr7    141419097  141420758         1662             *     82     42    74    91 0.000241     0.540      1508242
+3             chr7    141420759  141423760         3002             *     82     43    75    90 0.000474     0.541      1505240
+4             chr7    141429472  141433796         4325             *     82     43    75    89 0.000568     0.543      1495204
+5             chr7    141423761  141427767         4007             *     82     44    75    90 0.000635     0.540      1501233
+6             chr7    141427768  141429471         1704             *     82     44    75    89 0.000757     0.541      1499529
+7             chr7    141433797  141435188         1392             *     81     41    74    82 0.001145     0.558      1493812
+8             chr8     39356825   39370186        13362             *    147     86    27    37 0.002204     0.586      4519814
+9             chr8     39370187   39379683         9497             *    161    111    31    45 0.003292     0.552      4510317
+10            chr8     39379684   39393417        13734             *    163    116    31    45 0.004599     0.546      4496583
+11            chr8     39476659   39497557        20899             *    139     73    21    26 0.006693     0.618      4392443
+12            chr8     39428327   39442543        14217             *    165    130    34    50 0.008649     0.525      4447457
+13            chr8     39460088   39469612         9525             *    153    110    30    42 0.009223     0.546      4420388
+14            chr8     39442544   39449313         6770             *    165    131    34    50 0.009374     0.524      4440687
+15            chr8     39449314   39449314            1             *    165    133    34    50 0.010966     0.521      4440686
+16            chr8     39393418   39401865         8448             *    164    124    32    45 0.011442     0.537      4488135
+17            chr8     39449315   39450167          853             *    164    131    34    49 0.012733     0.524      4439833
+18            chr8     39473098   39476658         3561             *    152    107    27    37 0.012776     0.554      4413342
+19            chr8     39421344   39428326         6983             *    165    129    34    48 0.012985     0.529      4461674
+20            chr8     39401866   39408899         7034             *    164    124    33    45 0.014981     0.538      4481101
+21            chr8     39408900   39421343        12444             *    164    126    33    45 0.017423     0.535      4468657
+22            chr8     39457082   39460087         3006             *    161    123    31    42 0.020620     0.538      4429913
+23            chr8     39469613   39473097         3485             *    152    107    28    36 0.022260     0.557      4416903
+24            chr8     39450168   39457081         6914             *    162    127    31    42 0.025747     0.533      4432919
+25            chr5     97076368   97087516        11149             *     35     29    20    31 0.071627     0.478      1699484
+26            chr5     97087517   97121798        34282             *     35     30    20    31 0.083753     0.474      1665202
+27            chr5     97075236   97076367         1132             *     35     29    20    30 0.085417     0.482      1710633
+28            chr5     97121799   97125076         3278             *     35     30    20    30 0.099207     0.478      1661924
+29            chr5     97074222   97075235         1014             *     31     27    18    28 0.104587     0.471      1711765
+30            chr7    141439889  141441259         1371             *     12     17    13    38 0.111219     0.312      1487741
+31           chr19     20404485   20413667         9183             *     42     34    22    28 0.145680     0.508      3949333
+32           chr19     20413668   20418018         4351             *     45     44    26    38 0.146509     0.464      3944982
+33           chr19     20422200   20482954        60755             *     56     51    40    43 0.337158     0.505      3880046
+34           chr19     20418019   20422199         4181             *     55     51    40    43 0.360403     0.503      3940801
+35           chr19     20482955   20493452        10498             *     56     51    40    42 0.367762     0.508      3869548
+36            chr6     79031111   79031808          698             *    166    150    89    87 0.373007     0.518     16695192
+37            chr6     79031809   79034385         2577             *    167    153    93    90 0.419630     0.517     16692615
+38           chr19     20493453   20507068        13616             *     51     50    38    41 0.433129     0.494      3855932
+39           chr18     64897188   64898547         1360             *     23     18    26    23 0.470144     0.544     48106187
+40            chr6     79029649   79029919          271             *    144    136    80    76 0.528033     0.514     16697081
+41            chr6     79029920   79031110         1191             *    144    136    80    76 0.528033     0.514     16695890
+42           chr18     64904657   64905087          431             *     23     20    25    23 0.530448     0.527     48113656
+43           chr18     64905088   64905367          280             *     23     20    25    23 0.530448     0.527     48114087
+44            chr2     41092148   41101972         9825             *     69     66    61    58 0.559394     0.512     36007147
+45           chr18     64905368   64906488         1121             *     22     20    25    23 0.572727     0.522     48114367
+46           chr18     64903149   64904521         1373             *     23     21    25    23 0.575616     0.522     48112148
+47           chr18     64904522   64904656          135             *     23     21    25    23 0.575616     0.522     48113521
+48           chr15     32505886   32518049        12164             *     44     44    37    36 0.596651     0.503      1794885
+49           chr18     64898548   64903148         4601             *     23     21    26    23 0.611779     0.527     48107547
+50            chr6     79083327   79086086         2760             *    166    155   112    96 0.715210     0.526     16640914
+51            chr6     79034386   79036116         1731             *    167    160   105    92 0.720616     0.519     16690884
+52            chr6     79086087   79088461         2375             *    166    155   112    95 0.734544     0.527     16638539
+53            chr6     79036117   79039486         3370             *    167    161   107    92 0.765932     0.520     16687514
+54            chr6     79081010   79083326         2317             *    166    162   114    99 0.773371     0.518     16643674
+55            chr6     79042356   79056616        14261             *    167    163   110    95 0.781053     0.518     16670384
+56            chr6     79075016   79077157         2142             *    167    164   114    99 0.784260     0.517     16649843
+57            chr6     79088462   79090197         1736             *    162    154   111    93 0.785578     0.525     16636803
+58            chr6     79070426   79075015         4590             *    167    164   113    98 0.785963     0.517     16651985
+59            chr6     79039487   79042355         2869             *    167    162   110    94 0.787899     0.520     16684645
+60            chr6     67075448   67079426         3979             *     76     71    60    47 0.793116     0.535      4831447
+61            chr6     79077158   79081009         3852             *    167    164   115    99 0.798747     0.517     16645991
+62            chr6     79069278   79070425         1148             *    167    164   114    98 0.800468     0.517     16656575
+63            chr6     79063712   79065998         2287             *    167    164   113    97 0.802205     0.518     16661002
+64            chr6     67101258   67104015         2758             *     75     70    61    47 0.810017     0.538      4857257
+65            chr6     67079427   67101257        21831             *     76     71    61    47 0.811505     0.537      4835426
+66            chr6     79065999   79069277         3279             *    167    164   114    97 0.816026     0.518     16657723
+67            chr6     79056617   79063711         7095             *    167    164   112    95 0.819560     0.519     16663289
+68            chr6     67104016   67105019         1004             *     74     70    61    47 0.823733     0.536      4860015
+69            chr3     46771354   46825614        54261             *     13     15    18    14 0.845729     0.517     19285386
+70           chr20     52081230   52081774          545             *     46     44    40    28 0.869793     0.544      8515226
+71           chr15     32530025   32530130          106             *     63     67    64    52 0.880876     0.516      1819024
+72           chr20     52081775   52088118         6344             *     47     47    41    29 0.893939     0.537      8508882
+73           chr15     32587888   32595161         7274             *     61     67    61    50 0.895396     0.510      1876887
+74           chr15     32518050   32530024        11975             *     61     62    60    45 0.898323     0.531      1807049
+75            chr4    161271979  161276892         4914             *     26     32    34    28 0.899595     0.500     15990978
+76           chr15     32538343   32549650        11308             *     63     68    65    52 0.903504     0.516      1827342
+77           chr15     32530131   32538342         8212             *     63     67    65    51 0.905752     0.520      1819130
+78           chr15     32569801   32587887        18087             *     62     68    64    51 0.915066     0.514      1858800
+79           chr15     32549651   32569800        20150             *     62     68    65    51 0.924410     0.516      1838650
+80            chr4    161290510  161291569         1060             *     27     36    35    28 0.945796     0.492     16009509
+81            chr4    161276893  161290509        13617             *     27     36    36    28 0.954370     0.496     15995892
+82            chr5      8756148    8756614          467             *     19     27    29    18 0.985472     0.516      7892147
+83            chr5      8756615    8800106        43492             *     19     28    29    18 0.988637     0.511      7892614
+84            chr5      8756085    8756147           63             *     18     27    29    18 0.989245     0.511      7892084
+----
+
+
+----
+> zz <- my.qq.func(DF$p.vec,tn=0:4,hc=0.9,hm=1)
+> pdf("figures/ingo.qq.reg.pdf",width=6,height=6)
+> xr=c(0,1.02*max(zz$x))
+> yr=c(0,1.02*max(c(zz$up,zz$z)))
+> par(las=1,xaxs="i",yaxs="i")
+> plot(range(zz$x),range(c(0,zz$up)),type="n",xlim=xr,ylim=yr,xlab="",ylab="",xaxt="n")
+> axis(1,0:4)
+> axis(3,zz$tt$k,zz$tt$tn,cex.axis=0.5)
+>   polygon(c(zz$x,rev(zz$x)),c(zz$lo,rev(zz$up)),col="lightgrey",border=F)
+> lines(c(0,max(zz$x)),c(0,max(zz$x)))
+> cls=c("blue","red")
+> cls=cls[zz$f+1]
+> points(zz$x,zz$z,pch=19,col=cls,cex=0.75)
+> mtext(expression(paste("expected  ",-log[10]," (p-value)",sep="")),side=1,line=3)
+> par(las=0)
+> mtext(expression(paste("observed  ",-log[10]," (p-value)",sep="")),side=2,line=2.5)
+> dev.off()
+----
+
+----
+> zz <- my.qq.func(DF.cmp$p.vec,tn=0:4,hc=0.9,hm=1)
+> pdf("figures/ingo.qq.cmp.pdf",width=6,height=6)
+> xr=c(0,1.02*max(zz$x))
+> yr=c(0,1.02*max(c(zz$up,zz$z)))
+> par(las=1,xaxs="i",yaxs="i")
+> plot(range(zz$x),range(c(0,zz$up)),type="n",xlim=xr,ylim=yr,xlab="",ylab="",xaxt="n")
+> axis(1,0:4)
+> axis(3,zz$tt$k,zz$tt$tn,cex.axis=0.5)
+>   polygon(c(zz$x,rev(zz$x)),c(zz$lo,rev(zz$up)),col="lightgrey",border=F)
+> lines(c(0,max(zz$x)),c(0,max(zz$x)))
+> cls=c("blue","red")
+> cls=cls[zz$f+1]
+> points(zz$x,zz$z,pch=19,col=cls,cex=0.75)
+> mtext(expression(paste("expected  ",-log[10]," (p-value)",sep="")),side=1,line=3)
+> par(las=0)
+> mtext(expression(paste("observed  ",-log[10]," (p-value)",sep="")),side=2,line=2.5)
+> dev.off()
+----
+
+
+==== Fisher's Method  ====
+
+===== Component-wise =====
+
+----
+> (fishers.p.cmp <- sum(-2*log(DF.cmp$p.vec)))
+[1] 337
+> pchisq(fishers.p.cmp, df = 2*length(DF.cmp$p.vec), lower.tail = FALSE)
+[1] 0.00000000000019
+----
+
+===== Region-wise. =====
+
+----
+> (fishers.p <- sum(-2*log(DF$p.vec)))
+[1] 32.5
+> pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
+[1] 0.178
+----
+
+=== Permutation Test ===
+
+----
+> index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
+> fe.beaty.2 <- fe.beaty[index.beaty,]
+> index.pitt <- queryHits(findOverlaps(rowData(fe.pitt),DF.cmp$grange))
+> fe.pitt.2 <- fe.pitt[index.pitt,]
+> cD <- DataFrame(colData(fe.beaty.2)$id)
+> colnames(cD) <- "id"
+> colData(fe.beaty.2) <- cD
+> colnames(fe.beaty.2) <- colnames(fe.beaty)
+> fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
+----
+
+----
+> n.perm <- 1e1			## used to be 1e5
+> p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
+> set.seed(1)
+> for( i in 1:n.perm ){
+      cleft.index <- sample(nrow(completeTrios(fe.all)),nrow(completeTrios(fe.beaty.2)), replace = FALSE )
+      cleft.ids <- unique(c(as.matrix(completeTrios(fe.all))[cleft.index,]))
+      con.ids   <- unique(c(as.matrix(completeTrios(fe.all))[-cleft.index,]))
+      fe.beaty.perm <- fe.all[,colnames(fe.all) %in% cleft.ids]
+      fe.pitt.perm <- fe.all[,colnames(fe.all) %in% con.ids]
+      trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty.perm, type = "cnv")
+      trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+      dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
+      trioAssay.pitt <- Trioconductor:::TrioAssay(fe.pitt.perm, type = "cnv")
+      trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
+      dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
+      table.list.beaty <- apply(trioStates.beaty, 2, "table")
+      table.list.pitt <- apply(trioStates.pitt, 2, "table")
+      TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, Trioconductor:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
+      TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, Trioconductor:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
+      TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
+      colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
+      rownames(TU.mat) <- names(table.list.beaty)
+      #TU.mat.cmp <- TU.mat
+      #gr.cmp <- rowData(fe.beaty.perm)
+      fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
+      p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
+ }
+----
+These are the adjusted component-wise p-values:
+----
+> p.min <- apply(p.mat,1,"min")
+> c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+chr7 chr8 
+   0    0 
+----
+And the threshold for nominal p-values is:
+----
+> quantile(p.min,probs=0.05)
+     5% 
+0.00482 
+----
+
+=== Parent of Origin and Cleft Type Tables ===
+
+.Chromosome 7
+[width="40%",cols="5"]
+[options="header",grid="rows"]
+|======
+||T case (clp=1,2,3)| U case| T con|U con|
+Total|69 (17,21,31)|38 (13,10,15)|68|78|
+Maternal|40|23|35|45|
+Paternal|38|19|37|42|
+|======
+
+.Chromosome 8
+[width="40%",cols="5"]
+[options="header",grid="rows"]
+|======
+||T case (clp=1,2,3)| U case| T con|U con|
+Total|140 (46,38,56)|104 (28,33,43)|32|45|
+Maternal|86|58|10|17|
+Paternal|76|62|21|30|
+|======
+
+== Subject IDs for Jeff ==
+
+----
+> index <- findOverlaps(rowData(fe.beaty), chr7.region)
+> fe.beaty.chr7.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
+> (ids.chr7 <- unique(colnames(fe.beaty.chr7.inherited)))
+ [1] "11005_02@1008472482" "11005_03@1008472481" "12066_03@0067868236" "12082_01@0067868230" "12082_02@0067868223"
+ [6] "12087_01@0067868249" "12087_03@0067868225" "12094_02@0067866317" "12099_02@0067866339" "12101_02@0067866267"
+[11] "12108_02@0067866288" "12128_03@0067867203" "12141_01@0067867142" "12141_02@0067867118" "12157_03@0067866945"
+[16] "12162_01@0067866986" "12162_02@0067866962" "12170_02@0067866950" "12173_03@0067866927" "12178_01@0067866956"
+[21] "12178_03@0067866929" "12209_02@0067867099" "12242_01@0067866679" "12242_02@0067866678" "12249_03@0067866682"
+[26] "12256_02@0067866720" "12264_03@0067866693" "12266_01@0067866645" "12266_02@0067866640" "12268_03@0067866641"
+[31] "12278_01@0067866556" "12278_02@0067866537" "12278_03@0067866627" "12293_01@0067866567" "12293_03@0067866543"
+[36] "12298_02@0067866569" "12308_03@0067866435" "12313_01@0067866362" "12313_03@0067866433" "12323_01@0067866375"
+[41] "12323_03@0067866351" "12328_01@0067866380" "12328_03@0067866353" "12382_01@1008493062" "12382_03@1008493086"
+[46] "13035_02@1008471820" "13050_02@1008472968" "13070_01@1008471852" "13070_03@1008471851" "13118_03@1008469199"
+[51] "14015_02@1008491498" "14039_01@1008490887" "14039_03@1008490933" "14143_01@1008491538" "14143_03@1008491579"
+[56] "14191_01@1008491622" "14191_02@1008491639" "15010_02@1008475266" "15011_01@1008475210" "15011_03@1008475219"
+[61] "15017_02@1008475280" "15093_03@1008474960" "16047_01@1008494517" "16047_02@1008494528" "16181_03@1008493360"
+[66] "16312_03@1008489802"
+> (unique(substr(ids.chr7, start = 1, stop = 5)))
+ [1] "11005" "12066" "12082" "12087" "12094" "12099" "12101" "12108" "12128" "12141" "12157" "12162" "12170" "12173" "12178" "12209"
+[17] "12242" "12249" "12256" "12264" "12266" "12268" "12278" "12293" "12298" "12308" "12313" "12323" "12328" "12382" "13035" "13050"
+[33] "13070" "13118" "14015" "14039" "14143" "14191" "15010" "15011" "15017" "15093" "16047" "16181" "16312"
+----
+
+----
+> chr8.region <- GRanges( seqnames = "chr8", ranges = IRanges( start = 39341981, end = 39548228) )
+> index <- findOverlaps(rowData(fe.beaty), chr8.region)
+> fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
+> (ids.chr8 <- unique(colnames(fe.beaty.chr8.inherited)))
+  [1] "11005_01@1008472480" "11005_03@1008472481" "11021_02@1008472419" "11021_03@1008471966" "11035_01@1008471376"
+  [6] "11035_03@1008472048" "12002_01@1008489061" "12002_02@1008489065" "12002_03@1008490119" "12004_01@1008489060"
+ [11] "12004_02@1008490093" "12004_03@1008490095" "12005_03@1008490143" "12008_01@1008490140" "12008_02@1008490145"
+ [16] "12008_03@1008490164" "12014_01@1008490162" "12014_02@1008489044" "12015_01@1008490100" "12015_03@1008490124"
+ [21] "12021_03@1008490150" "12022_02@1008490086" "12024_01@1008490151" "12024_02@1008490158" "12024_03@1008489033"
+ [26] "12027_01@1008490157" "12027_02@1008490084" "12027_03@1008490105" "12028_01@1008490108" "12028_03@1008490132"
+ [31] "12029_03@1008489071" "12036_02@1008494892" "12036_03@1008494897" "12037_02@1008494921" "12038_01@1008494945"
+ [36] "12038_02@1008494964" "12038_03@1008494874" "12039_01@1008494891" "12039_02@1008494898" "12039_03@1008494915"
+ [41] "12040_01@1008494922" "12040_02@1008494939" "12040_03@1008494946" "12042_01@1008494899" "12042_02@1008494914"
+ [46] "12042_03@1008494938" "12043_01@1008494947" "12043_03@1008494876" "12047_03@1008494912" "12049_01@1008494960"
+ [51] "12049_02@1008494878" "12052_01@1008494879" "12052_02@1008494886" "12054_01@1008494951" "12054_02@1008494958"
+ [56] "12054_03@1008494880" "12055_01@1008494885" "12056_01@1008489250" "12056_02@1008494933" "12060_01@1008494883"
+ [61] "12060_02@1008494906" "12061_01@0067868262" "12061_02@0067868239" "12062_01@0067868215" "12062_02@0067868214"
+ [66] "12063_01@0067868190" "12063_02@0067868167" "12064_01@0067868240" "12064_02@0067868237" "12064_03@0067868216"
+ [71] "12066_01@0067868260" "12066_02@0067868241" "12074_01@0067868244" "12074_03@0067868220" "12077_01@0067868232"
+ [76] "12077_02@0067868221" "12077_03@0067868208" "12078_01@0067868197" "12078_02@0067868184" "12079_03@0067868231"
+ [81] "12080_01@0067868222" "12080_02@0067868207" "12080_03@0067868198" "12087_01@0067868249" "12087_02@0067868228"
+ [86] "12087_03@0067868225" "12089_01@0067868251" "12089_02@0067868250" "12092_01@0067866295" "12092_02@0067866294"
+ [91] "12092_03@0067866271" "12093_01@0067866270" "12093_02@0067866247" "12093_03@0067863704" "12094_01@0067866320"
+ [96] "12094_02@0067866317" "12094_03@0067866293" "12098_01@0067866292" "12098_02@0067866273" "12098_03@0067866268"
+[101] "12099_01@0067866249" "12099_02@0067866339" "12100_03@0067866291" "12101_01@0067866274" "12101_02@0067866267"
+[106] "12101_03@0067866250" "12102_01@0067866338" "12102_03@0067866314" "12103_01@0067866299" "12103_02@0067866275"
+[111] "12106_01@0067866276" "12106_03@0067866252" "12107_03@0067866312" "12108_01@0067866301" "12108_02@0067866288"
+[116] "12108_03@0067866277" "12110_01@0067866326" "12110_02@0067866311" "12110_03@0067866302" "12111_01@0067866287"
+[121] "12111_03@0067866254" "12112_01@0067866334" "12112_02@0067866327" "12113_01@0067866303" "12113_03@0067866279"
+[126] "12114_03@0067866333" "12115_01@0067866328" "12115_02@0067866309" "12115_03@0067866304" "12119_03@0067866331"
+[131] "12124_03@0067867160" "12127_01@0067867161" "12127_02@0067867156" "12128_01@0067867132" "12128_02@0067867113"
+[136] "12129_01@0067867186" "12129_03@0067867162" "12131_01@0067867131" "12131_03@0067867202" "12137_01@0067867189"
+[141] "12137_03@0067867165" "12141_01@0067867142" "12141_02@0067867118" "12141_03@0067867198" "12143_01@0067867150"
+[146] "12143_02@0067867143" "12144_01@0067867119" "12144_03@0067867192" "12146_01@0067867144" "12146_02@0067867125"
+[151] "12146_03@0067867120" "12149_01@0067867124" "12149_03@0067867194" "12151_01@0067866460" "12151_02@0067866991"
+[156] "12151_03@0067866990" "12152_01@0067866444" "12152_02@0067866966" "12152_03@0067866943" "12153_01@0067866942"
+[161] "12153_03@0067867013" "12155_01@0067866944" "12155_02@0067866941" "12155_03@0067866461" "12156_01@0067867012"
+[166] "12156_02@0067866993" "12156_03@0067866988" "12157_01@0067866969" "12157_03@0067866945" "12159_02@0067866987"
+[171] "12159_03@0067866970" "12160_01@0067866963" "12160_03@0067866939" "12161_01@0067866922" "12161_02@0067867010"
+[176] "12161_03@0067866995" "12162_01@0067866986" "12162_02@0067866962" "12162_03@0067866947" "12165_01@0067866961"
+[181] "12165_02@0067866948" "12165_03@0067866937" "12166_01@0067866924" "12166_03@0067866997" "12167_02@0067866973"
+[186] "12168_01@0067866949" "12168_03@0067866925" "12170_01@0067866974" "12170_02@0067866950" "12170_03@0067866935"
+[191] "12171_01@0067866926" "12171_02@0067867006" "12171_03@0067866999" "12173_01@0067866951" "12173_02@0067866934"
+[196] "12173_03@0067866927" "12174_03@0067866981" "12176_01@0067866933" "12176_02@0067866928" "12177_01@0067867001"
+[201] "12177_02@0067866980" "12177_03@0067866977" "12178_01@0067866956" "12178_02@0067866932" "12178_03@0067866929"
+[206] "12179_03@0067866473" "12181_01@0067866484" "12181_02@0067867087" "12181_03@0067867086" "12182_01@0067867063"
+[211] "12182_02@0067867062" "12186_01@0067867108" "12186_02@0067867089" "12187_01@0067867065" "12187_02@0067867060"
+[216] "12187_03@0067867041" "12188_03@0067867107" "12189_01@0067867090" "12189_02@0067867083" "12191_02@0067867018"
+[221] "12191_03@0067867106" "12194_01@0067867105" "12194_02@0067867092" "12195_03@0067867044" "12202_01@0067867095"
+[226] "12202_02@0067867078" "12202_03@0067867071" "12205_01@0067867077" "12205_02@0067867072" "12205_03@0067867053"
+[231] "12206_01@0067867048" "12206_02@0067867029" "12206_03@0067867024" "12208_01@0067867073" "12208_02@0067867052"
+[236] "12208_03@0067867049" "12209_01@0067867025" "12209_02@0067867099" "12212_02@0067866847" "12214_01@0067866893"
+[241] "12214_02@0067866872" "12214_03@0067866869" "12216_01@0067866916" "12216_02@0067866897" "12216_03@0067866892"
+[246] "12217_03@0067866849" "12221_01@0067866914" "12221_03@0067866890" "12223_03@0067866913" "12224_01@0067866900"
+[251] "12224_02@0067866889" "12225_01@0067866865" "12225_02@0067866852" "12225_03@0067866841" "12226_01@0067866828"
+[256] "12226_03@0067866901" "12230_02@0067866854" "12231_02@0067866910" "12232_01@0067866886" "12232_03@0067866472"
+[261] "12233_01@0067866855" "12233_03@0067866831" "12234_01@0067866909" "12234_03@0067866885" "12236_01@0067866832"
+[266] "12236_02@0067866908" "12236_03@0067866905" "12237_01@0067866884" "12237_03@0067866860" "12238_01@0067866857"
+[271] "12238_02@0067866836" "12239_01@0067866907" "12239_02@0067866906" "12241_01@0067866464" "12241_03@0067866702"
+[276] "12245_01@0067866656" "12245_03@0067866632" "12246_01@0067866724" "12246_02@0067866705" "12246_03@0067866700"
+[281] "12247_01@0067866681" "12247_02@0067866676" "12249_01@0067866706" "12249_02@0067866699" "12250_01@0067866675"
+[286] "12250_02@0067866658" "12250_03@0067866651" "12251_01@0067866634" "12251_02@0067866722" "12254_02@0067866697"
+[291] "12254_03@0067866684" "12255_01@0067866673" "12255_02@0067866660" "12255_03@0067866649" "12257_01@0067866696"
+[296] "12257_02@0067866685" "12257_03@0067866672" "12259_01@0067866719" "12259_02@0067866710" "12259_03@0067866695"
+[301] "12260_01@0067866686" "12260_03@0067866647" "12262_01@0067866694" "12262_02@0067866687" "12265_01@0067866688"
+[306] "12265_02@0067866669" "12265_03@0067866664" "12267_01@0067866713" "12267_02@0067866692" "12267_03@0067866689"
+[311] "12268_01@0067866668" "12268_02@0067866644" "12268_03@0067866641" "12269_02@0067866714" "12271_01@0067866448"
+[316] "12271_02@0067866607" "12271_03@0067866606" "12274_02@0067866605" "12275_01@0067866560" "12275_03@0067866536"
+[321] "12276_01@0067866628" "12276_02@0067866609" "12276_03@0067866604" "12277_02@0067866580" "12278_01@0067866556"
+[326] "12278_03@0067866627" "12280_01@0067866579" "12280_02@0067866562" "12284_03@0067866588" "12285_01@0067866577"
+[331] "12285_02@0067866564" "12285_03@0067866553" "12290_01@0067866590" "12290_03@0067866551" "12292_01@0067866598"
+[336] "12292_02@0067866591" "12292_03@0067866574" "12293_02@0067866550" "12293_03@0067866543" "12294_01@0067866621"
+[341] "12294_02@0067866616" "12296_03@0067866441" "12297_01@0067866617" "12297_03@0067866593" "12298_02@0067866569"
+[346] "12298_03@0067866545" "12300_02@0067866445" "12300_03@0067866452" "12304_01@0067866416" "12304_02@0067866413"
+[351] "12305_01@0067866368" "12305_02@0067866365" "12308_01@0067866364" "12308_03@0067866435" "12309_01@0067866418"
+[356] "12309_02@0067866411" "12309_03@0067866394" "12311_03@0067866419" "12313_01@0067866362" "12313_02@0067866347"
+[361] "12313_03@0067866433" "12314_01@0067866420" "12314_02@0067866409" "12314_03@0067866396" "12315_01@0067866385"
+[366] "12315_02@0067866372" "12316_01@0067866348" "12316_02@0067866432" "12317_01@0067866408" "12317_03@0067866384"
+[371] "12321_01@0067866350" "12321_02@0067866430" "12321_03@0067866423" "12323_01@0067866375" "12323_03@0067866351"
+[376] "12324_01@0067866429" "12324_02@0067866424" "12324_03@0067866405" "12325_01@0067866400" "12325_02@0067866381"
+[381] "12325_03@0067866376" "12327_01@0067866425" "12327_02@0067866404" "12327_03@0067866401" "12328_01@0067866380"
+[386] "12328_02@0067866377" "12328_03@0067866353" "12329_03@0067866451" "12330_02@0067866439" "12332_01@0067866775"
+[391] "12332_02@0067866774" "12332_03@0067866751" "12340_01@0067866771" "12340_02@0067866754" "12340_03@0067866747"
+[396] "12341_01@0067866730" "12341_02@0067866803" "12352_01@0067866807" "12352_03@0067866783" "12353_01@0067866766"
+[401] "12353_02@0067866759" "12353_03@0067866742" "12361_02@1008489239" "12362_01@1008493096" "12362_02@1008493118"
+[406] "12362_03@1008493119" "12363_01@1008493142" "12363_03@1008493069" "12364_01@1008493071" "12364_02@1008493093"
+[411] "12364_03@1008493095" "12365_01@1008493117" "12365_02@1008493120" "12368_02@1008493140" "12370_03@1008493139"
+[416] "12371_01@1008493051" "12371_02@1008493066" "12371_03@1008493075" "12375_01@1008493100" "12375_02@1008493113"
+[421] "12375_03@1008493124" "12376_03@1008493064" "12378_01@1008493125" "12378_02@1008493136" "12378_03@1008489267"
+[426] "12379_01@1008493063" "12379_03@1008493087" "12381_01@1008493126" "12381_03@1008489268" "12382_01@1008493062"
+[431] "12382_02@1008493079" "12382_03@1008493086" "12383_02@1008493110" "12385_02@1008493104" "12387_02@1008493081"
+[436] "12387_03@1008493084" "12388_01@1008493105" "12388_02@1008493108" "12390_01@1008493082" "12390_02@1008493083"
+[441] "12390_03@1008493106" "12402_01@1008490483" "12402_03@1008490507" "12403_02@1008490531" "12403_03@1008490546"
+[446] "12404_02@1008490473" "12404_03@1008490484" "12405_01@1008490497" "12405_02@1008490508" "12405_03@1008490521"
+[451] "12406_02@1008489020" "12409_01@1008489035" "12409_02@1008490471" "13001_03@1008472891" "13005_03@1008472952"
+[456] "13028_01@1008472598" "13028_02@1008472507" "13030_02@1008471891" "13031_01@1008471921" "13031_02@1008471919"
+[461] "13031_03@1008471920" "13035_02@1008471820" "13039_02@1008471771" "13040_01@1008471750" "13040_02@1008472006"
+[466] "13040_03@1008471749" "13041_01@1008471745" "13041_02@1008472005" "13041_03@1008471746" "13046_03@1008471815"
+[471] "13047_01@1008471801" "13050_01@1008472966" "13050_03@1008472967" "13054_01@1008472921" "13054_02@1008472923"
+[476] "13054_03@1008472922" "13058_01@1008472974" "13058_02@1008472972" "13059_01@1008472943" "13059_02@1008472925"
+[481] "13059_03@1008472944" "13062_03@1008471878" "13070_03@1008471851" "13073_01@1008471900" "13073_02@1008471898"
+[486] "13077_01@1008471838" "13077_02@1008471840" "13085_01@1008471742" "13085_02@1008471744" "13085_03@1008469162"
+[491] "13086_01@1008471828" "13086_02@1008471826" "13097_01@1008469150" "13097_03@1008469151" "13098_01@1008469161"
+[496] "13098_02@1008469159" "13098_03@1008469160" "13109_02@1008471868" "13111_02@1008469203" "13111_03@1008469202"
+[501] "13114_03@1008471917" "13116_01@1008469230" "13116_02@1008469228" "13116_03@1008469229" "13117_01@1008469209"
+[506] "13117_02@1008469207" "13117_03@1008469208" "13119_01@1008469158" "13119_02@1008469156" "13121_01@1008469177"
+[511] "13121_02@1008469179" "13121_03@1008469178" "13125_01@1008469153" "13125_02@1008469155" "13144_01@1008469185"
+[516] "13144_02@1008469183" "13144_03@1008469184" "14008_01@1008492540" "14008_02@1008492545" "14008_03@1008492564"
+[521] "14015_01@1008492547" "14023_03@1008492559" "14037_02@1008490934" "14043_01@1008490932" "14043_03@1008490859"
+[526] "14044_02@1008490883" "14069_01@1008489544" "14069_02@1008489566" "14069_03@1008489567" "14080_03@1008489514"
+[531] "14082_03@1008489586" "14088_02@1008489502" "14092_01@1008489534" "14092_02@1008489551" "14110_01@1008491099"
+[536] "14110_02@1008491106" "14110_03@1008491123" "14138_01@1008491559" "14138_03@1008491583" "14140_01@1008491537"
+[541] "14140_02@1008491556" "14140_03@1008491561" "14143_01@1008491538" "14143_02@1008491562" "14148_01@1008491516"
+[546] "14148_03@1008491540" "14152_01@1008491552" "14152_02@1008491576" "14153_01@1008491600" "14153_02@1008491518"
+[551] "14153_03@1008491527" "14155_01@1008491575" "14155_03@1008491599" "14164_01@1008491572" "14164_03@1008491596"
+[556] "14165_02@1008491523" "14175_01@1020495071" "14175_02@1020495080" "14175_03@1008491700" "14182_01@1008491625"
+[561] "14182_02@1008491636" "14185_01@1008491637" "14185_02@1008491648" "14185_03@1008491661" "14191_03@1008491646"
+[566] "14195_02@1008491664" "14196_01@1008491693" "14196_02@1008491190" "14196_03@1008491620" "15001_02@1008472010"
+[571] "15003_01@1008475191" "15003_02@1008475215" "15003_03@1008475213" "15007_01@1008475241" "15007_02@1008475265"
+[576] "15007_03@1008475260" "15009_01@1008475235" "15009_03@1008475242" "15013_01@1008475196" "15013_03@1008475209"
+[581] "15017_01@1008475256" "15017_03@1008475269" "15020_01@1008475270" "15020_03@1008475279" "15029_01@1008475226"
+[586] "15029_02@1008475250" "15029_03@1008475227" "15032_01@0067899126" "15032_02@0067899102" "15032_03@0067899103"
+[591] "15039_01@0067899171" "15039_03@0067899154" "15040_01@0067899123" "15040_02@0067899099" "15040_03@0067899106"
+[596] "15041_01@0067899082" "15041_03@0067899170" "15051_01@0067899086" "15051_02@0067899159" "15051_03@0067899166"
+[601] "15056_01@0067899088" "15056_03@0067899164" "15066_01@0070312832" "15066_02@0070312808" "15068_01@0070312876"
+[606] "15068_02@0070312852" "15068_03@0070316522" "15070_02@0070312851" "15071_01@0070312834" "15071_03@0070312827"
+[611] "15075_01@0070312860" "15075_02@0070312836" "15075_03@0070312849" "15086_01@0070312816" "15086_02@0070312889"
+[616] "15089_01@0070312817" "15089_02@0070312890" "15091_01@0070316501" "15091_02@0070312818" "15101_01@1008475523"
+[621] "15103_02@1008475531" "15110_03@1008475519" "15113_01@1008475494" "15113_03@1008475511" "15115_01@1008475559"
+[626] "15115_03@1008475566" "15116_01@1008475493" "15116_02@1008475502" "15116_03@1008475512" "15118_03@1008475492"
+[631] "15120_01@1008475561" "15124_01@0067899607" "15124_03@0067899606" "15125_01@0067899582" "15125_02@0067899653"
+[636] "15126_01@0067899632" "15126_03@0067899629" "16028_01@1008494452" "16028_02@1008494473" "16028_03@1008494476"
+[641] "16045_01@1008494540" "16045_03@1008494564" "16047_03@1008494541" "16066_01@1008495449" "16066_03@1008495473"
+[646] "16146_01@1008494645" "16146_02@1008494664" "16146_03@1008494669" "16149_03@1008494595" "16151_01@1008494054"
+[651] "16151_02@1008495662" "16151_03@1008495664" "16170_01@1008495694" "16170_02@1008495703" "16170_03@1008495718"
+[656] "16179_01@1008495650" "16179_03@1008495674" "16181_03@1008493360" "16185_02@1008493405" "16191_01@1008493427"
+[661] "16191_02@1008493339" "16194_01@1008493340" "16194_03@1008493377" "16197_01@1008493365" "16197_02@1008493376"
+[666] "16197_03@1008493389" "16209_01@1008493420" "16209_02@1008489255" "16212_01@1008495304" "16212_02@1008495326"
+[671] "16212_03@1008495327" "16218_01@1008495329" "16218_02@1008495348" "16221_02@1008495274" "16221_03@1008495283"
+[676] "16222_01@1008495298" "16222_02@1008495307" "16222_03@1008495322" "16224_01@1008495273" "16224_03@1008495297"
+[681] "16233_01@1008495318" "16233_02@1008495335" "16233_03@1008495342" "16239_03@1008495290" "16242_01@1008494824"
+[686] "16242_03@1008494847" "16249_02@1008494802" "16250_01@1008494843" "16250_02@1008494850" "16250_03@1008494867"
+[691] "16259_01@1008494791" "16259_02@1008494806" "16259_03@1008494815" "16262_01@1008494790" "16262_02@1008494807"
+[696] "16262_03@1008494814" "16265_01@1008494808" "16265_03@1008494832" "16267_01@1008494788" "16267_02@1008494809"
+[701] "16267_03@1008494812" "16269_02@1008494786" "16305_01@1008489805" "16305_02@1008489807" "16307_01@1008489024"
+[706] "16307_02@1008489804" "16307_03@1008489809" "16308_02@1008489833" "16313_01@1008489811" "16313_03@1008489835"
+[711] "16314_01@1008489850" "16314_03@1008489788" "16320_01@1008489872" "16320_03@1008489814" "16322_01@1008489862"
+[716] "16322_03@1008489791" "18017_01@0070297512" "18017_03@0070297488" "18026_01@0070297461" "18026_02@0070297456"
+[721] "18026_03@0070297532" "18060_01@0070298444" "18060_03@0070298420" "18117_01@0070298681" "18117_02@0070298660"
+[726] "18117_03@0070298657"
+> (unique(substr(ids.chr8, start = 1, stop = 5)))
+  [1] "11005" "11021" "11035" "12002" "12004" "12005" "12008" "12014" "12015" "12021" "12022" "12024" "12027" "12028" "12029"
+ [16] "12036" "12037" "12038" "12039" "12040" "12042" "12043" "12047" "12049" "12052" "12054" "12055" "12056" "12060" "12061"
+ [31] "12062" "12063" "12064" "12066" "12074" "12077" "12078" "12079" "12080" "12087" "12089" "12092" "12093" "12094" "12098"
+ [46] "12099" "12100" "12101" "12102" "12103" "12106" "12107" "12108" "12110" "12111" "12112" "12113" "12114" "12115" "12119"
+ [61] "12124" "12127" "12128" "12129" "12131" "12137" "12141" "12143" "12144" "12146" "12149" "12151" "12152" "12153" "12155"
+ [76] "12156" "12157" "12159" "12160" "12161" "12162" "12165" "12166" "12167" "12168" "12170" "12171" "12173" "12174" "12176"
+ [91] "12177" "12178" "12179" "12181" "12182" "12186" "12187" "12188" "12189" "12191" "12194" "12195" "12202" "12205" "12206"
+[106] "12208" "12209" "12212" "12214" "12216" "12217" "12221" "12223" "12224" "12225" "12226" "12230" "12231" "12232" "12233"
+[121] "12234" "12236" "12237" "12238" "12239" "12241" "12245" "12246" "12247" "12249" "12250" "12251" "12254" "12255" "12257"
+[136] "12259" "12260" "12262" "12265" "12267" "12268" "12269" "12271" "12274" "12275" "12276" "12277" "12278" "12280" "12284"
+[151] "12285" "12290" "12292" "12293" "12294" "12296" "12297" "12298" "12300" "12304" "12305" "12308" "12309" "12311" "12313"
+[166] "12314" "12315" "12316" "12317" "12321" "12323" "12324" "12325" "12327" "12328" "12329" "12330" "12332" "12340" "12341"
+[181] "12352" "12353" "12361" "12362" "12363" "12364" "12365" "12368" "12370" "12371" "12375" "12376" "12378" "12379" "12381"
+[196] "12382" "12383" "12385" "12387" "12388" "12390" "12402" "12403" "12404" "12405" "12406" "12409" "13001" "13005" "13028"
+[211] "13030" "13031" "13035" "13039" "13040" "13041" "13046" "13047" "13050" "13054" "13058" "13059" "13062" "13070" "13073"
+[226] "13077" "13085" "13086" "13097" "13098" "13109" "13111" "13114" "13116" "13117" "13119" "13121" "13125" "13144" "14008"
+[241] "14015" "14023" "14037" "14043" "14044" "14069" "14080" "14082" "14088" "14092" "14110" "14138" "14140" "14143" "14148"
+[256] "14152" "14153" "14155" "14164" "14165" "14175" "14182" "14185" "14191" "14195" "14196" "15001" "15003" "15007" "15009"
+[271] "15013" "15017" "15020" "15029" "15032" "15039" "15040" "15041" "15051" "15056" "15066" "15068" "15070" "15071" "15075"
+[286] "15086" "15089" "15091" "15101" "15103" "15110" "15113" "15115" "15116" "15118" "15120" "15124" "15125" "15126" "16028"
+[301] "16045" "16047" "16066" "16146" "16149" "16151" "16170" "16179" "16181" "16185" "16191" "16194" "16197" "16209" "16212"
+[316] "16218" "16221" "16222" "16224" "16233" "16239" "16242" "16249" "16250" "16259" "16262" "16265" "16267" "16269" "16305"
+[331] "16307" "16308" "16313" "16314" "16320" "16322" "18017" "18026" "18060" "18117"
+----
+
+== Session Info ==
+----
+> date()
+[1] "Sun Feb  2 20:39:22 2014"
+> sessionInfo()
+R version 3.0.1 (2013-05-16)
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=C                 LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+ [1] grid      splines   parallel  stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] Gviz_1.5.3                              TxDb.Hsapiens.UCSC.hg18.knownGene_2.9.0 GenomicFeatures_1.13.8                 
+ [4] AnnotationDbi_1.23.20                   CleftCNVAssoc_0.0.2                     MinimumDistance_1.5.0                  
+ [7] GWASTools_1.7.3                         sandwich_2.2-10                         zoo_1.7-10                             
+[10] gdsfmt_0.9.15                           ncdf_1.6.6                              Biobase_2.21.2                         
+[13] Trioconductor_1.0.8                     snpStats_1.11.0                         Matrix_1.0-12                          
+[16] lattice_0.20-15                         survival_2.37-4                         GenomicRanges_1.13.15                  
+[19] XVector_0.1.0                           IRanges_1.19.8                          BiocGenerics_0.7.2                     
+[22] cacheSweave_0.6-1                       stashR_0.3-5                            filehash_2.2-1                         
+[25] ascii_2.1                              
+
+loaded via a namespace (and not attached):
+ [1] affyio_1.29.0        BiocInstaller_1.11.4 biomaRt_2.17.1       Biostrings_2.29.3    biovizBase_1.9.2     bit_1.1-10          
+ [7] bitops_1.0-5         BSgenome_1.29.0      cluster_1.14.4       codetools_0.2-8      colorspace_1.2-2     compiler_3.0.1      
+[13] DBI_0.2-7            dichromat_2.0-0      digest_0.6.3         DNAcopy_1.35.1       ff_2.2-11            foreach_1.4.0       
+[19] GWASExactHW_1.01     Hmisc_3.12-2         iterators_1.0.6      labeling_0.2         lmtest_0.9-31        matrixStats_0.8.5   
+[25] msm_1.2              munsell_0.4.2        mvtnorm_0.9-9995     oligoClasses_1.23.0  plyr_1.8             quantsmooth_1.27.0  
+[31] RColorBrewer_1.0-5   RCurl_1.95-4.1       R.methodsS3_1.4.4    rpart_4.1-1          Rsamtools_1.13.16    RSQLite_0.11.4      
+[37] rtracklayer_1.21.5   scales_0.2.3         stats4_3.0.1         stringr_0.6.2        tools_3.0.1          VanillaICE_1.23.0   
+[43] XML_3.96-1.1         zlibbioc_1.7.0      
+----
+
