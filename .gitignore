@@ -30,3 +30,6 @@ make.out
 Rplots.pdf
 tables.asciidoc.*
 *-old
+*.jpg
+*.pdf
+*.asciidoc.txt
