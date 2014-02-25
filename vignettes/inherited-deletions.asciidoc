@@ -9,28 +9,23 @@ options(width=1000, continue="  ")
 @ 
 
 == Construct CNV Matrix ==
-Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
+
+Before any analysis begins we construct the CNV matrix.  This matrix
+is a matrix containing 0,1,2 for number of deletions at a CNV
+component.  Each row corresponds to a subject, and each column to a
+cnv component.
 
 <<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
-system("R CMD INSTALL ~/jhsph/R/packages/CleftCNVAssoc")
+system("R CMD INSTALL ~/jhsph/R/packages/CleftCNVAssoc") # Before installing CleftCNVAssoc be sure that the vignette data-cleaning has been run
 system("R CMD INSTALL ~/Trioconductor")
 library("Trioconductor")
 @
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~ Data Creation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 <<makedata, eval = FALSE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
@@ -101,19 +96,26 @@ The control group.
   pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
   ped.pitt <- PedClass(pitt.ped)
   fe.pitt <- FamilyExperiment(se.pitt, pedigree = ped.pitt )
+  cD <- merge(colData(fe.pitt),pitt.clean.strict, by.x  = "id", by.y="Sample.Name", all.x = TRUE)
+  rownames(cD) <- cD$id
+  colData(fe.pitt) <- cD
+
 @ 
 <<fe-pitt, echo = TRUE, eval = FALSE, cache = FALSE>>=
 fe.pitt
 @
 <<save, echo = TRUE, eval = FALSE, cache = FALSE>>=
-save(fe.beaty, fe.pitt, fe.beaty.pheno, file = "./../data/fe.RData" ) 
+save(fe.beaty, fe.pitt, fe.beaty.pheno, file = "./../data/fe.RData" )
+system("R CMD INSTALL ~/Trioconductor")
+source("~/Trioconductor/R/reload.R")
+reload("Trioconductor")
 @ 
 
-
-
-
-
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~ Analysis ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 == Association (Component-wise) ==
 Our first idea was to do a two by two test on the transmitted and non-transmitted counts in clefts and controls.  In the process of doing so we identified regions of under-transmission, as well as a few signifcany regions.
@@ -126,6 +128,9 @@ reload("Trioconductor")
 #library(Trioconductor)
 library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 data("fe", package = "Trioconductor")
+fe.beaty
+fe.pitt
+fe.pheno
 #data("pedigrees", package="CleftCNVAssoc")
 #data("penncnvjoint", package = "CleftCNVAssoc")
 #data("cnv", package = "Trioconductor")
@@ -220,7 +225,7 @@ with(as(values(regions.gr),"data.frame"),plot(width(regions.gr)/1e3, n.cmp, pch 
 <<chr16, eval = TRUE, echo = TRUE, cache = FALSE>>=
 (bad.region.gr <- regions.gr[which(values(regions.gr)$n.cmp >= 120)])
 @ 
-The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
+//The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
 
 <<transvp2, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
 regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
@@ -390,6 +395,9 @@ if( length(rowData(fe.beaty.i)) > 1 ){
 )
 colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
 save(trans.mat, file = "./../data/trans.mat.RData")
+system("R CMD INSTALL ~/Trioconductor")
+source("~/Trioconductor/R/reload.R")
+reload("Trioconductor")
 @
 
 <<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
