@@ -130,7 +130,7 @@ library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 data("fe", package = "Trioconductor")
 fe.beaty
 fe.pitt
-fe.pheno
+fe.beaty.pheno
 #data("pedigrees", package="CleftCNVAssoc")
 #data("penncnvjoint", package = "CleftCNVAssoc")
 #data("cnv", package = "Trioconductor")
