@@ -15,7 +15,7 @@ Before any analysis begins we construct the CNV matrix.  This matrix is a matrix
 system("R CMD INSTALL ~/jhsph/R/packages/CleftCNVAssoc")
 system("R CMD INSTALL ~/Trioconductor")
 library("Trioconductor")
-source("./../R/reload.R")
+source("~/Trioconductor/R/reload.R")
 @
 
 <<makedata, eval = TRUE>>=
@@ -51,8 +51,8 @@ Now with these GRanges objects we use the Trioconductor function CNVMatrix to co
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 #Here is were we add rows of zeros to cnv.mat
-cnv.obj.beaty$cnv.mat <- matrix(0,nrow=length(ids.with.no.deletion.beaty),ncol=ncol(cnv.obj.beaty$cnv.mat),dimnames=list(ids.with.no.deletion.beaty,colnames(cnv.obj.beaty$cnv.mat)))
-cnv.obj.pitt$cnv.mat <- matrix(0,nrow=length(ids.with.no.deletion.pitt),ncol=ncol(cnv.obj.pitt$cnv.mat),dimnames=list(ids.with.no.deletion.pitt,colnames(cnv.obj.pitt$cnv.mat)))
+cnv.obj.beaty$cnv.mat <- rbind(cnv.obj.beaty$cnv.mat,matrix(0,nrow=length(ids.with.no.deletion.beaty),ncol=ncol(cnv.obj.beaty$cnv.mat),dimnames=list(ids.with.no.deletion.beaty,colnames(cnv.obj.beaty$cnv.mat))))
+cnv.obj.pitt$cnv.mat <- rbind(cnv.obj.pitt$cnv.mat,matrix(0,nrow=length(ids.with.no.deletion.pitt),ncol=ncol(cnv.obj.pitt$cnv.mat),dimnames=list(ids.with.no.deletion.pitt,colnames(cnv.obj.pitt$cnv.mat))))
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 system("R CMD INSTALL ~/Trioconductor")
 reload("Trioconductor")
