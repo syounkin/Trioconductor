@@ -10,38 +10,63 @@ options(width=1000, continue="  ")
 
 == Construct CNV Matrix ==
 Before any analysis begins we construct the CNV matrix.  This matrix is a matrix containing 0,1,2 for number of deletions at a CNV component.  Each row corresponds to a subject, and each column to a cnv component.
+
 <<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
+system("R CMD INSTALL ~/jhsph/R/packages/CleftCNVAssoc")
+system("R CMD INSTALL ~/Trioconductor")
 library("Trioconductor")
+source("./../R/reload.R")
 @
-<<makedata, eval = FALSE>>=
+
+<<makedata, eval = TRUE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
+ids.with.no.deletion.beaty <- c()
+if( length(unique(values(gr.deletion.beaty)$id)) < length(unique(values(gr.beaty)$id))){
+    message("Some beaty subject(s) have zero deletions that pass requirements.")
+    indx <- which(!(unique(values(gr.beaty)$id) %in% unique(values(gr.deletion.beaty)$id)))
+    ids.with.no.deletion.beaty <- as.character(unique(values(gr.beaty)$id)[indx])
+}
 homos.beaty <- with(values(gr.deletion.beaty),cn==0)
-gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
-homos.pitt <- with(values(gr.deletion.pitt),cn==0)
+# This is an important step that should be well-described and checked!
 gr.deletion.beaty.clean <- c( unlist(reduce(split(gr.deletion.beaty, values(gr.deletion.beaty)$id))), unlist(reduce(split(gr.deletion.beaty[homos.beaty], values(gr.deletion.beaty[homos.beaty])$id))))
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+gr.deletion.pitt <- gr.pitt[values(gr.pitt)$numsnp >= 10 & values(gr.pitt)$cn %in% 0:1 ]
+ids.with.no.deletion.pitt <- c()
+if( length(unique(values(gr.deletion.pitt)$id)) < length(unique(values(gr.pitt)$id))){
+    message("Some pitt subject(s) have zero deletions that pass requirements.")
+    indx <- which(!(unique(values(gr.pitt)$id) %in% unique(values(gr.deletion.pitt)$id)))
+    ids.with.no.deletion.pitt <- as.character(unique(values(gr.pitt)$id)[indx])
+}
+homos.pitt <- with(values(gr.deletion.pitt),cn==0)
+# This is an important step that should be well-described and checked!
 gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
 @ 
 
 Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
-<<cnvmatrix, echo = TRUE, eval = FALSE, cache = FALSE>>=
+
+<<cnvmatrix, echo = TRUE, eval = TRUE, cache = FALSE>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
+#Here is were we add rows of zeros to cnv.mat
+cnv.obj.beaty$cnv.mat <- matrix(0,nrow=length(ids.with.no.deletion.beaty),ncol=ncol(cnv.obj.beaty$cnv.mat),dimnames=list(ids.with.no.deletion.beaty,colnames(cnv.obj.beaty$cnv.mat)))
+cnv.obj.pitt$cnv.mat <- matrix(0,nrow=length(ids.with.no.deletion.pitt),ncol=ncol(cnv.obj.pitt$cnv.mat),dimnames=list(ids.with.no.deletion.pitt,colnames(cnv.obj.pitt$cnv.mat)))
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 system("R CMD INSTALL ~/Trioconductor")
-source("./../R/reload.R")
 reload("Trioconductor")
 @ 
 
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
-<<options, echo=TRUE, eval = FALSE >>=
+<<options, echo=TRUE, eval = TRUE >>=
   data("cnv", package = "Trioconductor")
   data("pedigrees", package = "CleftCNVAssoc")
   data("clean-samples", package = "CleftCNVAssoc")
 @ 
 Now we create the FamilyExperiment for the cleft group.
-<<se-beaty, echo = FALSE, eval = FALSE>>=
+<<se-beaty, echo = FALSE, eval = TRUE>>=
   se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.beaty$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.beaty$cnv.mat), row.names = rownames(cnv.obj.beaty$cnv.mat)), rowData = cnv.obj.beaty$cmp.gr )
   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
@@ -51,27 +76,33 @@ Now we create the FamilyExperiment for the cleft group.
   rownames(cD) <- cD$id
   colData(fe.beaty) <- cD
 @ 
-<<fe-beaty, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<fe-beaty, echo = TRUE, eval = TRUE, cache = FALSE>>=
 (fe.beaty.pheno <- fe.beaty)
 @
 The control group.
-<<se-pitt, echo = FALSE, eval = FALSE>>=
+<<se-pitt, echo = FALSE, eval = TRUE>>=
   se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.pitt$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.pitt$cnv.mat), row.names = rownames(cnv.obj.pitt$cnv.mat)), rowData = cnv.obj.pitt$cmp.gr )
   pitt.trios <- MinimumDistance:::trios(pitt.pedigree)
   pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
   ped.pitt <- PedClass(pitt.ped)
   fe.pitt <- FamilyExperiment(se.pitt, pedigree = ped.pitt )
 @ 
-<<fe-pitt, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<fe-pitt, echo = TRUE, eval = TRUE, cache = FALSE>>=
 fe.pitt
 @
-<<save, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<save, echo = TRUE, eval = TRUE, cache = FALSE>>=
 save(fe.beaty, fe.pitt, file = "./../data/fe.RData" ) 
 @ 
 
+
+
+
+
+
+
 == Association (Component-wise) ==
 Our first idea was to do a two by two test on the transmitted and non-transmitted counts in clefts and controls.  In the process of doing so we identified regions of under-transmission, as well as a few signifcany regions.
-<<options, echo=FALSE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<options, echo=FALSE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 setCacheDir("sgy-cache")
 options(width=132, digits=3, scipen=4, continue =" ")
 system("R CMD INSTALL ~/Trioconductor")
@@ -85,16 +116,16 @@ data("penncnvjoint", package = "CleftCNVAssoc")
 data("cnv", package = "Trioconductor")
 @ 
 
-<<FamilyExperiment, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<FamilyExperiment, echo = TRUE, eval = FALSE, cache = FALSE>>=
   fe.beaty.parents <- fe.beaty[,colnames(fe.beaty)%in%parents(fe.beaty)]
   fe.pitt.parents <- fe.pitt[,colnames(fe.pitt)%in%parents(fe.pitt)]
 @ 
-<<freq-vec, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<freq-vec, echo = TRUE, eval = FALSE, cache = FALSE>>=
     freq.beaty.vec <- colSums(cnv(fe.beaty.parents))/nrow(cnv(fe.beaty.parents))
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
 @ 
 // The above must have been written before the MAF method was implemented.
-<<trioStates, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<trioStates, eval = FALSE, echo = TRUE, cache = FALSE>>=
     trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.beaty) <- dimnames(trioAssay.beaty$O)
@@ -102,12 +133,12 @@ data("cnv", package = "Trioconductor")
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
 @ 
-<<table-list, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<table-list, eval = FALSE, echo = TRUE, cache = FALSE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
 Compute a DataFrame containing counts of transmissions by case/control with rows for components.  This is partly what distinguishes a DataFrame from a data.frame --- the ability to keep a GRanges object in a column.
-<<TU, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<TU, eval = FALSE, echo = TRUE, cache = FALSE>>=
 TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, Trioconductor:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, Trioconductor:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
 TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
@@ -122,31 +153,31 @@ DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
 colnames(DF) <- c("grange", colnames(TU.mat))
 @ 
 Now with that DataFrame we construct a histogram of overall transmission rate by component.
-<<hist, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<hist, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
 @ 
 Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
-<<fish, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<fish, eval = FALSE, echo = TRUE, cache = FALSE>>=
 fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 (DF <- DataFrame(DF,p.vec, trans.vec))
 DF.cmp <- DF
 @ 
 Number of components and number of regions is given below.
-<<length1, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<length1, echo = TRUE, eval = FALSE, cache = FALSE>>=
 c(length(DF$grange),length(reduce(DF$grange)))
 @ 
 
 === Figures ===
 
-<<qqplot, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<qqplot, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 n <- nrow(DF)
 plot( -log10((1:n)/n), -log10(DF$p.vec[order(DF$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
 lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
 
 
-<<pmin, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<pmin, eval = FALSE, echo = TRUE, cache = FALSE>>=
 regions.gr <- reduce(DF$grange)
 index.vec <- subjectHits(findOverlaps(DF$grange,regions.gr))
 DF.list <- split(DF, index.vec)
@@ -156,27 +187,27 @@ p.median.DF <- Trioconductor:::f.cmp( DF, "p.vec", median, na.rm = TRUE )
 trans.median.DF <- Trioconductor:::f.cmp( DF, "trans.vec", median, na.rm = TRUE )
 @
 
-<<meta, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<meta, eval = FALSE, echo = TRUE, cache = FALSE>>=
 meta <- values(regions.gr)
 meta <- DataFrame(meta, p.min = p.min.DF$value, p.median = p.median.DF$value, trans.median = trans.median.DF$value, n.cmp = n.DF$value)
 values(regions.gr) <- meta
 @
-<<tophits, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<tophits, eval = FALSE, echo = TRUE, cache = FALSE>>=
 head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),25)
 @ 
-<<transvp, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<transvp, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
 with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(width(regions.gr)/1e3, n.cmp, pch = 20))
 @ 
-<<chr16, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<chr16, eval = FALSE, echo = TRUE, cache = FALSE>>=
 (bad.region.gr <- regions.gr[which(values(regions.gr)$n.cmp >= 120)])
 @ 
 The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
 
-<<transvp2, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<transvp2, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
 layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
 with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
@@ -184,7 +215,7 @@ with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(width(regions.gr), n.cmp, pch = 20))
 @ 
-<<cumsum, fig = TRUE, width = 8, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<cumsum, fig = TRUE, width = 8, eval = FALSE, echo = TRUE, cache = FALSE>>=
 TranscriptDb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 chrlength <- c(0,seqlengths(TranscriptDb)[paste0("chr",1:22)])
 names(chrlength) <- c(names(chrlength[-1]),"foo")
@@ -198,21 +229,21 @@ for( i in 1:length(regions.gr) ){
 axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
 axis(2)
 @ 
-<<transmedianhist, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<transmedianhist, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 with(as(values(regions.gr),"data.frame"),hist(trans.median))
 @ 
-<<thresh, echo = TRUE, cache = FALSE>>=
+<<thresh, echo = TRUE, cache = FALSE, eval = FALSE>>=
 thresh <- with(as(values(regions.gr),"data.frame"),median(trans.median))
 regions.gr.clean <- regions.gr[which(values(regions.gr)$trans.median >= thresh)]
 DF.clean <- DF[queryHits(findOverlaps(DF$grange, regions.gr.clean)),]
 
 @ 
-<<qqplot-clean, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<qqplot-clean, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 n <- nrow(DF.clean)
 plot( -log10((1:n)/n), -log10(DF.clean$p.vec[order(DF.clean$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
 lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
-<<cumsum2, fig = TRUE, width = 8, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<cumsum2, fig = TRUE, width = 8, eval = FALSE, echo = TRUE, cache = FALSE>>=
 index.vec <- subjectHits(findOverlaps(DF.clean$grange,regions.gr.clean))
 DF.clean.list <- split(DF.clean, index.vec)
 
@@ -224,10 +255,10 @@ lines( c(1,(chrstart+chrlength)[22]), rep(-log10(0.05/n),2), lty = 3)
 axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
 axis(2)
 @ 
-<<phist, fig = TRUE,  eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<phist, fig = TRUE,  eval = FALSE, echo = TRUE, cache = FALSE>>=
 with(as(values(regions.gr.clean),"data.frame"),hist(p.min, breaks = 10))
 @ 
-<<transvp3, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<transvp3, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
 with(as(values(regions.gr.clean),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
 with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
@@ -239,11 +270,11 @@ with(as(values(regions.gr.clean),"data.frame"),plot(width(regions.gr.clean), n.c
 Note that this uses a very strict definition for non-transmitted.  To be non-transmitted a region must have no component in region with a trio-state that indicates non-transmission.  This may bias the estimate towards over-transmission.
 
 First we see how many regions there are to begin with.
-<<regions>>=
+<<regions, eval = FALSE>>=
 reduce(rowData(fe.beaty))
 @
 
-<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
+<<trioStates2, eval = FALSE, echo = TRUE, results = verbatim, cache = FALSE>>=
 trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
@@ -346,7 +377,7 @@ colnames(trans.mat) <- c("trans.cleft", "untrans.cleft", "trans.con", "untrans.c
 save(trans.mat, file = "./../data/trans.mat.RData")
 @
 
-<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
+<<trioStates3, eval = FALSE, echo = TRUE, results = verbatim, cache = FALSE>>=
 trans.mat.clp <- c()
 gr.reduce <- reduce(rowData(fe.beaty))
 n.reg <- length(gr.reduce)
@@ -433,34 +464,34 @@ head(trans.mat)
 head(trans.mat.clp)
 @
 
-<<loadtrans, eval = TRUE, echo = FALSE, cache = FALSE>>=
+<<loadtrans, eval = FALSE, echo = FALSE, cache = FALSE>>=
 load(file = "./../data/trans.mat.RData")
 @
 
-<<transrate, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<transrate, echo = TRUE, eval = FALSE, cache = FALSE>>=
 transrate.cleft <- trans.mat[,"trans.cleft"]/rowSums(trans.mat[,c("trans.cleft","untrans.cleft")])
 transrate.con <- trans.mat[,"trans.con"]/rowSums(trans.mat[,c("trans.con","untrans.con")])
 transrate.all <- rowSums(trans.mat[,c("trans.cleft","trans.con")])/rowSums(trans.mat[,c("trans.cleft","untrans.cleft","trans.con","untrans.con")])
 @
 Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.
-<<testable, cache = FALSE, results = verbatim>>=
+<<testable, cache = FALSE, results = verbatim, eval = FALSE>>=
 TU.mat <- trans.mat
 testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
 TU.mat <- TU.mat[testable,]
 trans.mat.clp <- trans.mat.clp[testable,]
 @
-<<testable2, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<testable2, echo = TRUE, eval = FALSE, cache = FALSE>>=
 rownames(TU.mat) <- names(table.list.beaty)[testable]
 colnames(TU.mat) <- c("T.case", "U.case", "T.con", "U.con", "trans.cleft.ma", "untrans.cleft.ma", "trans.cleft.fa", "untrans.cleft.fa", "trans.con.ma", "untrans.con.ma", "trans.con.fa", "untrans.con.fa")
 DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat, trans.mat.clp)
 colnames(DF) <- c("grange", colnames(TU.mat), colnames(trans.mat.clp))
 @
-First we display the function that performs Fisher's exact test.
-<<TUfish, eval = TRUE, echo = TRUE, cache = FALSE>>=
+First we display the function that performs Fishers exact test.
+<<TUfish, eval = FALSE, echo = TRUE, cache = FALSE>>=
 Trioconductor:::TU.fish
 @
 Then we apply it to each region after filtering out regions that did not have enough observations.
-<<fish2, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<fish2, eval = FALSE, echo = TRUE, cache = FALSE>>=
 TU.mat.test <- TU.mat[,1:4]
 colnames(TU.mat.test) <- c("T.case", "U.case", "T.con", "U.con")
 fish.list <- apply(TU.mat.test,1,Trioconductor:::TU.fish)
@@ -469,7 +500,7 @@ DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transra
 head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
 @
 There are \Sexpr{nrow(DF)} regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
-<<headtrans, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<headtrans, eval = FALSE, echo = TRUE, cache = FALSE>>=
 head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
 @ 
 
@@ -477,12 +508,12 @@ Note that a region on chromosome six appears twice in the top six by p-value.  H
 
 === Figures ===
 
-<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE, echo = TRUE, results = hide >>=
+<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = FALSE, echo = TRUE, results = hide >>=
 par(bg="white")
 hist(DF$transrate.con.testable., col = "gray", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
 @
 
-<<cifigcleft, fig = TRUE, cache = FALSE, echo = TRUE>>=
+<<cifigcleft, fig = TRUE, cache = FALSE, echo = TRUE, eval = FALSE>>=
 htest.list.cleft <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
@@ -497,7 +528,7 @@ lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
 lines( rep(8,2), c(0,1), lty = 3 )
 @
-<<cifigcon, fig = TRUE, cache = FALSE, echo = TRUE>>=
+<<cifigcon, fig = TRUE, cache = FALSE, echo = TRUE, eval = FALSE>>=
 htest.list.con <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
@@ -512,7 +543,7 @@ lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
 lines( rep(8,2), c(0,1), lty = 3 )
 @
-<<cifigall, fig = TRUE, cache = FALSE, echo = TRUE>>=
+<<cifigall, fig = TRUE, cache = FALSE, echo = TRUE, eval = FALSE>>=
 htest.list.all <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
@@ -527,7 +558,7 @@ lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
 lines( rep(8,2), c(0,1), lty = 3 )
 @
-<<chr7ci, eval = TRUE, echo = TRUE, results = hide>>=
+<<chr7ci, eval = FALSE, echo = TRUE, results = hide>>=
 as(reduce(rowData(fe.beaty))[testable,],"data.frame")
 ci.mat.cleft[25,]
 ci.mat.con[25,]
@@ -542,7 +573,7 @@ which(o==25)
 which(o==26)
 which(o==32)
 @
-<<cifig1, fig = TRUE, width = 5, height = 5, echo = TRUE>>=
+<<cifig1, fig = TRUE, width = 5, height = 5, echo = TRUE, eval = FALSE>>=
 eps <- 0.05
 plot(1,type = "n", xlim = c(0,1), ylim = c(0,1), xlab = "Transmission Rate", ylab = "", main = "95% Confidence Interval", axes = FALSE)
 lines(x = ci.mat.cleft[25,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
@@ -609,7 +640,7 @@ image:figures/HLA.jpg[link="https://en.wikipedia.org/wiki/Human_leukocyte_antige
 
 We choose to remove these due to the unusually high amount of known variability in this region.  We believe the noisy control data, coupled with the highly variable HLA region results in deflated transmission rates in the controls, and therefore testing against the controls will result in false positive detection.
 
-<<filterhla>>=
+<<filterhla, eval = FALSE>>=
 hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788048))
 @
 
@@ -617,7 +648,7 @@ hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788
 
 We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
 
-<<filter>>=
+<<filter, eval = FALSE>>=
 data("centromere")
 lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
 seqlevels(lowmap.gr) <- seqlevels(DF$grange)
@@ -631,19 +662,19 @@ as.data.frame(DF)
 
 The filter accounts for \Sexpr{round(sum(width(filter.gr))/1e6,0)} MB made up of \Sexpr{length(filter.gr)} distinct regions.
 
-<<filtercmp, echo = TRUE>>=
+<<filtercmp, echo = TRUE, eval = FALSE>>=
 dist.vec.cmp <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
 DF.cmp <- DataFrame(DF.cmp, dist.vec.cmp)
 @
 
 
-<<disthist, fig = TRUE, echo = TRUE, height = 4, width = 4>>=
+<<disthist, fig = TRUE, echo = TRUE, height = 4, width = 4, eval = FALSE>>=
 plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
 axis(2)
 lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
 @
 
-<<disthistpdf, echo = TRUE, results = hide>>=
+<<disthistpdf, echo = TRUE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/disthist.pdf")
 par(bg="white")
 plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
@@ -654,16 +685,16 @@ dev.off()
 
 In the figure above a horizontal line is drawn at 1 MB.  \Sexpr{sum(dist.vec <= 1e6 )} regions are within 1 MB of a bad region, which is \Sexpr{round(sum(dist.vec <= 1e6 )/length(dist.vec)*100,0)}% of all regions! Note that \Sexpr{sum(dist.vec == 0 )} regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
 
-<<disttrans, fig = TRUE, width = 12, height = 6, echo = TRUE>>=
+<<disttrans, fig = TRUE, width = 12, height = 6, echo = TRUE, eval = FALSE>>=
 plot(DF$dist.vec, DF$transrate.con.testable., pch = 20, col = ifelse(DF$dist.vec<=1e6,"red","black"))
 lines(c(0,max(DF$dist.vec)), rep(1/2,2), lty = 3 )
 @
 
-<<filterout, fig = TRUE, height = 6, width = 6, echo = TRUE>>=
+<<filterout, fig = TRUE, height = 6, width = 6, echo = TRUE, eval = FALSE>>=
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
 @
 
-<<filteroutpdf, echo = TRUE, results = hide>>=
+<<filteroutpdf, echo = TRUE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/filterout.pdf")
 par(bg="white")
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
@@ -672,7 +703,7 @@ dev.off()
 
 ==== Region-wise ====
 
-<<filteregion>>=
+<<filteregion, eval = FALSE>>=
 TU.mat <- TU.mat[DF$dist.vec > 1e6,]
 ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
 ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
@@ -681,20 +712,20 @@ DF <- DF[DF$dist.vec > 1e6,]
 
 ==== Component-wise ====
 
-<<filtercomp>>=
+<<filtercomp, eval = FALSE>>=
 TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
 DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
 @
 
 === Chromosome 7 ===
 
-<<gviz, echo = TRUE>>=
+<<gviz, echo = TRUE, eval = FALSE>>=
 library("Gviz")
 library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 @
 
-<<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
+<<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
 chr <- 7
 wd <- 100e3
 chr7.region <- DF$grange[8]
@@ -708,7 +739,7 @@ itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr7pdf, echo = TRUE, cache = FALSE, results = hide, eval = TRUE>>=
+<<chr7pdf, echo = TRUE, cache = FALSE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/chr7.pdf")
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -716,7 +747,7 @@ dev.off()
 
 === Chromosome 8 ===
 
-<<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
+<<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
 chr <- 8
 chr8.region <- DF$grange[9]
 chr8.index <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
@@ -729,7 +760,7 @@ itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr8pdf, echo = TRUE, cache = FALSE, results = hide, eval = TRUE>>=
+<<chr8pdf, echo = TRUE, cache = FALSE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/chr8.pdf")
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -737,7 +768,7 @@ dev.off()
 
 === Figure 1 ===
 
-<<cifigcleftnew, fig = TRUE, cache = FALSE, echo = TRUE, results = hide, height = 8, width = 10>>=
+<<cifigcleftnew, fig = TRUE, cache = FALSE, echo = TRUE, results = hide, height = 8, width = 10, eval = FALSE>>=
 
 layout(matrix(1:2,nrow=1,ncol=2))
 par(mai=c(1,2.5,0,0), bg = "white")
@@ -855,7 +886,7 @@ text(x = -log10(0.05), y = length(o)+1, labels = "Nominal\n 0.05 significance", 
 
 === QQ Plot ===
 
-<<ingo, echo = TRUE>>=
+<<ingo, echo = TRUE, eval = FALSE>>=
 my.qq.func=function(p,f,pval=TRUE,gc=FALSE,tn,hc=0.99,hm=100,...){
   if(missing(f)) f=rep(0,length(p))
   wh=which(is.na(p)|is.na(f))
@@ -948,20 +979,20 @@ my.qq.plot=function(zz,cut,rmx=0,mt="",mt.cex=1,mt.line=NA,mgp=c(3,1,0),tn.cex=1
 
 @
 
-<<qqregion, fig = TRUE, width = 6, height = 6, eval = TRUE, echo = TRUE>>=
+<<qqregion, fig = TRUE, width = 6, height = 6, eval = FALSE, echo = TRUE>>=
 o <- order(-log10(DF$p.vec), decreasing = TRUE)
 plot( -log10((1:length(DF$p.vec))/length(DF$p.vec)), -log10(DF$p.vec)[o], xlim = xlim <- c(0,max(-log10(DF$p.vec))), ylim = xlim, xlab = "Expected -log10p", ylab = "Observed -log10p", main = "")
 lines( x = c(0,4), y = c(0,4), lty = 3)
 @
 
-<<qqPlotregion, fig = TRUE, width = 6, height = 6>>=
+<<qqPlotregion, fig = TRUE, width = 6, height = 6, eval = FALSE>>=
 library("snpStats")
 par(bg="white")
 qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
 
 @
 
-<<qqPlotregionpdf>>=
+<<qqPlotregionpdf, eval = FALSE>>=
 pdf(file="figures/qqplotregion.pdf")
 par(bg="white")
 qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
@@ -970,18 +1001,18 @@ dev.off()
 
 There are \Sexpr{length(DF$p.vec)} tests in this figure.
 
-<<showregion>>=
+<<showregion, eval = FALSE>>=
 o <- order(DF$p.vec)
 as.data.frame(DF[o,])
 @
 
-<<qqPlotcmp, fig = TRUE, width = 6, height = 6>>=
+<<qqPlotcmp, fig = TRUE, width = 6, height = 6, eval = FALSE>>=
 par(bg="white")
 qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
 
 @
 
-<<qqPlotcmppdf>>=
+<<qqPlotcmppdf,eval = FALSE>>=
 pdf(file="figures/qqplotcmp.pdf")
 par(bg="white")
 qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
@@ -990,13 +1021,13 @@ dev.off()
 
 There are \Sexpr{length(DF.cmp$p.vec)} tests in this figure.
 
-<<showcmp>>=
+<<showcmp, eval = FALSE>>=
 o <- order(DF.cmp$p.vec)
 as.data.frame(DF.cmp[o,])
 @
 
 
-<<ingoplotreg, echo = TRUE, results = hide>>=
+<<ingoplotreg, echo = TRUE, results = hide, eval = FALSE>>=
 zz <- my.qq.func(DF$p.vec,tn=0:4,hc=0.9,hm=1)
 
 pdf("figures/ingo.qq.reg.pdf",width=6,height=6)
@@ -1017,7 +1048,7 @@ mtext(expression(paste("observed  ",-log[10]," (p-value)",sep="")),side=2,line=2
 dev.off()
 @
 
-<<ingoplotcmp, echo = TRUE, results = hide>>=
+<<ingoplotcmp, echo = TRUE, results = hide, eval = FALSE>>=
 zz <- my.qq.func(DF.cmp$p.vec,tn=0:4,hc=0.9,hm=1)
 
 pdf("figures/ingo.qq.cmp.pdf",width=6,height=6)
@@ -1043,21 +1074,21 @@ dev.off()
 
 ===== Component-wise =====
 
-<<fishersmethod>>=
+<<fishersmethod, eval = FALSE>>=
 (fishers.p.cmp <- sum(-2*log(DF.cmp$p.vec)))
 pchisq(fishers.p.cmp, df = 2*length(DF.cmp$p.vec), lower.tail = FALSE)
 @
 
 ===== Region-wise. =====
 
-<<fishersmethod>>=
+<<fishersmethod, eval = FALSE>>=
 (fishers.p <- sum(-2*log(DF$p.vec)))
 pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 @
 
 === Permutation Test ===
 
-<<perm1>>=
+<<perm1, eval = FALSE>>=
 index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
 fe.beaty.2 <- fe.beaty[index.beaty,]
 
@@ -1072,7 +1103,7 @@ colnames(fe.beaty.2) <- colnames(fe.beaty)
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = FALSE, eval = TRUE>>=
+<<perm2, cache = FALSE, eval = FALSE>>=
 n.perm <- 1e3			## used to be 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
@@ -1102,12 +1133,12 @@ for( i in 1:n.perm ){
 }
 @
 These are the adjusted component-wise p-values:
-<<pmin, eval = TRUE>>=
+<<pmin, eval = FALSE>>=
 p.min <- apply(p.mat,1,"min")
 c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
 @
 And the threshold for nominal p-values is:
-<<padj, eval = TRUE>>=
+<<padj, eval = FALSE>>=
 quantile(p.min,probs=0.05)
 @
 
@@ -1135,14 +1166,14 @@ Paternal|76|62|21|30|
 
 == Subject IDs for Jeff ==
 
-<<idschr7>>=
+<<idschr7, eval = FALSE>>=
 index <- findOverlaps(rowData(fe.beaty), chr7.region)
 fe.beaty.chr7.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
 (ids.chr7 <- unique(colnames(fe.beaty.chr7.inherited)))
 (unique(substr(ids.chr7, start = 1, stop = 5)))
 @
 
-<<idschr8>>=
+<<idschr8, eval = FALSE>>=
 chr8.region <- GRanges( seqnames = "chr8", ranges = IRanges( start = 39341981, end = 39548228) )
 index <- findOverlaps(rowData(fe.beaty), chr8.region)
 fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
@@ -1151,7 +1182,7 @@ fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryH
 @
 
 == Session Info ==
-<<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<session, echo = TRUE, eval = FALSE, cache = FALSE>>=
 date()
 sessionInfo()
 @
