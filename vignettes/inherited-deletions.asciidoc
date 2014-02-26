@@ -71,7 +71,8 @@ reload("Trioconductor")
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
 <<options, echo=TRUE, eval = TRUE >>=
-  data("cnv", package = "Trioconductor")
+  #data("cnv", package = "Trioconductor")
+  load(file = "./../data/cnv.RData")
   data("pedigrees", package = "CleftCNVAssoc")
   data("clean-samples", package = "CleftCNVAssoc")
 @ 
@@ -127,12 +128,14 @@ source("./../R/reload.R")
 reload("Trioconductor")
 #library(Trioconductor)
 library("TxDb.Hsapiens.UCSC.hg18.knownGene")
-data("fe", package = "Trioconductor")
+load(file = "./../data/fe.RData")
+#data("fe", package = "Trioconductor")
 fe.beaty
 fe.pitt
 fe.beaty.pheno
-#data("pedigrees", package="CleftCNVAssoc")
-#data("penncnvjoint", package = "CleftCNVAssoc")
+data("pedigrees", package="CleftCNVAssoc")
+data("penncnvjoint", package = "CleftCNVAssoc")
+load(file = "./../data/cnv.RData")
 #data("cnv", package = "Trioconductor")
 @ 
 
@@ -672,7 +675,8 @@ hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788
 We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
 
 <<filter, eval = TRUE>>=
-data("centromere")
+load(file = "./../data/centromere.RData")
+#data("centromere")
 lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
 seqlevels(lowmap.gr) <- seqlevels(DF$grange)
 seqlengths(lowmap.gr) <- seqlengths(DF$grange)
