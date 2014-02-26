@@ -27,7 +27,7 @@ library("Trioconductor")
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-<<makedata, eval = FALSE>>=
+<<makedata, eval = TRUE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
 ids.with.no.deletion.beaty <- c()
@@ -56,12 +56,12 @@ gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.del
 
 Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
 
-<<cnvmatrix, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<cnvmatrix, echo = TRUE, eval = TRUE, cache = FALSE>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 #Here is were we add rows of zeros to cnv.mat
-cnv.obj.beaty$cnv.mat <- rbind(cnv.obj.beaty$cnv.mat,matrix(0,nrow=length(ids.with.no.deletion.beaty),ncol=ncol(cnv.obj.beaty$cnv.mat),dimnames=list(ids.with.no.deletion.beaty,colnames(cnv.obj.beaty$cnv.mat))))
-cnv.obj.pitt$cnv.mat <- rbind(cnv.obj.pitt$cnv.mat,matrix(0,nrow=length(ids.with.no.deletion.pitt),ncol=ncol(cnv.obj.pitt$cnv.mat),dimnames=list(ids.with.no.deletion.pitt,colnames(cnv.obj.pitt$cnv.mat))))
+#cnv.obj.beaty$cnv.mat <- rbind(cnv.obj.beaty$cnv.mat,matrix(0,nrow=length(ids.with.no.deletion.beaty),ncol=ncol(cnv.obj.beaty$cnv.mat),dimnames=list(ids.with.no.deletion.beaty,colnames(cnv.obj.beaty$cnv.mat))))
+#cnv.obj.pitt$cnv.mat <- rbind(cnv.obj.pitt$cnv.mat,matrix(0,nrow=length(ids.with.no.deletion.pitt),ncol=ncol(cnv.obj.pitt$cnv.mat),dimnames=list(ids.with.no.deletion.pitt,colnames(cnv.obj.pitt$cnv.mat))))
 save( cnv.obj.beaty, cnv.obj.pitt, file = "./../data/cnv.RData" )
 system("R CMD INSTALL ~/Trioconductor")
 source("~/Trioconductor/R/reload.R")
@@ -70,13 +70,13 @@ reload("Trioconductor")
 
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
-<<options, echo=TRUE, eval = FALSE >>=
+<<options, echo=TRUE, eval = TRUE >>=
   data("cnv", package = "Trioconductor")
   data("pedigrees", package = "CleftCNVAssoc")
   data("clean-samples", package = "CleftCNVAssoc")
 @ 
 Now we create the FamilyExperiment for the cleft group.
-<<se-beaty, echo = FALSE, eval = FALSE>>=
+<<se-beaty, echo = FALSE, eval = TRUE>>=
   se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.beaty$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.beaty$cnv.mat), row.names = rownames(cnv.obj.beaty$cnv.mat)), rowData = cnv.obj.beaty$cmp.gr )
   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
@@ -86,11 +86,11 @@ Now we create the FamilyExperiment for the cleft group.
   rownames(cD) <- cD$id
   colData(fe.beaty) <- cD
 @ 
-<<fe-beaty, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<fe-beaty, echo = TRUE, eval = TRUE, cache = FALSE>>=
 (fe.beaty.pheno <- fe.beaty)
 @
 The control group.
-<<se-pitt, echo = FALSE, eval = FALSE>>=
+<<se-pitt, echo = FALSE, eval = TRUE>>=
   se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.pitt$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.pitt$cnv.mat), row.names = rownames(cnv.obj.pitt$cnv.mat)), rowData = cnv.obj.pitt$cmp.gr )
   pitt.trios <- MinimumDistance:::trios(pitt.pedigree)
   pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
@@ -101,10 +101,10 @@ The control group.
   colData(fe.pitt) <- cD
 
 @ 
-<<fe-pitt, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<fe-pitt, echo = TRUE, eval = TRUE, cache = FALSE>>=
 fe.pitt
 @
-<<save, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<save, echo = TRUE, eval = TRUE, cache = FALSE>>=
 save(fe.beaty, fe.pitt, fe.beaty.pheno, file = "./../data/fe.RData" )
 system("R CMD INSTALL ~/Trioconductor")
 source("~/Trioconductor/R/reload.R")
@@ -1111,7 +1111,7 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 
 === Permutation Test ===
 
-<<perm1, eval = TRUE>>=
+<<perm1, eval = FALSE>>=
 index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
 fe.beaty.2 <- fe.beaty[index.beaty,]
 
@@ -1126,7 +1126,7 @@ colnames(fe.beaty.2) <- colnames(fe.beaty)
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = FALSE, eval = TRUE>>=
+<<perm2, cache = FALSE, eval = FALSE>>=
 n.perm <- 1e3			## used to be 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
@@ -1156,12 +1156,12 @@ for( i in 1:n.perm ){
 }
 @
 These are the adjusted component-wise p-values:
-<<pmin, eval = TRUE>>=
+<<pmin, eval = FALSE>>=
 p.min <- apply(p.mat,1,"min")
 c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
 @
 And the threshold for nominal p-values is:
-<<padj, eval = TRUE>>=
+<<padj, eval = FALSE>>=
 quantile(p.min,probs=0.05)
 @
 
@@ -1189,14 +1189,14 @@ Paternal|76|62|21|30|
 
 == Subject IDs for Jeff ==
 
-<<idschr7, eval = TRUE>>=
+<<idschr7, eval = FALSE>>=
 index <- findOverlaps(rowData(fe.beaty), chr7.region)
 fe.beaty.chr7.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
 (ids.chr7 <- unique(colnames(fe.beaty.chr7.inherited)))
 (unique(substr(ids.chr7, start = 1, stop = 5)))
 @
 
-<<idschr8, eval = TRUE>>=
+<<idschr8, eval = FALSE>>=
 chr8.region <- GRanges( seqnames = "chr8", ranges = IRanges( start = 39341981, end = 39548228) )
 index <- findOverlaps(rowData(fe.beaty), chr8.region)
 fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
