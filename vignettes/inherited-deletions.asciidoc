@@ -27,7 +27,7 @@ library("Trioconductor")
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-<<makedata, eval = FALSE>>=
+<<makedata, eval = TRUE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
 gr.deletion.beaty <- gr.beaty[values(gr.beaty)$numsnp >= 10 & values(gr.beaty)$cn %in% 0:1 ]
 ids.with.no.deletion.beaty <- c()
@@ -56,7 +56,7 @@ gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.del
 
 Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
 
-<<cnvmatrix, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<cnvmatrix, echo = TRUE, eval = TRUE, cache = FALSE>>=
 system.time( cnv.obj.beaty <- CNVMatrix( gr.deletion.beaty.clean, gr = gr.deletion.pitt.clean ) )
 system.time( cnv.obj.pitt <- CNVMatrix( gr.deletion.pitt.clean, gr = gr.deletion.beaty.clean ) )
 #Here is were we add rows of zeros to cnv.mat
@@ -70,14 +70,14 @@ reload("Trioconductor")
 
 == Make Data ==
 Now we use the CNV matrix as part of a FamilyExperiment object, as defined in Trioconductor.  With the FE object we may easily acces trio-states of CNV components and regions.
-<<options, echo=TRUE, eval = FALSE >>=
+<<options, echo=TRUE, eval = TRUE >>=
   #data("cnv", package = "Trioconductor")
   load(file = "./../data/cnv.RData")
   data("pedigrees", package = "CleftCNVAssoc")
   data("clean-samples", package = "CleftCNVAssoc")
 @ 
 Now we create the FamilyExperiment for the cleft group.
-<<se-beaty, echo = FALSE, eval = FALSE>>=
+<<se-beaty, echo = FALSE, eval = TRUE>>=
   se.beaty <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.beaty$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.beaty$cnv.mat), row.names = rownames(cnv.obj.beaty$cnv.mat)), rowData = cnv.obj.beaty$cmp.gr )
   beaty.trios <- MinimumDistance:::trios(beaty.pedigree)
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
@@ -87,11 +87,11 @@ Now we create the FamilyExperiment for the cleft group.
   rownames(cD) <- cD$id
   colData(fe.beaty) <- cD
 @ 
-<<fe-beaty, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<fe-beaty, echo = TRUE, eval = TRUE, cache = FALSE>>=
 (fe.beaty.pheno <- fe.beaty)
 @
 The control group.
-<<se-pitt, echo = FALSE, eval = FALSE>>=
+<<se-pitt, echo = FALSE, eval = TRUE>>=
   se.pitt <- SummarizedExperiment(assays = SimpleList(cnv = t(cnv.obj.pitt$cnv.mat)), colData = DataFrame(id=rownames(cnv.obj.pitt$cnv.mat), row.names = rownames(cnv.obj.pitt$cnv.mat)), rowData = cnv.obj.pitt$cmp.gr )
   pitt.trios <- MinimumDistance:::trios(pitt.pedigree)
   pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
@@ -102,10 +102,10 @@ The control group.
   colData(fe.pitt) <- cD
 
 @ 
-<<fe-pitt, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<fe-pitt, echo = TRUE, eval = TRUE, cache = FALSE>>=
 fe.pitt
 @
-<<save, echo = TRUE, eval = FALSE, cache = FALSE>>=
+<<save, echo = TRUE, eval = TRUE, cache = FALSE>>=
 save(fe.beaty, fe.pitt, fe.beaty.pheno, file = "./../data/fe.RData" )
 system("R CMD INSTALL ~/Trioconductor")
 source("~/Trioconductor/R/reload.R")
