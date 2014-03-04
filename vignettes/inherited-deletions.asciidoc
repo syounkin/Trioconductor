@@ -83,7 +83,7 @@ Now we create the FamilyExperiment for the cleft group.
   beaty.ped <- DataFrame(famid = do.call("rbind",strsplit(beaty.trios$O, "_" ))[,1], id = beaty.trios$O, fid = beaty.trios$F, mid = beaty.trios$M, sex = NA, dx = NA)
   ped <- PedClass(beaty.ped)
   fe.beaty <- FamilyExperiment(se.beaty, pedigree = ped )
-  cD <- merge(colData(fe.beaty),beaty.clean.strict,by.x  = "id", by.y="Sample.Name", all.x = TRUE)
+  cD <- merge(colData(fe.beaty),beaty.clean.strict,by.x  = "id", by.y="Sample.Name", all.x = TRUE, sort = FALSE)
   rownames(cD) <- cD$id
   colData(fe.beaty) <- cD
 @ 
@@ -97,7 +97,7 @@ The control group.
   pitt.ped <- DataFrame(famid = pitt.trios$O, id = pitt.trios$O, fid = pitt.trios$F, mid = pitt.trios$M, sex = NA, dx = NA)
   ped.pitt <- PedClass(pitt.ped)
   fe.pitt <- FamilyExperiment(se.pitt, pedigree = ped.pitt )
-  cD <- merge(colData(fe.pitt),pitt.clean.strict, by.x  = "id", by.y="Sample.Name", all.x = TRUE)
+  cD <- merge(colData(fe.pitt),pitt.clean.strict, by.x  = "id", by.y="Sample.Name", all.x = TRUE, sort = FALSE)
   rownames(cD) <- cD$id
   colData(fe.pitt) <- cD
 
