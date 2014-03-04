@@ -8,13 +8,6 @@ par(bg="white")
 options(width=1000, continue="  ")
 @ 
 
-== Construct CNV Matrix ==
-
-Before any analysis begins we construct the CNV matrix.  This matrix
-is a matrix containing 0,1,2 for number of deletions at a CNV
-component.  Each row corresponds to a subject, and each column to a
-cnv component.
-
 <<package, echo = TRUE, eval = TRUE, cache = FALSE>>=
 system("R CMD INSTALL ~/jhsph/R/packages/CleftCNVAssoc") # Before installing CleftCNVAssoc be sure that the vignette data-cleaning has been run
 system("R CMD INSTALL ~/Trioconductor")
@@ -26,6 +19,13 @@ library("Trioconductor")
 //~~~~~~~~ Data Creation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+== Construct CNV Matrix ==
+
+Before any analysis begins we construct the CNV matrix.  This matrix
+is a matrix containing 0,1,2 for number of deletions at a CNV
+component.  Each row corresponds to a subject, and each column to a
+cnv component.
 
 <<makedata, echo = FALSE, eval = FALSE>>=
 source("~/jhsph/R/packages/CleftCNVAssoc/vignettes/curated/make-data.R")
@@ -133,21 +133,24 @@ load(file = "./../data/fe.RData")
 fe.beaty
 fe.pitt
 fe.beaty.pheno
-data("pedigrees", package="CleftCNVAssoc")
-data("penncnvjoint", package = "CleftCNVAssoc")
-load(file = "./../data/cnv.RData")
+#data("pedigrees", package="CleftCNVAssoc")
+#data("penncnvjoint", package = "CleftCNVAssoc")
+#load(file = "./../data/cnv.RData")
 #data("cnv", package = "Trioconductor")
 @ 
 
 <<FamilyExperiment, echo = TRUE, eval = TRUE, cache = FALSE>>=
   fe.beaty.parents <- fe.beaty[,colnames(fe.beaty)%in%parents(fe.beaty)]
   fe.pitt.parents <- fe.pitt[,colnames(fe.pitt)%in%parents(fe.pitt)]
-@ 
-<<freq-vec, echo = TRUE, eval = TRUE, cache = FALSE>>=
+@
+
+<<freq-vec, echo = FALSE, eval = FALSE, cache = FALSE>>=
     freq.beaty.vec <- colSums(cnv(fe.beaty.parents))/nrow(cnv(fe.beaty.parents))
     freq.pitt.vec <- colSums(cnv(fe.pitt.parents))/nrow(cnv(fe.pitt.parents))
-@ 
+@
+
 // The above must have been written before the MAF method was implemented.
+
 <<trioStates, eval = TRUE, echo = TRUE, cache = FALSE>>=
     trioAssay.beaty <- Trioconductor:::TrioAssay(fe.beaty, type = "cnv")
     trioStates.beaty <- with(trioAssay.beaty, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
@@ -155,12 +158,18 @@ load(file = "./../data/cnv.RData")
     trioAssay.pitt <- Trioconductor:::TrioAssay(fe.pitt, type = "cnv")
     trioStates.pitt <- with(trioAssay.pitt, matrix( paste0(F,M,O), nrow = nrow(O), ncol = ncol(O)))
     dimnames(trioStates.pitt) <- dimnames(trioAssay.pitt$O)
-@ 
+@
+
 <<table-list, eval = TRUE, echo = TRUE, cache = FALSE>>=
     table.list.beaty <- apply(trioStates.beaty, 2, "table")
     table.list.pitt <- apply(trioStates.pitt, 2, "table")
 @ 
-Compute a DataFrame containing counts of transmissions by case/control with rows for components.  This is partly what distinguishes a DataFrame from a data.frame --- the ability to keep a GRanges object in a column.
+
+Compute a DataFrame containing counts of transmissions by case/control
+with rows for components.  This is partly what distinguishes a
+DataFrame from a data.frame --- the ability to keep a GRanges object
+in a column.
+
 <<TU, eval = TRUE, echo = TRUE, cache = FALSE>>=
 TU.mat.beaty <- matrix(unlist(lapply(table.list.beaty, Trioconductor:::CountTU)), nrow = length(table.list.beaty), ncol = 2, byrow = TRUE )
 TU.mat.pitt <- matrix(unlist(lapply(table.list.pitt, Trioconductor:::CountTU)), nrow = length(table.list.pitt), ncol = 2, byrow = TRUE )
@@ -175,18 +184,23 @@ TU.mat.cmp <- TU.mat
 DF <- DataFrame(rowData(fe.beaty)[testable],TU.mat)
 colnames(DF) <- c("grange", colnames(TU.mat))
 @ 
+
 Now with that DataFrame we construct a histogram of overall transmission rate by component.
 <<hist, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
 hist(trans.vec <- rowSums(TU.mat[,c(1,3)])/rowSums(TU.mat), breaks = 20)
 @ 
+
 Histogram of transmission rate component-wise.  We see a clear bimodal distribution.
+
 <<fish, eval = TRUE, echo = TRUE, cache = FALSE>>=
 fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
 p.vec <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 (DF <- DataFrame(DF,p.vec, trans.vec))
 DF.cmp <- DF
 @ 
+
 Number of components and number of regions is given below.
+
 <<length1, echo = TRUE, eval = TRUE, cache = FALSE>>=
 c(length(DF$grange),length(reduce(DF$grange)))
 @ 
@@ -215,20 +229,24 @@ meta <- values(regions.gr)
 meta <- DataFrame(meta, p.min = p.min.DF$value, p.median = p.median.DF$value, trans.median = trans.median.DF$value, n.cmp = n.DF$value)
 values(regions.gr) <- meta
 @
+
 <<tophits, eval = TRUE, echo = TRUE, cache = FALSE>>=
 head(as(regions.gr[order(values(regions.gr)$p.min)],"data.frame"),25)
 @ 
+
 <<transvp, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
 layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
 with(as(values(regions.gr),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(n.cmp, trans.median, pch = 20))
 with(as(values(regions.gr),"data.frame"),plot(width(regions.gr)/1e3, n.cmp, pch = 20))
-@ 
+@
+
 <<chr16, eval = TRUE, echo = TRUE, cache = FALSE>>=
 (bad.region.gr <- regions.gr[which(values(regions.gr)$n.cmp >= 120)])
-@ 
-//The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
+@
+
+The outlier is on chromsome 16.  It is a region with \Sexpr{values(bad.region.gr)$n.cmp} components, and has width \Sexpr{width(bad.region.gr)/1e3} kB. chr16:\Sexpr{start(bad.region.gr)}-\Sexpr{end(bad.region.gr)}.  
 
 <<transvp2, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
 regions.gr <- regions.gr[-which(values(regions.gr)$n.cmp >= 120)]
@@ -297,7 +315,7 @@ First we see how many regions there are to begin with.
 reduce(rowData(fe.beaty))
 @
 
-<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
+<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
 trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
@@ -403,7 +421,7 @@ source("~/Trioconductor/R/reload.R")
 reload("Trioconductor")
 @
 
-<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
+<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
 trans.mat.clp <- c()
 gr.reduce <- reduce(rowData(fe.beaty))
 n.reg <- length(gr.reduce)
@@ -843,13 +861,13 @@ axis(2, at = at <- (length(o) - 0:(length(o)-1)), labels = paste0(seqnames(DF$gr
 #legend(x = 0.75, y = max(x)-2, legend = c("cleft","control","both"), col = c(rgb(1,0,0,alpha),rgb(0,0,1,alpha),rgb(1,0,1,1)), pch = c(15,15,15), cex = 0.8 )
 
 par(mai=c(1,0,0,0), bg = "white")
-plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,4), cex.lab = 0.5, cex.axis = 0.5 )
+plot(-log10(DF$p.vec[o]), y = length(o):1, pch = 20, col = "black", cex = 1.5, axes = FALSE, main = "", xlab = "-log10(p)", ylab = "", xlim = c(0,3), cex.lab = 0.5, cex.axis = 0.5 )
 lines(rep(-log10(0.05/sum(DF$dist.vec > 1e6)),2), c(1,length(o)), lty = 3)
 lines(rep(-log10(0.05),2), c(1,length(o)), lty = 3)
 axis(1)
 @
 
-<<cifigcleftnewpdf, cache = FALSE, echo = TRUE, results = hide>>=
+<<cifigcleftnewpdf, cache = FALSE, echo = TRUE>>=
 pdf(file = "./figures/cifigcleftnew.pdf", width = 6, height = 4)
 par(bg="white")
 
