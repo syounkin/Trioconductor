@@ -773,7 +773,7 @@ txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 <<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 7
 wd <- 100e3
-chr7.region <- DF$grange[8]
+chr7.region <- DF$grange[37]
 chr7.index <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 chr7.index2 <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
@@ -794,7 +794,7 @@ dev.off()
 
 <<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 8
-chr8.region <- DF$grange[9]
+chr8.region <- DF$grange[38]
 chr8.index <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 chr8.index2 <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
