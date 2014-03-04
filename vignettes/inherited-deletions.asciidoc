@@ -602,7 +602,10 @@ lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
 lines( rep(8,2), c(0,1), lty = 3 )
 @
-<<chr7ci, eval = TRUE, echo = TRUE, results = hide>>=
+
+Hard-coded values here!
+
+<<chr7ci, eval = TRUE, echo = TRUE>>=
 as(reduce(rowData(fe.beaty))[testable,],"data.frame")
 ci.mat.cleft[25,]
 ci.mat.con[25,]
@@ -770,6 +773,8 @@ library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 @
 
+Hard-coded values here!
+
 <<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 7
 wd <- 100e3
@@ -791,6 +796,8 @@ dev.off()
 @
 
 === Chromosome 8 ===
+
+Hard-coded values here!
 
 <<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 8
