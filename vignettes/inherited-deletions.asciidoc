@@ -607,31 +607,34 @@ Hard-coded values here!
 
 <<chr7ci, eval = TRUE, echo = TRUE>>=
 as(reduce(rowData(fe.beaty))[testable,],"data.frame")
-ci.mat.cleft[25,]
-ci.mat.con[25,]
-ci.mat.all[25,]
-ci.mat.cleft[26,]
-ci.mat.con[26,]
-ci.mat.all[26,]
-ci.mat.cleft[32,]
-ci.mat.con[32,]
-ci.mat.all[32,]
-which(o==25)
-which(o==26)
-which(o==32)
+ci.mat.cleft
+ci.mat.con
+ci.mat.all
+ci.mat.cleft[37,]                       # 25 -> 37
+ci.mat.con[37,]
+ci.mat.all[37,]
+ci.mat.cleft[38,]                       # 26 -> 38
+ci.mat.con[38,]
+ci.mat.all[38,]
+ci.mat.cleft[9,]                       # 32 -> 9
+ci.mat.con[9,]
+ci.mat.all[9,]
+which(o==37)
+which(o==38)
+which(o==9)
 @
 <<cifig1, fig = TRUE, width = 5, height = 5, echo = TRUE, eval = TRUE>>=
 eps <- 0.05
 plot(1,type = "n", xlim = c(0,1), ylim = c(0,1), xlab = "Transmission Rate", ylab = "", main = "95% Confidence Interval", axes = FALSE)
-lines(x = ci.mat.cleft[25,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
-lines(x = ci.mat.con[25,], y = rep(0.75,2), lwd = 2, col = "blue")
-lines(x = ci.mat.all[25,], y = rep(0.75+eps,2), lwd = 2, col = "green")
-lines(x = ci.mat.cleft[26,], y = rep(0.5-eps,2), lwd = 2, col = "orange")
-lines(x = ci.mat.con[26,], y = rep(0.5,2), lwd = 2, col = "blue")
-lines(x = ci.mat.all[26,], y = rep(0.5+eps,2), lwd = 2, col = "green")
-lines(x = ci.mat.cleft[32,], y = rep(0.25-eps,2), lwd = 2, col = "orange")
-lines(x = ci.mat.con[32,], y = rep(0.25,2), lwd = 2, col = "blue")
-lines(x = ci.mat.all[32,], y = rep(0.25+eps,2), lwd = 2, col = "green")
+lines(x = ci.mat.cleft[37,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
+lines(x = ci.mat.con[37,], y = rep(0.75,2), lwd = 2, col = "blue")
+lines(x = ci.mat.all[37,], y = rep(0.75+eps,2), lwd = 2, col = "green")
+lines(x = ci.mat.cleft[38,], y = rep(0.5-eps,2), lwd = 2, col = "orange")
+lines(x = ci.mat.con[38,], y = rep(0.5,2), lwd = 2, col = "blue")
+lines(x = ci.mat.all[38,], y = rep(0.5+eps,2), lwd = 2, col = "green")
+lines(x = ci.mat.cleft[9,], y = rep(0.25-eps,2), lwd = 2, col = "orange")
+lines(x = ci.mat.con[9,], y = rep(0.25,2), lwd = 2, col = "blue")
+lines(x = ci.mat.all[9,], y = rep(0.25+eps,2), lwd = 2, col = "green")
 lines(rep(0.5,2), c(0,1), lty = 3 )
 axis(1, at = at <- c(0.25, 0.5, 0.75), labels = at )
 text( x = 0.1, y = 0.75, labels = "Chr. 7 (34)" )
@@ -778,7 +781,7 @@ Hard-coded values here!
 <<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 7
 wd <- 100e3
-chr7.region <- DF$grange[37]
+chr7.region <- DF$grange[12]	## this use to be the magic number 37!!
 chr7.index <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 chr7.index2 <- subjectHits(findOverlaps(chr7.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
@@ -801,7 +804,7 @@ Hard-coded values here!
 
 <<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
 chr <- 8
-chr8.region <- DF$grange[38]
+chr8.region <- DF$grange[13] 	## this is used to be the magic number 38
 chr8.index <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 chr8.index2 <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
 gtrack <- GenomeAxisTrack()
@@ -938,7 +941,7 @@ text(x = -log10(0.05), y = length(o)+1, labels = "Nominal\n 0.05 significance", 
 
 === QQ Plot ===
 
-<<ingo, echo = TRUE, eval = TRUE>>=
+<<ingo, echo = FALSE, eval = TRUE>>=
 my.qq.func=function(p,f,pval=TRUE,gc=FALSE,tn,hc=0.99,hm=100,...){
   if(missing(f)) f=rep(0,length(p))
   wh=which(is.na(p)|is.na(f))
