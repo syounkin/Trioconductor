@@ -1148,7 +1148,7 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 
 === Permutation Test ===
 
-<<perm1, eval = TRUE>>=
+<<perm1, eval = FALSE>>=
 index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
 fe.beaty.2 <- fe.beaty[index.beaty,]
 
@@ -1159,6 +1159,11 @@ cD <- DataFrame(colData(fe.beaty.2)$id)
 colnames(cD) <- "id"
 colData(fe.beaty.2) <- cD
 colnames(fe.beaty.2) <- colnames(fe.beaty)
+
+cD <- DataFrame(colData(fe.pitt.2)$id)
+colnames(cD) <- "id"
+colData(fe.pitt.2) <- cD
+colnames(fe.pitt.2) <- colnames(fe.pitt)
 
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
