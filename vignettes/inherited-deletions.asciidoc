@@ -768,6 +768,11 @@ TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
 DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
 @
 
+<<write-data, eval = TRUE, echo = TRUE>>=
+write.table(as.data.frame(DF), file = "data-region")
+write.table(as.data.frame(DF.cmp), file = "data-component")
+@
+
 === Chromosome 7 ===
 
 <<gviz, echo = TRUE, eval = TRUE>>=
@@ -1143,7 +1148,7 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 
 === Permutation Test ===
 
-<<perm1, eval = FALSE>>=
+<<perm1, eval = TRUE>>=
 index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
 fe.beaty.2 <- fe.beaty[index.beaty,]
 
@@ -1158,8 +1163,8 @@ colnames(fe.beaty.2) <- colnames(fe.beaty)
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = FALSE, eval = FALSE>>=
-n.perm <- 1e3			## used to be 1e5
+<<perm2, cache = FALSE, eval = TRUE>>=
+n.perm <- 1e4			## used to be 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
 for( i in 1:n.perm ){
