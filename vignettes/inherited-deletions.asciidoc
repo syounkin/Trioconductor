@@ -1148,7 +1148,7 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 
 === Permutation Test ===
 
-<<perm1, eval = FALSE>>=
+<<perm1, eval = TRUE>>=
 index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
 fe.beaty.2 <- fe.beaty[index.beaty,]
 
@@ -1169,6 +1169,7 @@ fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbi
 @
 
 <<perm2, cache = FALSE, eval = TRUE>>=
+date()
 n.perm <- 1e4			## used to be 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
@@ -1196,14 +1197,19 @@ for( i in 1:n.perm ){
      fish.list <- apply(TU.mat,1,Trioconductor:::TU.fish)
      p.mat[i,] <- unlist( lapply( fish.list, function(obj) return(obj$p.value) ) )
 }
+date()
 @
 These are the adjusted component-wise p-values:
-<<pmin, eval = FALSE>>=
+
+Magic numbers here.
+
+<<pmin, eval = TRUE>>=
 p.min <- apply(p.mat,1,"min")
-c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+#c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
+c(chr7=ecdf(p.min)(0.00442),chr8=ecdf(p.min)(0.00938))
 @
 And the threshold for nominal p-values is:
-<<padj, eval = FALSE>>=
+<<padj, eval = TRUE>>=
 quantile(p.min,probs=0.05)
 @
 
