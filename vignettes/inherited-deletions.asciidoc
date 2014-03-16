@@ -1206,7 +1206,7 @@ Magic numbers here.
 <<pmin, eval = TRUE>>=
 p.min <- apply(p.mat,1,"min")
 #c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
-c(chr7=ecdf(p.min)(0.00442),chr8=ecdf(p.min)(0.00938))
+c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0023273))
 @
 And the threshold for nominal p-values is:
 <<padj, eval = TRUE>>=
