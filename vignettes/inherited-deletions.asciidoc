@@ -1170,7 +1170,7 @@ fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbi
 
 <<perm2, cache = FALSE, eval = TRUE>>=
 date()
-n.perm <- 1e4			## used to be 1e5
+n.perm <- 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
 set.seed(1)
 for( i in 1:n.perm ){
