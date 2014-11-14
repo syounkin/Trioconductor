@@ -315,7 +315,7 @@ First we see how many regions there are to begin with.
 reduce(rowData(fe.beaty))
 @
 
-<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
+<<trioStates2, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
 trans.mat <- c()
 n.reg <- length(reduce(rowData(fe.beaty)))
 system.time(
@@ -421,7 +421,7 @@ source("~/Trioconductor/R/reload.R")
 reload("Trioconductor")
 @
 
-<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = TRUE>>=
+<<trioStates3, eval = TRUE, echo = TRUE, results = verbatim, cache = FALSE>>=
 trans.mat.clp <- c()
 gr.reduce <- reduce(rowData(fe.beaty))
 n.reg <- length(gr.reduce)
@@ -793,13 +793,13 @@ gtrack <- GenomeAxisTrack()
 grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID", )
 dtrack <- DataTrack( range = DF.cmp$grange[chr7.index], data = t(TU.mat.cmp[chr7.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
 dtrack2 <- DataTrack( range = DF.cmp$grange[chr7.index2], data = -log10(DF.cmp$p.vec[chr7.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
-itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+plotTracks(list(dtrack2, dtrack,  grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
 <<chr7pdf, echo = TRUE, cache = FALSE, results = hide, eval = TRUE>>=
 pdf(file = "./figures/chr7.pdf")
-plotTracks(list(dtrack2, dtrack,  grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+plotTracks(list(dtrack2, dtrack,  grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
 @
 
@@ -816,13 +816,13 @@ gtrack <- GenomeAxisTrack()
 grtrack <- GeneRegionTrack(txdb, genome="hg18", chromosome=chr, name="Entrez Gene ID")
 dtrack <- DataTrack( range = DF.cmp$grange[chr8.index], data = t(TU.mat.cmp[chr8.index,]), groups = colnames(TU.mat.cmp), type = "S", cex = 1, name = "Count", ylim = c(0,200), legend = TRUE, col = c(rep("red",2),rep("blue",2)), lty = 1:2, lwd = 2 )
 dtrack2 <- DataTrack( range = DF.cmp$grange[chr8.index2], data = -log10(DF.cmp$p.vec[chr8.index2]), type = "S", ylim = c(0,5), name = "-log10(p)", lwd = 2 )
-itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
-plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+#itrack <- IdeogramTrack(genome = "hg18", chromosome = paste0("chr", chr), lty = 1, lwd = 1 )
+plotTracks(list(dtrack2, dtrack, grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
 <<chr8pdf, echo = TRUE, cache = FALSE, results = hide, eval = TRUE>>=
 pdf(file = "./figures/chr8.pdf")
-plotTracks(list(dtrack2, dtrack, grtrack, gtrack, itrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
+plotTracks(list(dtrack2, dtrack, grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
 @
 
@@ -1148,7 +1148,7 @@ pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 
 === Permutation Test ===
 
-<<perm1, eval = TRUE>>=
+<<perm1, eval = FALSE>>=
 index.beaty <- queryHits(findOverlaps(rowData(fe.beaty),DF.cmp$grange))
 fe.beaty.2 <- fe.beaty[index.beaty,]
 
@@ -1168,7 +1168,7 @@ colnames(fe.pitt.2) <- colnames(fe.pitt)
 fe.all <- FamilyExperiment( cbind(fe.beaty.2,fe.pitt.2), pedigree = PedClass(rbind(fe.beaty.2@pedigree,fe.pitt.2@pedigree)) )
 @
 
-<<perm2, cache = FALSE, eval = TRUE>>=
+<<perm2, cache = FALSE, eval = FALSE>>=
 date()
 n.perm <- 1e5
 p.mat <- matrix(numeric(n.perm*nrow(fe.all)), ncol = nrow(fe.all), nrow = n.perm )
@@ -1203,13 +1203,13 @@ These are the adjusted component-wise p-values:
 
 Magic numbers here.
 
-<<pmin, eval = TRUE>>=
+<<pmin, eval = FALSE>>=
 p.min <- apply(p.mat,1,"min")
 #c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0022040))
 c(chr7=ecdf(p.min)(0.0000983),chr8=ecdf(p.min)(0.0023273))
 @
 And the threshold for nominal p-values is:
-<<padj, eval = TRUE>>=
+<<padj, eval = FALSE>>=
 quantile(p.min,probs=0.05)
 @
 
@@ -1250,6 +1250,11 @@ index <- findOverlaps(rowData(fe.beaty), chr8.region)
 fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryHits(index)]))>=1]
 (ids.chr8 <- unique(colnames(fe.beaty.chr8.inherited)))
 (unique(substr(ids.chr8, start = 1, stop = 5)))
+@
+
+<<rds, eval = TRUE, echo = TRUE>>=
+saveRDS(DF, file = "./../data/DF.rds")
+saveRDS(DF.cmp, file = "./../data/DF.cmp.rds")
 @
 
 == Session Info ==
