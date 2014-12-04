@@ -54,6 +54,7 @@ homos.pitt <- with(values(gr.deletion.pitt),cn==0)
 gr.deletion.pitt.clean <- c( unlist(reduce(split(gr.deletion.pitt, values(gr.deletion.pitt)$id))), unlist(reduce(split(gr.deletion.pitt[homos.pitt], values(gr.deletion.pitt[homos.pitt])$id))))
 @ 
 
+
 Now with these GRanges objects we use the Trioconductor function CNVMatrix to construct the CNV matrices.
 
 <<cnvmatrix, echo = FALSE, eval = FALSE, cache = FALSE>>=
@@ -177,7 +178,8 @@ TU.mat <- cbind(TU.mat.beaty, TU.mat.pitt)
 colnames(TU.mat) <- c("T.case","U.case","T.con","U.con")
 rownames(TU.mat) <- names(table.list.beaty)
 gr.cmp <- rowData(fe.beaty)
-testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+#testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+testable <- which(   (rowSums(TU.mat[,1:2])>=0) & (rowSums(TU.mat[,3:4])>=0) )
 length(testable)
 TU.mat <- TU.mat[testable,]
 TU.mat.cmp <- TU.mat
@@ -279,12 +281,12 @@ regions.gr.clean <- regions.gr[which(values(regions.gr)$trans.median >= thresh)]
 DF.clean <- DF[queryHits(findOverlaps(DF$grange, regions.gr.clean)),]
 
 @ 
-<<qqplot-clean, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<qqplot-clean, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 n <- nrow(DF.clean)
 plot( -log10((1:n)/n), -log10(DF.clean$p.vec[order(DF.clean$p.vec)]), xlim = xlim <- c(0,5), ylim = xlim)
 lines( c(0,xlim[2]), c(0,xlim[2]), lty = 3 )
 @ 
-<<cumsum2, fig = TRUE, width = 8, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<cumsum2, fig = TRUE, width = 8, eval = FALSE, echo = TRUE, cache = FALSE>>=
 index.vec <- subjectHits(findOverlaps(DF.clean$grange,regions.gr.clean))
 DF.clean.list <- split(DF.clean, index.vec)
 
@@ -296,10 +298,10 @@ lines( c(1,(chrstart+chrlength)[22]), rep(-log10(0.05/n),2), lty = 3)
 axis(1, chrstart, label = paste0("chr",1:length(chrstart)))
 axis(2)
 @ 
-<<phist, fig = TRUE,  eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<phist, fig = TRUE,  eval = FALSE, echo = TRUE, cache = FALSE>>=
 with(as(values(regions.gr.clean),"data.frame"),hist(p.min, breaks = 10))
 @ 
-<<transvp3, fig = TRUE, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<transvp3, fig = TRUE, eval = FALSE, echo = TRUE, cache = FALSE>>=
 layout(mat=matrix(1:4, nrow = 2, ncol = 2 ))
 with(as(values(regions.gr.clean),"data.frame"),plot(trans.median, -log10(p.min), pch = 20))
 with(as(values(regions.gr.clean),"data.frame"),plot(n.cmp, -log10(p.min), pch = 20))
@@ -520,7 +522,8 @@ transrate.all <- rowSums(trans.mat[,c("trans.cleft","trans.con")])/rowSums(trans
 Here we filter out any rare deletions by requiring at least 25 observeable transmissins in the cleft group and the control group.
 <<testable, cache = FALSE, results = verbatim, eval = TRUE>>=
 TU.mat <- trans.mat
-testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+#testable <- which(   (rowSums(TU.mat[,1:2])>=25) & (rowSums(TU.mat[,3:4])>=25) )
+testable <- which(   (rowSums(TU.mat[,1:2])>=0) & (rowSums(TU.mat[,3:4])>=0) ) # Inserted post-analysis so rscharpf could have unfiltered list of regions
 TU.mat <- TU.mat[testable,]
 trans.mat.clp <- trans.mat.clp[testable,]
 @
@@ -530,12 +533,18 @@ colnames(TU.mat) <- c("T.case", "U.case", "T.con", "U.con", "trans.cleft.ma", "u
 DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat, trans.mat.clp)
 colnames(DF) <- c("grange", colnames(TU.mat), colnames(trans.mat.clp))
 @
+
+<<rds, eval = TRUE, echo = TRUE>>=
+saveRDS(DF, file = "./../data/DF.rds")
+saveRDS(DF.cmp, file = "./../data/DF.cmp.rds")
+@
+
 First we display the function that performs Fishers exact test.
-<<TUfish, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<TUfish, eval = FALSE, echo = TRUE, cache = FALSE>>=
 Trioconductor:::TU.fish
 @
 Then we apply it to each region after filtering out regions that did not have enough observations.
-<<fish2, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<fish2, eval = FALSE, echo = TRUE, cache = FALSE>>=
 TU.mat.test <- TU.mat[,1:4]
 colnames(TU.mat.test) <- c("T.case", "U.case", "T.con", "U.con")
 fish.list <- apply(TU.mat.test,1,Trioconductor:::TU.fish)
@@ -544,7 +553,7 @@ DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transra
 head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
 @
 There are \Sexpr{nrow(DF)} regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
-<<headtrans, eval = TRUE, echo = TRUE, cache = FALSE>>=
+<<headtrans, eval = FALSE, echo = TRUE, cache = FALSE>>=
 head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
 @ 
 
@@ -552,12 +561,12 @@ Note that a region on chromosome six appears twice in the top six by p-value.  H
 
 === Figures ===
 
-<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE, echo = TRUE, results = hide >>=
+<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = FALSE, echo = TRUE, results = hide >>=
 par(bg="white")
 hist(DF$transrate.con.testable., col = "gray", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
 @
 
-<<cifigcleft, fig = TRUE, cache = FALSE, echo = TRUE, eval = TRUE>>=
+<<cifigcleft, fig = TRUE, cache = FALSE, echo = TRUE, eval = FALSE>>=
 htest.list.cleft <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.cleft[[i]] <- binom.test(TU.mat[i,"T.case"],sum(TU.mat[i,c("T.case","U.case")]))
@@ -572,7 +581,7 @@ lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
 lines( rep(8,2), c(0,1), lty = 3 )
 @
-<<cifigcon, fig = TRUE, cache = FALSE, echo = TRUE, eval = TRUE>>=
+<<cifigcon, fig = TRUE, cache = FALSE, echo = TRUE, eval = FALSE>>=
 htest.list.con <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.con[[i]] <- binom.test(TU.mat[i,"T.con"],sum(TU.mat[i,c("T.con","U.con")]))
@@ -587,7 +596,7 @@ lines( rep(28,2), c(0,1), lty = 3 )
 lines( rep(34,2), c(0,1), lty = 3 )
 lines( rep(8,2), c(0,1), lty = 3 )
 @
-<<cifigall, fig = TRUE, cache = FALSE, echo = TRUE, eval = TRUE>>=
+<<cifigall, fig = TRUE, cache = FALSE, echo = TRUE, eval = FALSE>>=
 htest.list.all <- list(NA, length = nrow(TU.mat))
 for( i in 1:nrow(TU.mat) ){
      htest.list.all[[i]] <- binom.test(sum(TU.mat[i,c("T.case","T.con")]), sum(TU.mat[i,c("T.case","U.case","T.con","U.con")]))
@@ -605,7 +614,7 @@ lines( rep(8,2), c(0,1), lty = 3 )
 
 Hard-coded values here!
 
-<<chr7ci, eval = TRUE, echo = TRUE>>=
+<<chr7ci, eval = FALSE, echo = TRUE>>=
 as(reduce(rowData(fe.beaty))[testable,],"data.frame")
 ci.mat.cleft
 ci.mat.con
@@ -623,7 +632,7 @@ which(o==37)
 which(o==38)
 which(o==9)
 @
-<<cifig1, fig = TRUE, width = 5, height = 5, echo = TRUE, eval = TRUE>>=
+<<cifig1, fig = TRUE, width = 5, height = 5, echo = TRUE, eval = FALSE>>=
 eps <- 0.05
 plot(1,type = "n", xlim = c(0,1), ylim = c(0,1), xlab = "Transmission Rate", ylab = "", main = "95% Confidence Interval", axes = FALSE)
 lines(x = ci.mat.cleft[37,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
@@ -690,7 +699,7 @@ image:figures/HLA.jpg[link="https://en.wikipedia.org/wiki/Human_leukocyte_antige
 
 We choose to remove these due to the unusually high amount of known variability in this region.  We believe the noisy control data, coupled with the highly variable HLA region results in deflated transmission rates in the controls, and therefore testing against the controls will result in false positive detection.
 
-<<filterhla, eval = TRUE>>=
+<<filterhla, eval = FALSE>>=
 hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788048))
 @
 
@@ -698,7 +707,7 @@ hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788
 
 We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
 
-<<filter, eval = TRUE>>=
+<<filter, eval = FALSE>>=
 load(file = "./../data/centromere.RData")
 #data("centromere")
 lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
@@ -713,19 +722,19 @@ as.data.frame(DF)
 
 The filter accounts for \Sexpr{round(sum(width(filter.gr))/1e6,0)} MB made up of \Sexpr{length(filter.gr)} distinct regions.
 
-<<filtercmp, echo = TRUE, eval = TRUE>>=
+<<filtercmp, echo = TRUE, eval = FALSE>>=
 dist.vec.cmp <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
 DF.cmp <- DataFrame(DF.cmp, dist.vec.cmp)
 @
 
 
-<<disthist, fig = TRUE, echo = TRUE, height = 4, width = 4, eval = TRUE>>=
+<<disthist, fig = TRUE, echo = TRUE, height = 4, width = 4, eval = FALSE>>=
 plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
 axis(2)
 lines(c(1,length(dist.vec)), rep(1,2), lty = 3 )
 @
 
-<<disthistpdf, echo = TRUE, results = hide, eval = TRUE>>=
+<<disthistpdf, echo = TRUE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/disthist.pdf")
 par(bg="white")
 plot(dist.vec[order(dist.vec)]/1e6, type = "b", pch = 20, xlab = "Region", ylab = "Distance to Filtered Region (MB)", main = "", axes = FALSE)
@@ -736,16 +745,16 @@ dev.off()
 
 In the figure above a horizontal line is drawn at 1 MB.  \Sexpr{sum(dist.vec <= 1e6 )} regions are within 1 MB of a bad region, which is \Sexpr{round(sum(dist.vec <= 1e6 )/length(dist.vec)*100,0)}% of all regions! Note that \Sexpr{sum(dist.vec == 0 )} regions overlap a bad region.  In the figure below points in red are within 1 MB of a bad region.
 
-<<disttrans, fig = TRUE, width = 12, height = 6, echo = TRUE, eval = TRUE>>=
+<<disttrans, fig = TRUE, width = 12, height = 6, echo = TRUE, eval = FALSE>>=
 plot(DF$dist.vec, DF$transrate.con.testable., pch = 20, col = ifelse(DF$dist.vec<=1e6,"red","black"))
 lines(c(0,max(DF$dist.vec)), rep(1/2,2), lty = 3 )
 @
 
-<<filterout, fig = TRUE, height = 6, width = 6, echo = TRUE, eval = TRUE>>=
+<<filterout, fig = TRUE, height = 6, width = 6, echo = TRUE, eval = FALSE>>=
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
 @
 
-<<filteroutpdf, echo = TRUE, results = hide, eval = TRUE>>=
+<<filteroutpdf, echo = TRUE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/filterout.pdf")
 par(bg="white")
 boxplot(list( DF[DF$dist.vec>=1e6,"transrate.con.testable."], DF[DF$dist.vec<1e6,"transrate.con.testable."]), names = c("> 1MB", "< 1MB"), ylab = "Transmission Rate (Controls)" )
@@ -754,7 +763,7 @@ dev.off()
 
 ==== Region-wise ====
 
-<<filteregion, eval = TRUE>>=
+<<filteregion, eval = FALSE>>=
 TU.mat <- TU.mat[DF$dist.vec > 1e6,]
 ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
 ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
@@ -763,19 +772,19 @@ DF <- DF[DF$dist.vec > 1e6,]
 
 ==== Component-wise ====
 
-<<filtercomp, eval = TRUE>>=
+<<filtercomp, eval = FALSE>>=
 TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
 DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
 @
 
-<<write-data, eval = TRUE, echo = TRUE>>=
+<<write-data, eval = FALSE, echo = TRUE>>=
 write.table(as.data.frame(DF), file = "data-region")
 write.table(as.data.frame(DF.cmp), file = "data-component")
 @
 
 === Chromosome 7 ===
 
-<<gviz, echo = TRUE, eval = TRUE>>=
+<<gviz, echo = TRUE, eval = FALSE>>=
 library("Gviz")
 library("TxDb.Hsapiens.UCSC.hg18.knownGene")
 txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
@@ -783,7 +792,7 @@ txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene
 
 Hard-coded values here!
 
-<<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
+<<chr7, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
 chr <- 7
 wd <- 100e3
 chr7.region <- DF$grange[12]	## this use to be the magic number 37!!
@@ -797,7 +806,7 @@ dtrack2 <- DataTrack( range = DF.cmp$grange[chr7.index2], data = -log10(DF.cmp$p
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr7pdf, echo = TRUE, cache = FALSE, results = hide, eval = TRUE>>=
+<<chr7pdf, echo = TRUE, cache = FALSE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/chr7.pdf")
 plotTracks(list(dtrack2, dtrack,  grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr7.region)-wd, to = end(chr7.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -807,7 +816,7 @@ dev.off()
 
 Hard-coded values here!
 
-<<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = TRUE>>=
+<<chr8, fig = TRUE, echo = TRUE, cache = FALSE, width = 12, height = 6, eval = FALSE>>=
 chr <- 8
 chr8.region <- DF$grange[13] 	## this is used to be the magic number 38
 chr8.index <- subjectHits(findOverlaps(chr8.region,DF.cmp$grange))
@@ -820,7 +829,7 @@ dtrack2 <- DataTrack( range = DF.cmp$grange[chr8.index2], data = -log10(DF.cmp$p
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 @
 
-<<chr8pdf, echo = TRUE, cache = FALSE, results = hide, eval = TRUE>>=
+<<chr8pdf, echo = TRUE, cache = FALSE, results = hide, eval = FALSE>>=
 pdf(file = "./figures/chr8.pdf")
 plotTracks(list(dtrack2, dtrack, grtrack, gtrack ),  background.panel = "#FFFEDB", background.title = "darkblue", from = start(chr8.region)-wd, to = end(chr8.region)+wd, collapseTranscripts = TRUE, geneSymbols = FALSE, showId = TRUE, fill = "darkgreen" )
 dev.off()
@@ -828,7 +837,7 @@ dev.off()
 
 === Figure 1 ===
 
-<<cifigcleftnew, fig = TRUE, cache = FALSE, echo = TRUE, results = hide, height = 8, width = 10, eval = TRUE>>=
+<<cifigcleftnew, fig = TRUE, cache = FALSE, echo = TRUE, results = hide, height = 8, width = 10, eval = FALSE>>=
 
 layout(matrix(1:2,nrow=1,ncol=2))
 par(mai=c(1,2.5,0,0), bg = "white")
@@ -946,7 +955,7 @@ text(x = -log10(0.05), y = length(o)+1, labels = "Nominal\n 0.05 significance", 
 
 === QQ Plot ===
 
-<<ingo, echo = FALSE, eval = TRUE>>=
+<<ingo, echo = FALSE, eval = FALSE>>=
 my.qq.func=function(p,f,pval=TRUE,gc=FALSE,tn,hc=0.99,hm=100,...){
   if(missing(f)) f=rep(0,length(p))
   wh=which(is.na(p)|is.na(f))
@@ -1039,20 +1048,20 @@ my.qq.plot=function(zz,cut,rmx=0,mt="",mt.cex=1,mt.line=NA,mgp=c(3,1,0),tn.cex=1
 
 @
 
-<<qqregion, fig = TRUE, width = 6, height = 6, eval = TRUE, echo = TRUE>>=
+<<qqregion, fig = TRUE, width = 6, height = 6, eval = FALSE, echo = TRUE>>=
 o <- order(-log10(DF$p.vec), decreasing = TRUE)
 plot( -log10((1:length(DF$p.vec))/length(DF$p.vec)), -log10(DF$p.vec)[o], xlim = xlim <- c(0,max(-log10(DF$p.vec))), ylim = xlim, xlab = "Expected -log10p", ylab = "Observed -log10p", main = "")
 lines( x = c(0,4), y = c(0,4), lty = 3)
 @
 
-<<qqPlotregion, fig = TRUE, width = 6, height = 6, eval = TRUE>>=
+<<qqPlotregion, fig = TRUE, width = 6, height = 6, eval = FALSE>>=
 library("snpStats")
 par(bg="white")
 qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
 
 @
 
-<<qqPlotregionpdf, eval = TRUE>>=
+<<qqPlotregionpdf, eval = FALSE>>=
 pdf(file="figures/qqplotregion.pdf")
 par(bg="white")
 qq.chisq(-2*log(DF$p.vec), df = 2, pch = 20 )
@@ -1061,18 +1070,18 @@ dev.off()
 
 There are \Sexpr{length(DF$p.vec)} tests in this figure.
 
-<<showregion, eval = TRUE>>=
+<<showregion, eval = FALSE>>=
 o <- order(DF$p.vec)
 as.data.frame(DF[o,])
 @
 
-<<qqPlotcmp, fig = TRUE, width = 6, height = 6, eval = TRUE>>=
+<<qqPlotcmp, fig = TRUE, width = 6, height = 6, eval = FALSE>>=
 par(bg="white")
 qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
 
 @
 
-<<qqPlotcmppdf,eval = TRUE>>=
+<<qqPlotcmppdf,eval = FALSE>>=
 pdf(file="figures/qqplotcmp.pdf")
 par(bg="white")
 qq.chisq(-2*log(DF.cmp$p.vec), df = 2, pch = 20 )
@@ -1081,13 +1090,13 @@ dev.off()
 
 There are \Sexpr{length(DF.cmp$p.vec)} tests in this figure.
 
-<<showcmp, eval = TRUE>>=
+<<showcmp, eval = FALSE>>=
 o <- order(DF.cmp$p.vec)
 as.data.frame(DF.cmp[o,])
 @
 
 
-<<ingoplotreg, echo = TRUE, results = hide, eval = TRUE>>=
+<<ingoplotreg, echo = TRUE, results = hide, eval = FALSE>>=
 zz <- my.qq.func(DF$p.vec,tn=0:4,hc=0.9,hm=1)
 
 pdf("figures/ingo.qq.reg.pdf",width=6,height=6)
@@ -1108,7 +1117,7 @@ mtext(expression(paste("observed  ",-log[10]," (p-value)",sep="")),side=2,line=2
 dev.off()
 @
 
-<<ingoplotcmp, echo = TRUE, results = hide, eval = TRUE>>=
+<<ingoplotcmp, echo = TRUE, results = hide, eval = FALSE>>=
 zz <- my.qq.func(DF.cmp$p.vec,tn=0:4,hc=0.9,hm=1)
 
 pdf("figures/ingo.qq.cmp.pdf",width=6,height=6)
@@ -1134,14 +1143,14 @@ dev.off()
 
 ===== Component-wise =====
 
-<<fishersmethod, eval = TRUE>>=
+<<fishersmethod, eval = FALSE>>=
 (fishers.p.cmp <- sum(-2*log(DF.cmp$p.vec)))
 pchisq(fishers.p.cmp, df = 2*length(DF.cmp$p.vec), lower.tail = FALSE)
 @
 
 ===== Region-wise. =====
 
-<<fishersmethod, eval = TRUE>>=
+<<fishersmethod, eval = FALSE>>=
 (fishers.p <- sum(-2*log(DF$p.vec)))
 pchisq(fishers.p, df = 2*length(DF$p.vec), lower.tail = FALSE)
 @
@@ -1252,13 +1261,13 @@ fe.beaty.chr8.inherited <- fe.beaty[queryHits(index),rowSums(cnv(fe.beaty[queryH
 (unique(substr(ids.chr8, start = 1, stop = 5)))
 @
 
-<<rds, eval = TRUE, echo = TRUE>>=
+<<rds, eval = FALSE, echo = TRUE>>=
 saveRDS(DF, file = "./../data/DF.rds")
 saveRDS(DF.cmp, file = "./../data/DF.cmp.rds")
 @
 
 == Session Info ==
-<<session, echo = TRUE, eval = TRUE, cache = FALSE>>=
+<<session, echo = TRUE, eval = FALSE, cache = FALSE>>=
 date()
 sessionInfo()
 @
