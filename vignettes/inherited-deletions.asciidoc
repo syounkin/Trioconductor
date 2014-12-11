@@ -534,17 +534,13 @@ DF <- DataFrame(reduce(rowData(fe.beaty))[testable],TU.mat, trans.mat.clp)
 colnames(DF) <- c("grange", colnames(TU.mat), colnames(trans.mat.clp))
 @
 
-<<rds, eval = TRUE, echo = TRUE>>=
-saveRDS(DF, file = "./../data/DF.rds")
-saveRDS(DF.cmp, file = "./../data/DF.cmp.rds")
-@
 
 First we display the function that performs Fishers exact test.
-<<TUfish, eval = FALSE, echo = TRUE, cache = FALSE>>=
+<<TUfish, eval = TRUE, echo = TRUE, cache = FALSE>>=
 Trioconductor:::TU.fish
 @
 Then we apply it to each region after filtering out regions that did not have enough observations.
-<<fish2, eval = FALSE, echo = TRUE, cache = FALSE>>=
+<<fish2, eval = TRUE, echo = TRUE, cache = FALSE>>=
 TU.mat.test <- TU.mat[,1:4]
 colnames(TU.mat.test) <- c("T.case", "U.case", "T.con", "U.con")
 fish.list <- apply(TU.mat.test,1,Trioconductor:::TU.fish)
@@ -553,7 +549,7 @@ DF <- DataFrame(DF,p.vec,transrate.all[testable],transrate.con[testable],transra
 head(as(DF[with(as(DF,"data.frame"),order(p.vec)),],"data.frame"))
 @
 There are \Sexpr{nrow(DF)} regions that were tested.  Here we see the first six ordered by p-value and later ordered by transmission rate.
-<<headtrans, eval = FALSE, echo = TRUE, cache = FALSE>>=
+<<headtrans, eval = TRUE, echo = TRUE, cache = FALSE>>=
 head(as(DF[with(as(DF,"data.frame"),order(transrate.con.testable.)),],"data.frame"))
 @ 
 
@@ -561,7 +557,7 @@ Note that a region on chromosome six appears twice in the top six by p-value.  H
 
 === Figures ===
 
-<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = FALSE, echo = TRUE, results = hide >>=
+<<transhist, fig = TRUE, cache = FALSE,  height=6, width = 6, eval = TRUE, echo = TRUE, results = hide >>=
 par(bg="white")
 hist(DF$transrate.con.testable., col = "gray", xlab = "Regional Transmission Rate", ylab = "", main = "", xlim = c(0,1) )
 @
@@ -614,7 +610,7 @@ lines( rep(8,2), c(0,1), lty = 3 )
 
 Hard-coded values here!
 
-<<chr7ci, eval = FALSE, echo = TRUE>>=
+<<chr7ci, eval = FALSE, echo = FALSE>>=
 as(reduce(rowData(fe.beaty))[testable,],"data.frame")
 ci.mat.cleft
 ci.mat.con
@@ -632,7 +628,7 @@ which(o==37)
 which(o==38)
 which(o==9)
 @
-<<cifig1, fig = TRUE, width = 5, height = 5, echo = TRUE, eval = FALSE>>=
+<<cifig1, fig = TRUE, width = 5, height = 5, echo = FALSE, eval = FALSE>>=
 eps <- 0.05
 plot(1,type = "n", xlim = c(0,1), ylim = c(0,1), xlab = "Transmission Rate", ylab = "", main = "95% Confidence Interval", axes = FALSE)
 lines(x = ci.mat.cleft[37,], y = rep(0.75-eps,2), lwd = 2, col = "orange")
@@ -699,7 +695,7 @@ image:figures/HLA.jpg[link="https://en.wikipedia.org/wiki/Human_leukocyte_antige
 
 We choose to remove these due to the unusually high amount of known variability in this region.  We believe the noisy control data, coupled with the highly variable HLA region results in deflated transmission rates in the controls, and therefore testing against the controls will result in false positive detection.
 
-<<filterhla, eval = FALSE>>=
+<<filterhla, eval = TRUE>>=
 hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788048))
 @
 
@@ -707,7 +703,7 @@ hla.gr <- GRanges(seqname="chr6", range = IRanges(start = 29940311, end =  32788
 
 We also include UCSC centromere/telomere locations and R. Scharpfs list of regions of low-mapability in the filter.
 
-<<filter, eval = FALSE>>=
+<<filter, eval = TRUE>>=
 load(file = "./../data/centromere.RData")
 #data("centromere")
 lowmap.gr <- readRDS(file = "./../inst/low_mappability.rds")
@@ -722,7 +718,7 @@ as.data.frame(DF)
 
 The filter accounts for \Sexpr{round(sum(width(filter.gr))/1e6,0)} MB made up of \Sexpr{length(filter.gr)} distinct regions.
 
-<<filtercmp, echo = TRUE, eval = FALSE>>=
+<<filtercmp, echo = TRUE, eval = TRUE>>=
 dist.vec.cmp <- as.data.frame(distanceToNearest(DF.cmp$grange,filter.gr))$distance
 DF.cmp <- DataFrame(DF.cmp, dist.vec.cmp)
 @
@@ -763,18 +759,23 @@ dev.off()
 
 ==== Region-wise ====
 
-<<filteregion, eval = FALSE>>=
-TU.mat <- TU.mat[DF$dist.vec > 1e6,]
-ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
-ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
+<<filteregion, eval = TRUE>>=
+#TU.mat <- TU.mat[DF$dist.vec > 1e6,]
+#ci.mat.cleft <- ci.mat.cleft[DF$dist.vec > 1e6,]
+#ci.mat.con <- ci.mat.con[DF$dist.vec > 1e6,]
 DF <- DF[DF$dist.vec > 1e6,]
 @
 
 ==== Component-wise ====
 
-<<filtercomp, eval = FALSE>>=
-TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
+<<filtercomp, eval = TRUE>>=
+#TU.mat.cmp <- TU.mat.cmp[DF.cmp$dist.vec > 1e6,]
 DF.cmp <- DF.cmp[DF.cmp$dist.vec > 1e6,]
+@
+
+<<rds, eval = TRUE, echo = TRUE>>=
+saveRDS(DF, file = "./../data/DF.rds")
+saveRDS(DF.cmp, file = "./../data/DF.cmp.rds")
 @
 
 <<write-data, eval = FALSE, echo = TRUE>>=
